@@ -1,2 +1,2 @@
 const Dic = {"A": 1}
-console.log(Object.keys(Dic)[0])
+console.log(Dic.toString())

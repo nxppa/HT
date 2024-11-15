@@ -97,6 +97,14 @@ function inferTransactionType(amount) {
     return 'no change'
   }
 }
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error);
+  SendToAll("Error: ", error.toString())
+  process.exit(1);
+});
+
+
 function GetTime(raw) {
   const now = new Date()
   let time = raw ? `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()},${now.getMilliseconds()}` : `[${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}]`;
@@ -704,7 +712,6 @@ app.post("*", async (req, res) => {
 });
 
 app.get("*", async (req, res) => {
-  SendToAll("Hello get")
   res.send("Hello get");
 });
 
