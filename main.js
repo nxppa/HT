@@ -104,13 +104,29 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-
 function GetTime(raw) {
-  const now = new Date()
-  let time = raw ? `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()},${now.getMilliseconds()}` : `[${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}]`;
+  const now = new Date();
 
-  return time
+  // Use Intl.DateTimeFormat to format time in Sydney with milliseconds
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    fractionalSecondDigits: 3, // Includes milliseconds
+    hour12: false,
+    timeZone: 'Australia/Sydney', // Specifies Sydney timezone
+  });
+
+  // Format the time string
+  const timeString = formatter.format(now);
+
+  // Add brackets if 'raw' is false
+  const time = raw ? timeString : `[${timeString}]`;
+
+  return time;
 }
+
+
 //-------My Wallet Logs ------\\
 let MyWalletAnalysis = {}
 connection.onLogs(MyWalletPubKey, async (logs, ctx) => {
