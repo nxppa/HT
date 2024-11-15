@@ -709,6 +709,7 @@ app.get("*", async (req, res) => {
 });
 
 const server = app.listen(PORT, '174.138.92.212', function (err) {
+  SendToAll("Starting")
   if (err) console.log(err);
   console.log("Server listening on PORT", PORT);
 });
