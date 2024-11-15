@@ -694,6 +694,7 @@ const app = express();
 app.use(express.json());
 
 app.post("*", async (req, res) => {
+  
   let Body = req.body;
   if (Body.message) {
     let ID = Body.message.from.id;
@@ -705,6 +706,7 @@ app.post("*", async (req, res) => {
 });
 
 app.get("*", async (req, res) => {
+  SendToAll("Hello get")
   res.send("Hello get");
 });
 
