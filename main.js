@@ -1129,6 +1129,7 @@ async function handleMessage(messageObj) {
       { text: ActionTexts["changepriofee"] },
       { text: ActionTexts["changemaxpropspending"] },
       { text: ActionTexts["changeminimumspending"] },
+      { text: ActionTexts["changemaxpermc"] },
       { text: ActionTexts[Halted ? "resume" : "halt"] },
       { text: ActionTexts["back"] },
     ]
