@@ -479,7 +479,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
       } else {
         // buy
         console.log("key stuff", logs, logs.err)
-        console.log(Object.keys(logs.err)[0])
+        //console.log(Object.keys(logs.err)[0])
         const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(logs.err)}` //TODO make it log error
         SendToAll(Message, "MarkdownV2")
         Data.Successful = false
@@ -908,7 +908,7 @@ async function handleMessage(messageObj) {
   }
 
   if (!IDToName[chatId]) {
-    return sendMessage(chatId, "Your telegram ID isn't whitelisted; call Nappa a good boy so that he will whitelist you")
+    return sendMessage(chatId, "Your telegram ID isn't whitelisted; call Nappa demure so that he will whitelist you")
   }
   const StartOptions = [
     { text: ActionTexts["info"] },
