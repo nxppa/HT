@@ -15,7 +15,6 @@ const SigCheckBaseAddress = "https://solscan.io/tx/"
 
 
 const SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112'; // SOL
-const express = require('express');
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
 const { rateLimitedGetParsedTokenAccountsByOwner } = require('./rateLimitedFunctions.js'); // Import the rate-limited function
 const MyWalletPubKey = new PublicKey(MyWallet)
@@ -689,31 +688,32 @@ main()
 
 
 const PORT = process.env.PORT || 4040;
+const express = require('express');
 
 const app = express();
 app.use(express.json());
 
 app.post("*", async (req, res) => {
-  let Body = req.body
+  let Body = req.body;
   if (Body.message) {
-    let ID = Body.message.from.id
-    let Text = Body.message.text
-    console.log(Text, ID)
-    handleMessage(Body.message)
+    let ID = Body.message.from.id;
+    let Text = Body.message.text;
+    console.log(Text, ID);
+    handleMessage(Body.message);
     res.send("Hello post");
   }
-
 });
 
 app.get("*", async (req, res) => {
   res.send("Hello get");
 });
 
-const server = app.listen(PORT, function (err) {
+const server = app.listen(PORT, '0.0.0.0', function (err) {
   if (err) console.log(err);
   console.log("Server listening on PORT", PORT);
 });
 //server.keepAliveTimeout = 61*1000
+
 
 const BASE_URL = `https://api.telegram.org/bot${MY_TOKEN}/`;
 function getAxiosInstance() {
