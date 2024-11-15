@@ -1,0 +1,44 @@
+const {Draw} = require("../db/Analysis/DrawStats")
+
+
+const analysis = Draw(
+    800,
+    600,
+    [150, 200],
+    ['Poops today', 'poops tomorrow'],
+    ['#4d310e', '#301809'],
+    
+)
+
+console.log(analysis.path)
+
+
+
+const fetch = require('node-fetch');
+const fs = require('fs');
+const FormData = require('form-data');
+
+const botToken = '7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE';
+
+async function sendFile(filePath, fileType, Person) {
+    const url = `https://api.telegram.org/bot${botToken}/send${fileType.charAt(0).toUpperCase() + fileType.slice(1)}`;
+
+    const form = new FormData();
+    form.append('chat_id', Person.toString());
+    form.append(fileType, fs.createReadStream(filePath));
+
+    try {
+        const response = await fetch(url, { method: 'POST', body: form });
+        const result = await response.json();
+        if (result.ok) {
+            console.log('File sent successfully');
+        } else {
+            console.error('Error sending file:', result.description);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Use 'photo' for images, 'document' for files like PDFs, 'audio' for audio files, etc.
+sendFile(analysis.path, 'photo', 6050162852); // Change 'photo' to appropriate file type if needed

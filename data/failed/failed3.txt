@@ -1,0 +1,31 @@
+Swap route received: {
+  code: 0,
+  msg: 'success',
+  data: {
+    quote: {
+      inputMint: 'So11111111111111111111111111111111111111112',
+      inAmount: '1243754',
+      outputMint: 'CZRjWZmZqovS3aCxezPTM1BraGwYTNo22ixf4uxnpump',
+      outAmount: '6906278893',
+      otherAmountThreshold: '6906278893',
+      inDecimals: 9,
+      outDecimals: 6,
+      swapMode: 'ExactIn',
+      slippageBps: '0',
+      platformFee: '12438',
+      priceImpactPct: '0',
+      routePlan: [Array],
+      timeTaken: 0.047
+    },
+    raw_tx: {
+      swapTransaction: 'AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAHFVmGQ5RSBFZXHKBRHhIJKK1CIkd7uh6ZnY6UCpTP8nz1nTscwT9oGbomUHB4LG5ygroQeWxPewd2j07f3FqZ1g6XDq73KcdcgK4ThFVcFtI0U7On+PC+B/Z2eyttC/UOCz6Jlo0YUbsenUmTlrsdm7Y8aB5wE+M5DoN0dv9PctExrVcTEk9KoyajmWm6CNyWmMbAjS4XtS1l0J6NvI4yyZx5/f3z/y6DYV6qShd68DAYic45gTgcm5TTuPJ8CAeYLN3dU5fNrzDx7WpDlcRRi+Qw8Owz/azH1DmLoCMTadDkrQs4sAiVkLf5efzqaKY0IBVRW1GGEwsDT2H9UMxu+3WHpMlvpYIgNzbOmbIh4Mn3ZYBtdE49LSE3BN3bG7+CUM6g4dhoRPS164ajR2VPHCxkj1gxHgmA6Kgv94Krg0XHaCfBDSNWBCohUIDRBM2v/XgDZn3gAa9bB0d5TvsW69keJPD4kZmI022LZYhJclpFzHuiODrTbfSZgl4XKu8yoKH1Z903PGtT9eTNJrfx3BUug0n3yNlucuAjJGzt1Kf1qWkQK9CowJAYluOzBnvUlPRfmBbahZYQOKA8Hx5Wc54DBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKmMlyWPTiSJ8bs9ECkUjg2DC1oTmdr/EIQEjnvY2+n4Wau/G5GKDL7ScpWFBuxjwn7EOwoBnXjcicbnlYSchvB/S9lJxDYCwz8gd5DtFqNSTKG5l1zxIaKpDP/sffi2is1GuBRH7RyGMoeUJXJwOopMtqGie7/fYBdf89MFeQO296/ifwTydVrZHPjG/D6i2eZ8O9mCUcOrWOuTu/VO75OECQ4ACQNrbhkAAAAAAA4ABQLgkwQADwIAAXwDAAAAWYZDlFIEVlccoFEeEgkorUIiR3u6HpmdjpQKlM/yfPUgAAAAAAAAAEJlQWR5QkdrQWpBMVRHU3V2cUZmSmtnTWZzVFRFS3pxWhgyAAAAAAClAAAAAAAAAAbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpEAQBGQAXAQERBgACABIPEAATEhADGgQFBgcYCAkKCwwNFAECABEJavoSAAAAAADtc6WbAQAAABADAQAAAQkPAgAVDAIAAACWMAAAAAAAAA8CABYMAgAAACChBwAAAAAAAngi7IA4m3irNyCVhOfnT/I8KaFWzJPLlRRQvLIzFYcbAhgZAgULSyBiMoUsgvLpiYMo6rQhbvAcuZGGJba/QDV7nS4dAsEAAhMF',
+      lastValidBlockHeight: 296495740,
+      prioritizationFeeLamports: 0,
+      recentBlockhash: 'CqafNBSUzeJuEA2LY1sodBxukRvJZKWFrGUJZmmkWvQb',
+      version: '0'
+    },
+    amount_in_usd: '0.19200453',
+    amount_out_usd: '0.19200745',
+    jito_order_id: null
+  }
+}

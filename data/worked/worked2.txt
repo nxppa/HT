@@ -1,0 +1,76 @@
+Swap route received: {
+  code: 0,
+  msg: 'success',
+  data: {
+    quote: {
+      inputMint: 'So11111111111111111111111111111111111111112',
+      inAmount: '90645',
+      outputMint: '9QD2oEzrMAnXkBkruNSKFnHzvPJ4bWkyrtVEwcyfpump',
+      outAmount: '43245365',
+      otherAmountThreshold: '43245365',
+      inDecimals: 9,
+      outDecimals: 6,
+      swapMode: 'ExactIn',
+      slippageBps: '0',
+      platformFee: '906',
+      priceImpactPct: '0',
+      routePlan: [Array],
+      timeTaken: 0.051
+    },
+    raw_tx: {
+      swapTransaction: 'AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAHElmGQ5RSBFZXHKBRHhIJKK1CIkd7uh6ZnY6UCpTP8nz12uhTOtc+8f5+0/doiItK07w4PxiourFbZkqtAfxhd8kUlmeVNuhhIGFRS0MTAPP9os6FobF5tFh3G2fqQRj9nnShMvZLaBuXe0BZsrJ5obrnsVzWD6xukFf0Tlx6sD4def398/8ug2FeqkoXevAwGInOOYE4HJuU07jyfAgHmCy2Z1TufxR/723LDJmmkuJbYGm+BPEP7Tw8Lw0aZBThLOCfjszNbORLW+D5FhsViJLL1XGI9+Td0b8ufxE/9QxD3l2Hct0JtbJigg/FZYwRI0pzRJiwGGWUlFNP8HT7rnWZ70Yp8lrfvminXnaLt+vNG/8kDdK56UILNTRqW215rSk0ILOyCl1BsEk1rERmGgjMfAUqWQVuXZG4ggYc5Rxu4es2m6/keM2uhxtlTGzkXvYgvm4a9kF90RX4k3oBHlwDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAIyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZfM91HrzmzD+JlGGzietPVunFKndPttCATirSTM2ruO8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpS9lJxDYCwz8gd5DtFqNSTKG5l1zxIaKpDP/sffi2is0Wgcm+JOfO0tlY6X8e6Xz1/qCF29t2yDrJX1YAAcolPh3l29bkq1I0Fe5rGUL2jAe4ZjEru+JgktgnckDOMVtaCQsACQNrbhkAAAAAAAsABQLgkwQADAYAAQANDg8ADgIAAnwDAAAAWYZDlFIEVlccoFEeEgkorUIiR3u6HpmdjpQKlM/yfPUgAAAAAAAAADR0WDlDZFk0b0MyalQ4RmtNaXBBS3djVnFGbU53eTlWBYAgAAAAAAClAAAAAAAAAAbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpDwQCGQAXAQEQEg8UGgMEFRYYBQYHCAkKEQIBABEJFWIBAAAAAAA135MCAAAAAA8DAgAAAQkOAgASDAIAAACKAwAAAAAAAA4CABMMAgAAACChBwAAAAAAAngi7IA4m3irNyCVhOfnT/I8KaFWzJPLlRRQvLIzFYcbAhgZAgULQ4MrZlOKwDPUW/kg2SU4eWORQe7vAmvV2OYThjH0ZREDHR8gAgYB',
+      lastValidBlockHeight: 296452134,
+      prioritizationFeeLamports: 0,
+      recentBlockhash: '31i7U1UBS9dYMVvAyPKNzX8i22ca2PsN5kLQrg1qkPrq',
+      version: '0'
+    },
+    amount_in_usd: '0.01404765',
+    amount_out_usd: '0.01408354',
+    jito_order_id: null
+  }
+}
+Transaction signed: Ady2Yq0ur9jA7fz/gKN7/0rqmmve6vG1fatCYqa1nSGdF6eStDGjk3MYU8pmOUsKzqrL7VwipHLSJxOrHq/x7gmAAQAHElmGQ5RSBFZXHKBRHhIJKK1CIkd7uh6ZnY6UCpTP8nz12uhTOtc+8f5+0/doiItK07w4PxiourFbZkqtAfxhd8kUlmeVNuhhIGFRS0MTAPP9os6FobF5tFh3G2fqQRj9nnShMvZLaBuXe0BZsrJ5obrnsVzWD6xukFf0Tlx6sD4def398/8ug2FeqkoXevAwGInOOYE4HJuU07jyfAgHmCy2Z1TufxR/723LDJmmkuJbYGm+BPEP7Tw8Lw0aZBThLOCfjszNbORLW+D5FhsViJLL1XGI9+Td0b8ufxE/9QxD3l2Hct0JtbJigg/FZYwRI0pzRJiwGGWUlFNP8HT7rnWZ70Yp8lrfvminXnaLt+vNG/8kDdK56UILNTRqW215rSk0ILOyCl1BsEk1rERmGgjMfAUqWQVuXZG4ggYc5Rxu4es2m6/keM2uhxtlTGzkXvYgvm4a9kF90RX4k3oBHlwDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAIyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZfM91HrzmzD+JlGGzietPVunFKndPttCATirSTM2ruO8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpS9lJxDYCwz8gd5DtFqNSTKG5l1zxIaKpDP/sffi2is0Wgcm+JOfO0tlY6X8e6Xz1/qCF29t2yDrJX1YAAcolPh3l29bkq1I0Fe5rGUL2jAe4ZjEru+JgktgnckDOMVtaCQsACQNrbhkAAAAAAAsABQLgkwQADAYAAQANDg8ADgIAAnwDAAAAWYZDlFIEVlccoFEeEgkorUIiR3u6HpmdjpQKlM/yfPUgAAAAAAAAADR0WDlDZFk0b0MyalQ4RmtNaXBBS3djVnFGbU53eTlWBYAgAAAAAAClAAAAAAAAAAbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpDwQCGQAXAQEQEg8UGgMEFRYYBQYHCAkKEQIBABEJFWIBAAAAAAA135MCAAAAAA8DAgAAAQkOAgASDAIAAACKAwAAAAAAAA4CABMMAgAAACChBwAAAAAAAngi7IA4m3irNyCVhOfnT/I8KaFWzJPLlRRQvLIzFYcbAhgZAgULQ4MrZlOKwDPUW/kg2SU4eWORQe7vAmvV2OYThjH0ZREDHR8gAgYB
+Transaction submitted successfully: {
+  code: 0,
+  msg: 'success',
+  data: {
+    hash: '5QwVDhCkEFPFkWLxeygSEd1NPevEMbhcxA4eqawWqXjr2w5L3jjSD6EBVP4p92cUx8EfdwwkQry4Pv3aCnZhKWT2',
+    resArr: [ [Object], [Object], [Object] ],
+    timeTaken: 717
+  }
+}
+
+  code: 0,
+  msg: 'success',
+  data: {
+    hash: '5QwVDhCkEFPFkWLxeygSEd1NPevEMbhcxA4eqawWqXjr2w5L3jjSD6EBVP4p92cUx8EfdwwkQry4Pv3aCnZhKWT2',
+    resArr: [ [Object], [Object], [Object] ],
+    timeTaken: 717
+  }
+  code: 0,
+  msg: 'success',
+  data: {
+    hash: '5QwVDhCkEFPFkWLxeygSEd1NPevEMbhcxA4eqawWqXjr2w5L3jjSD6EBVP4p92cUx8EfdwwkQry4Pv3aCnZhKWT2',
+    resArr: [ [Object], [Object], [Object] ],
+    timeTaken: 717
+  code: 0,
+  msg: 'success',
+  data: {
+    hash: '5QwVDhCkEFPFkWLxeygSEd1NPevEMbhcxA4eqawWqXjr2w5L3jjSD6EBVP4p92cUx8EfdwwkQry4Pv3aCnZhKWT2',
+    resArr: [ [Object], [Object], [Object] ],
+  code: 0,
+  msg: 'success',
+  data: {
+    hash: '5QwVDhCkEFPFkWLxeygSEd1NPevEMbhcxA4eqawWqXjr2w5L3jjSD6EBVP4p92cUx8EfdwwkQry4Pv3aCnZhKWT2',
+  code: 0,
+  msg: 'success',
+  data: {
+  code: 0,
+  code: 0,
+  msg: 'success',
+  data: {
+    hash: '5QwVDhCkEFPFkWLxeygSEd1NPevEMbhcxA4eqawWqXjr2w5L3jjSD6EBVP4p92cUx8EfdwwkQry4Pv3aCnZhKWT2',
+    resArr: [ [Object], [Object], [Object] ],
+    timeTaken: 717
+  }
+}

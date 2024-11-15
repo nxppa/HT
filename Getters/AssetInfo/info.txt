@@ -1,0 +1,8 @@
+FORMAT FOR GETTING ASSET INFO
+
+
+
+Output.Name = name of coin
+Output.Description = description of coin
+Output.Symbol = symbol of coin
+Output.Image = link to image of coin
