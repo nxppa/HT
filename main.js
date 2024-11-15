@@ -559,6 +559,7 @@ async function handleSwap(Mint, InpAmount, transactionType) {
 let subscriptions = {}
 function subscribeToWalletTransactions(CurrWalletPubKey, WalletAdd) {
   const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
+
     if (!targetWallets[WalletAdd]) {
       connection.removeOnLogsListener(subscriptions[WalletAdd])
       return
@@ -567,21 +568,22 @@ function subscribeToWalletTransactions(CurrWalletPubKey, WalletAdd) {
       targetWallets[WalletAdd][2] = await GetTokens(CurrWalletPubKey)
       return
     }
+    async function UpdateWalletFactor(){
+      const WalletSize = await getWalletBalance(WalletAdd)
+      const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1)
+      targetWallets[WalletAdd][0] = CurrentWalletFactor
+      targetWallets[WalletAdd][3] = WalletSize
+      console.log(`Wallet update for ${WalletAdd}: `, myWalletBalanceInSol, WalletSize)
+    }
+    UpdateWalletFactor()
     const ToSearchFor = [`Program log: Instruction: PumpSell`, `Program log: Instruction: PumpBuy`, `Program log: Instruction: CloseAccount`, `Program log: Create`, `Program log: Instruction: Sell`, `Program log: Instruction: Buy`]
     const InString = findMatchingStrings(logs.logs, ToSearchFor, false)
     if (InString && !logs.err) {
       console.log("good data: ", logs)
-
       handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs);
     } else {
       console.log("Useless data: ", logs)
     }
-    const WalletSize = await getWalletBalance(WalletAdd)
-    const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1)
-    targetWallets[WalletAdd][0] = CurrentWalletFactor
-    targetWallets[WalletAdd][3] = WalletSize
-    console.log(`Wallet update for ${WalletAdd}: `, myWalletBalanceInSol, WalletSize)
-
   }, 'confirmed')
   subscriptions[WalletAdd] = id
 }
