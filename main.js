@@ -1,6 +1,5 @@
 let targetWallets = {}
 const MyWallet = "5DtSqQQbbVKtgMosGsgRDDPKPizTeFijA9DEEfK9Exfe" //* public wallet address
-
 //*------- API Callers-------\\
 const { getWalletBalance } = require('./Getters/SolBalance/Solana.js');
 const { FetchSolVal } = require('./Getters/SolVal/Jupiter.js');
@@ -20,6 +19,7 @@ const { rateLimitedGetParsedTokenAccountsByOwner } = require('./rateLimitedFunct
 const MyWalletPubKey = new PublicKey(MyWallet)
 const axios = require("axios")
 const fs = require('fs');
+const http = require("http")
 const MY_TOKEN = "7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE";
 const Simulating = false
 const ConsecutiveSellsThreshold = 4
@@ -708,7 +708,7 @@ app.get("*", async (req, res) => {
   res.send("Hello get");
 });
 
-const server = app.listen(PORT, '0.0.0.0', function (err) {
+const server = app.listen(PORT, '174.138.92.212', function (err) {
   if (err) console.log(err);
   console.log("Server listening on PORT", PORT);
 });
