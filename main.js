@@ -621,8 +621,6 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
   subscribeToWalletTransactions(CurrWalletKey, Wallet);
 }
 //ngrok http http://localhost:4040
-const ngrokUrl = "https://e4b2-49-180-86-87.ngrok-free.app"
-
 
 function SetWebhook() {
   const WebhookUrl = `https://api.telegram.org/bot${MY_TOKEN}/setWebhook?url=${ngrokUrl}/`
@@ -687,7 +685,7 @@ main()
 
 
 
-const PORT = process.env.PORT || 4040;
+const PORT = process.env.PORT || 80;
 const express = require('express');
 
 const app = express();
