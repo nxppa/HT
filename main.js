@@ -156,11 +156,9 @@ async function GetTokens(Key) { //TODO make it so the parameter is the wallet st
     response.value.forEach((keyedAccount) => {
       const parsedInfo = keyedAccount.account.data.parsed.info;
       const mint = parsedInfo.mint;
-      if (IsPumpCoin(mint)) {
         const tokenAmountInfo = parsedInfo.tokenAmount;
         const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
         tokens[mint] = tokenAmount
-      }
     })
     return tokens;
   } catch (error) {
@@ -368,6 +366,9 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   SendToAll(Message, "MarkdownV2");
 
   if (transactionType === "buy") {
+      if (!IsPumpCoin(mintAddress)) {
+        SendToAll(`⚠️ Mint is not a pump token; trade skipped ${GetMintEmbed("mint", mintAddress)}`);
+      }
       const tokenPriceInUsd = await GetPrice(mintAddress);
       const MarketCap = tokenPriceInUsd * Bil;
       const FactorOfMarketCap = (NumTheyreBuying * tokenPriceInUsd) / MarketCap;
