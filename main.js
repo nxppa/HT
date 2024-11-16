@@ -403,7 +403,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   }
 
 
-  SendToAll(Message, "MarkdownV2");
+  SendToAll(Message, "Markdown");
   if (transactionType === "buy") {
     if (!IsPumpCoin(mintAddress)) {
       SendToAll(`⚠️ Mint is not a pump token; trade skipped ${GetMintEmbed("mint", mintAddress)}`);
@@ -735,7 +735,7 @@ main()
 
 
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 const express = require('express');
 
 const app = express();
