@@ -518,7 +518,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
         console.log(`failed to ${transactionType}` + transactionType == "sell" ? ". retrying" : ".")
       } else {
         // buy
-        console.log("key stuff", logs, logs.err)
+        console.log("key stuff", logs)
         //console.log(Object.keys(logs.err)[0])
         const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(logs.err)}` //TODO make it log error
         SendToAll(Message, "MarkdownV2")
