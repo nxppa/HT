@@ -101,7 +101,7 @@ function inferTransactionType(amount) {
 process.on('uncaughtException', (error) => {
   console.log('Uncaught exception:', error);
   SendToAll("Error: " + error.toString())
-  process.exit(1);
+  //process.exit(1);
 });
 
 function GetTime(raw) {
