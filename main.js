@@ -126,6 +126,10 @@ function GetTime(raw) {
   return time;
 }
 
+function ToDecimalString(num) {
+  // Convert the number to a string without scientific notation
+  return num.toLocaleString('fullwide', { useGrouping: false });
+}
 
 //-------My Wallet Logs ------\\
 let MyWalletAnalysis = {}
@@ -380,7 +384,6 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
 
 
   SendToAll(Message, "MarkdownV2");
-
   if (transactionType === "buy") {
     if (!IsPumpCoin(mintAddress)) {
       SendToAll(`⚠️ Mint is not a pump token; trade skipped ${GetMintEmbed("mint", mintAddress)}`);
@@ -398,13 +401,14 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
       SendToAll(`⚠️ Exceeded market cap proportion; trade skipped ${GetMintEmbed("mint", mintAddress)} (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`);
       return;
     }
+    const ProportionSpending = CostInUsd/(myWalletBalanceInSol*SolVal)
     const MaxAmountSpendingInUsd = myWalletBalanceInSol * SolVal * SetParameters.MaxProportionSpending
     if (CostInUsd > MaxAmountSpendingInUsd) {
       NumTokens = MaxAmountSpendingInUsd/tokenPriceInUsd
-      SendToAll(`🔶 Max spending proportion exceeded; setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
+      SendToAll(`🔶 Max spending proportion exceeded (${ProportionSpending}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
     }
     if (CostInUsd < SetParameters.MinimumSpending) {
-      SendToAll(`⚠️ Below minimum spending; trade skipped ($${CostInUsd})`);
+      SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)})`);
       return;
     }
   } else if (transactionType === "sell") {
@@ -1253,7 +1257,7 @@ async function handleMessage(messageObj) {
       const MaxMsg = "Max proportionate spending: " + SetParameters.MaxProportionSpending * 100 + "%"
       return sendMessage(chatId, MaxMsg);
     case ActionTexts["getminspending"]:
-      const MinMsg = `Minimum amount spending (USD): ${SetParameters.MinimumSpending}`
+      const MinMsg = `Minimum amount spending (USD): $${SetParameters.MinimumSpending}`
       return sendMessage(chatId, MinMsg);
     case ActionTexts["getmaxpermc"]:
       const MCMsg = `Maximum percent of market cap: ${SetParameters.MaxMarketCap * 100}%`
