@@ -411,7 +411,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     const tokenPriceInUsd = await GetPrice(mintAddress);
     const MarketCap = tokenPriceInUsd * Bil;
     const FactorOfMarketCap = (NumTheyreBuying * tokenPriceInUsd) / MarketCap;
-    const CostInUsd = (NumTokens * tokenPriceInUsd).toFixed(10)
+    const CostInUsd = (NumTokens * tokenPriceInUsd)
     console.log("cost in usd: ", CostInUsd)
     if (!tokenPriceInUsd) {
       SendToAll(`🚫 Could not fetch price for ${GetMintEmbed("mint", mintAddress)}; trade skipped.`);
