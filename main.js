@@ -407,6 +407,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   if (transactionType === "buy") {
     if (!IsPumpCoin(mintAddress)) {
       SendToAll(`⚠️ Mint is not a pump token; trade skipped ${GetMintEmbed("mint", mintAddress)}`);
+      return
     }
     const tokenPriceInUsd = await GetPrice(mintAddress);
     const MarketCap = tokenPriceInUsd * Bil;
