@@ -721,7 +721,7 @@ async function main() {
   var WalletText = fs.readFileSync(StringWalletFilePath, 'utf8')
   const Arr = WalletText.split('\n');
   const Msg = `Starting bot. Adding ${Arr.length - 1} wallets`
-  SendToAll(Msg, "Markdown", "sendMessage")
+  SendToAll(Msg, null, "sendMessage")
   for (const i in Arr) {
     const newWallet = Arr[i]
     if (isEthereumOrSolanaAddress(newWallet)) {
@@ -758,7 +758,6 @@ app.get("*", async (req, res) => {
 });
 
 const server = app.listen(PORT, '174.138.92.212', function (err) {
-  SendToAll("Starting")
   if (err) console.log(err);
   console.log("Server listening on PORT", PORT);
 });
