@@ -100,7 +100,7 @@ function inferTransactionType(amount) {
 
 process.on('uncaughtException', (error) => {
   console.log('Uncaught exception:', error);
-  SendToAll("Error: " + error.toString())
+  SendToAll("Error: " + error.toString(), "Markdown")
   //process.exit(1);
 });
 
@@ -785,6 +785,8 @@ function getAxiosInstance() {
 }
 
 async function SendToAll(text, Mode = "Markdown", Method = "sendMessage", MessageToEdit) { //TODO make it so that there is a way to make sure a message is specifically sent after the other
+  console.log(text, Mode)
+  
   for (const chatId in IDToName) {
     const data = await SendStandaloneMessage(chatId, text, Mode, Method, MessageToEdit)
     if (!InitialMessageIDForEach[chatId]) {
