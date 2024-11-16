@@ -735,14 +735,11 @@ main()
 
 
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 443;
 const express = require('express');
-
 const app = express();
 app.use(express.json());
-
 app.post("*", async (req, res) => {
-
   let Body = req.body;
   if (Body.message) {
     let ID = Body.message.from.id;
@@ -752,11 +749,9 @@ app.post("*", async (req, res) => {
     res.send("Hello post");
   }
 });
-
 app.get("*", async (req, res) => {
   res.send("Hello get");
 });
-
 const server = app.listen(PORT, '174.138.92.212', function (err) {
   if (err) console.log(err);
   console.log("Server listening on PORT", PORT);
