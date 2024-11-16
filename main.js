@@ -354,7 +354,7 @@ function AddData(Database, NewData) {
 }
 
 async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, Wallet, Signature, NumTheyreBuying, TheirLogs) {
-  const NumTokens = AmountOfTokensToSwap
+  let NumTokens = AmountOfTokensToSwap
 
 
   const InfoMapping = {
