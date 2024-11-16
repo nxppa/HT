@@ -403,7 +403,6 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
           SendToAll(`⚠️ Max spending proportion exceeded; trade skipped (${roundToDigits(ProportionOfMyWallet * 100, 3)}%)`);
           return;
       }
-  
       if (CostInUsd < SetParameters.MinimumSpending) {
           SendToAll(`⚠️ Below minimum spending; trade skipped ($${CostInUsd})`);
           return;
