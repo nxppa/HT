@@ -127,9 +127,29 @@ function GetTime(raw) {
 }
 
 function ToDecimalString(num) {
-  // Convert the number to a string without scientific notation
-  return num.toLocaleString('fullwide', { useGrouping: false });
+  // Handle small numbers explicitly
+  if (Math.abs(num) < 1e-6) {
+      return num.toFixed(20).replace(/\.?0+$/, ""); // Use a large number of decimals and strip trailing zeros
+  }
+
+  // Convert numbers without using scientific notation
+  let [integerPart, fractionalPart] = num.toString().split('e');
+  if (!fractionalPart) {
+      return integerPart; // Return directly if there's no scientific notation
+  }
+
+  // Handle scientific notation
+  let exponent = parseInt(fractionalPart, 10);
+  if (exponent > 0) {
+      // Positive exponent - shift the decimal point to the right
+      return integerPart.replace('.', '') + '0'.repeat(exponent - (integerPart.split('.')[1]?.length || 0));
+  } else {
+      // Negative exponent - shift the decimal point to the left
+      let digits = integerPart.replace('.', '');
+      return '0.' + '0'.repeat(Math.abs(exponent) - 1) + digits;
+  }
 }
+
 
 //-------My Wallet Logs ------\\
 let MyWalletAnalysis = {}
