@@ -138,7 +138,7 @@ function findMatchingStrings(stringsArray, substringsArray, Includes) {
   for (let i = 0; i < stringsArray.length; i++) {
     const originalString = stringsArray[i];
     for (let j = 0; j < substringsArray.length; j++) {
-      if (Includes){
+      if (Includes) {
         if (originalString.includes(substringsArray[j])) {
           return substringsArray[j]
         }
@@ -172,9 +172,9 @@ async function GetTokens(Key) { //TODO make it so the parameter is the wallet st
     response.value.forEach((keyedAccount) => {
       const parsedInfo = keyedAccount.account.data.parsed.info;
       const mint = parsedInfo.mint;
-        const tokenAmountInfo = parsedInfo.tokenAmount;
-        const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
-        tokens[mint] = tokenAmount
+      const tokenAmountInfo = parsedInfo.tokenAmount;
+      const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
+      tokens[mint] = tokenAmount
     })
     return tokens;
   } catch (error) {
@@ -382,47 +382,47 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   SendToAll(Message, "MarkdownV2");
 
   if (transactionType === "buy") {
-      if (!IsPumpCoin(mintAddress)) {
-        SendToAll(`⚠️ Mint is not a pump token; trade skipped ${GetMintEmbed("mint", mintAddress)}`);
-      }
-      const tokenPriceInUsd = await GetPrice(mintAddress);
-      const MarketCap = tokenPriceInUsd * Bil;
-      const FactorOfMarketCap = (NumTheyreBuying * tokenPriceInUsd) / MarketCap;
-      const CostInUsd = (NumTokens * tokenPriceInUsd).toFixed(10)
-      console.log("cost in usd: ", CostInUsd)
-      if (!tokenPriceInUsd) {
-          SendToAll(`🚫 Could not fetch price for ${GetMintEmbed("mint", mintAddress)}; trade skipped.`);
-          return;
-      }
-      if (FactorOfMarketCap > 0.03) {
-          SendToAll(`⚠️ Exceeded market cap proportion; trade skipped ${GetMintEmbed("mint", mintAddress)} (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`);
-          return;
-      }
-      const ProportionOfMyWallet = CostInUsd / (myWalletBalanceInSol * SolVal);
-      if (ProportionOfMyWallet > SetParameters.MaxProportionSpending) {
-          SendToAll(`⚠️ Max spending proportion exceeded; trade skipped (${roundToDigits(ProportionOfMyWallet * 100, 3)}%)`);
-          return;
-      }
-      if (CostInUsd < SetParameters.MinimumSpending) {
-          SendToAll(`⚠️ Below minimum spending; trade skipped ($${CostInUsd})`);
-          return;
-      }
+    if (!IsPumpCoin(mintAddress)) {
+      SendToAll(`⚠️ Mint is not a pump token; trade skipped ${GetMintEmbed("mint", mintAddress)}`);
+    }
+    const tokenPriceInUsd = await GetPrice(mintAddress);
+    const MarketCap = tokenPriceInUsd * Bil;
+    const FactorOfMarketCap = (NumTheyreBuying * tokenPriceInUsd) / MarketCap;
+    const CostInUsd = (NumTokens * tokenPriceInUsd).toFixed(10)
+    console.log("cost in usd: ", CostInUsd)
+    if (!tokenPriceInUsd) {
+      SendToAll(`🚫 Could not fetch price for ${GetMintEmbed("mint", mintAddress)}; trade skipped.`);
+      return;
+    }
+    if (FactorOfMarketCap > 0.03) {
+      SendToAll(`⚠️ Exceeded market cap proportion; trade skipped ${GetMintEmbed("mint", mintAddress)} (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`);
+      return;
+    }
+    const MaxAmountSpendingInUsd = myWalletBalanceInSol * SolVal * SetParameters.MaxProportionSpending
+    if (CostInUsd > MaxAmountSpendingInUsd) {
+      NumTokens = MaxAmountSpendingInUsd/tokenPriceInUsd
+      SendToAll(`🔶 Max spending proportion exceeded; setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
+    }
+    if (CostInUsd < SetParameters.MinimumSpending) {
+      SendToAll(`⚠️ Below minimum spending; trade skipped ($${CostInUsd})`);
+      return;
+    }
   } else if (transactionType === "sell") {
-      const balance = MyTokens[mintAddress] || 0;
-  
-      if (balance <= 0) {
-          const Indic = SetParameters.Halted || Simulating ? "🟠" : "";
-          SendToAll(`${Indic} No tokens available for ${GetMintEmbed("mint", mintAddress)}; swap skipped.`);
-          return;
-      }
-  
-      if (ConsecutiveSells[mintAddress] >= ConsecutiveSellsThreshold) {
-          AmountOfTokensToSwap = MyTokens[mintAddress];
-          //TODO Add timeframe
-      }
+    const balance = MyTokens[mintAddress] || 0;
+
+    if (balance <= 0) {
+      const Indic = SetParameters.Halted || Simulating ? "🟠" : "";
+      SendToAll(`${Indic} No tokens available for ${GetMintEmbed("mint", mintAddress)}; swap skipped.`);
+      return;
+    }
+
+    if (ConsecutiveSells[mintAddress] >= ConsecutiveSellsThreshold) {
+      NumTokens = MyTokens[mintAddress];
+      //TODO Add timeframe
+    }
   }
 
-  
+
   if (Simulating) {
     if (!NumTokens) {
       console.log("invalid amount of tokens to log: ", NumTokens, GetTime(), Wallet, mintAddress)
@@ -567,7 +567,7 @@ function subscribeToWalletTransactions(CurrWalletPubKey, WalletAdd) {
       targetWallets[WalletAdd][2] = await GetTokens(CurrWalletPubKey)
       return
     }
-    async function UpdateWalletFactor(){
+    async function UpdateWalletFactor() {
       const WalletSize = await getWalletBalance(WalletAdd)
       const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1)
       targetWallets[WalletAdd][0] = CurrentWalletFactor
@@ -718,7 +718,7 @@ const app = express();
 app.use(express.json());
 
 app.post("*", async (req, res) => {
-  
+
   let Body = req.body;
   if (Body.message) {
     let ID = Body.message.from.id;
