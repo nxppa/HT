@@ -721,7 +721,7 @@ async function main() {
   var WalletText = fs.readFileSync(StringWalletFilePath, 'utf8')
   const Arr = WalletText.split('\n');
   const Msg = `Starting bot. Adding ${Arr.length - 1} wallets`
-  SendToAll(Msg, null, "sendMessage")
+  SendToAll(Msg, "Markdown", "sendMessage")
   for (const i in Arr) {
     const newWallet = Arr[i]
     if (isEthereumOrSolanaAddress(newWallet)) {
