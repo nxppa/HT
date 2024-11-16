@@ -654,7 +654,7 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
     console.log(ProgressString)
     if (NumWalletsAdded == NumWalletsTotal) {
       StartedLogging = true
-      const Msg = SetParameters.Halted ? "Finished adding wallets. Bot is halted" : "Finished adding wallets. Bot is active"
+      const Msg = SetParameters.Halted ? "Finished adding wallets. Bot is halted." : "Finished adding wallets. Bot is active."
       for (id in IDToName) {
         SendStandaloneMessage((id).toString(), Msg, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
       }
