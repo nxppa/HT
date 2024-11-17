@@ -750,7 +750,7 @@ app.post("*", async (req, res) => {
   }
 });
 app.get("*", async (req, res) => {
-  res.send("(^w^)");
+  res.send("t.me/nappa2");
 });
 const server = app.listen(PORT, '174.138.92.212', function (err) {
   if (err) console.log(err);
