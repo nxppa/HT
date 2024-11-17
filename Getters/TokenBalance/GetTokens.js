@@ -14,7 +14,9 @@ async function GetTokens(Address) {
             const mint = parsedInfo.mint;
             const tokenAmountInfo = parsedInfo.tokenAmount;
             const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
-            tokens[mint] = tokenAmount
+            if (tokenAmount){
+                tokens[mint] = tokenAmount
+            }
         })
         return tokens;
     } catch (error) {

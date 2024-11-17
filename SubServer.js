@@ -5,11 +5,6 @@ const port = 80;
 const BackupIp = "146.190.214.255";
 
 // Mock data for demonstration
-const mockTokenBalances = {
-    "wallet1": { Address: "wallet1", Tokens: 100 },
-    "wallet2": { Address: "wallet2", Tokens: 200 },
-    // Add more wallet entries as needed
-};
 app.listen(port, BackupIp, function (err) {
     if (err) console.log(err);
     console.log("Server listening on PORT", port);
