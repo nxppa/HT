@@ -101,7 +101,7 @@ function inferTransactionType(amount) {
 process.on('uncaughtException', (error) => {
   console.log('Uncaught exception:', error);
   SendToAll("Error: " + error.toString(), "Markdown")
-  //process.exit(1);
+  //process.exit(1)
 });
 
 function GetTime(raw) {
@@ -186,10 +186,10 @@ function roundToDigits(number, digits) {
 async function UpdateMyWallet() {
   myWalletBalanceInSol = Simulating ? (SimulatingStartAmountUSD / SolVal) : await getWalletBalance(MyWallet)
 }
-async function GetTokens(Key) { //TODO make it so the parameter is the wallet string (easy)
-
+async function GetTokens(Address) {
+  const key = new PublicKey(Address)
   try {
-    const response = await rateLimitedGetParsedTokenAccountsByOwner(connection, Key, {
+    const response = await rateLimitedGetParsedTokenAccountsByOwner(connection, key, {
       programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'), // Token Program ID
     })
     const tokens = {};
@@ -228,9 +228,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs) {
   let Diagnosed = false
   try {
     const TheirLastTokens = targetWallets[Addy][2]
-    const TheirWalletKey = targetWallets[Addy][1]
-    console.log("their wallet key: ", TheirWalletKey)
-    const TheirCurrentTokens = await GetTokens(TheirWalletKey);
+    const TheirCurrentTokens = await GetTokens(Addy);
     if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens)) {
       console.log("no change?", TransType, logs)
       //checkTokenBalances(signature, TransType, Addy, logs)
@@ -581,7 +579,8 @@ async function handleSwap(Mint, InpAmount, transactionType) {
   }
 }
 let subscriptions = {}
-function subscribeToWalletTransactions(CurrWalletPubKey, WalletAdd) {
+function subscribeToWalletTransactions(WalletAdd) {
+  const CurrWalletPubKey = new PublicKey(WalletAdd)
   const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
 
     if (!targetWallets[WalletAdd]) {
@@ -589,7 +588,7 @@ function subscribeToWalletTransactions(CurrWalletPubKey, WalletAdd) {
       return
     }
     if (!StartedLogging) {
-      targetWallets[WalletAdd][2] = await GetTokens(CurrWalletPubKey)
+      targetWallets[WalletAdd][2] = await GetTokens(WalletAdd)
       return
     }
     async function UpdateWalletFactor() {
@@ -636,10 +635,9 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
     });
   }
 
-  const CurrWalletKey = new PublicKey(Wallet)
   const WalletSize = await getWalletBalance(Wallet)
   const CurrentWalletFactor = Math.min(await myWalletBalanceInSol / WalletSize, 1)
-  const TheirLastTokens = await GetTokens(CurrWalletKey);
+  const TheirLastTokens = await GetTokens(Wallet);
 
   if (InitialFetch) {
     NumWalletsAdded += 1
@@ -655,7 +653,8 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
     console.log(ProgressString)
     if (NumWalletsAdded == NumWalletsTotal) {
       StartedLogging = true
-      const Msg = SetParameters.Halted ? "Finished adding wallets. Bot is halted" : "Finished adding wallets. Bot is active"
+      let StartInidicator = SetParameters.Halted ? "🟨" : "🟩"
+      const Msg = StartInidicator + SetParameters.Halted ? "Finished adding wallets. Bot is halted" : "Finished adding wallets. Bot is active" + StartInidicator
       for (id in IDToName) {
         SendStandaloneMessage((id).toString(), Msg, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
       }
@@ -668,8 +667,8 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
     }
   }
 
-  targetWallets[Wallet] = [CurrentWalletFactor, CurrWalletKey, TheirLastTokens, WalletSize, Alias,]
-  subscribeToWalletTransactions(CurrWalletKey, Wallet);
+  targetWallets[Wallet] = [CurrentWalletFactor, null, TheirLastTokens, WalletSize, Alias,]
+  subscribeToWalletTransactions(Wallet);
 }
 //ngrok http http://localhost:4040
 
@@ -1040,7 +1039,7 @@ async function handleMessage(messageObj) {
       }
       const Viewing = messageText
       if (!targetWallets[Viewing]) {
-        sendMessage(chatId, "Please enter a valid wallet address to remove.");
+        sendMessage(chatId, "Please enter a valid wallet address to appraise.");
         userStates[chatId].waitingForWalletToView = false
       } else {
         userStates[chatId].waitingForWalletToView = false;
