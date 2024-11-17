@@ -4,7 +4,7 @@ const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
 
-async function MainGetTokens(Address) {
+async function GetTokens(Address) {
     const key = new PublicKey(Address)
     try {
         const response = await connection.getParsedTokenAccountsByOwner(key, {programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')})
@@ -23,4 +23,4 @@ async function MainGetTokens(Address) {
     }
 }
 
-module.exports = MainGetTokens
+module.exports = GetTokens
