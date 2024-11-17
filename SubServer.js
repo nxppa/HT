@@ -23,7 +23,7 @@ app.get("/TokenBal", async (req, res) => {
         return res.status(400).send({ error: "Wallet parameter is required" });
     }
     
-    const tokenBalance = GetTokens(wallet)
+    const tokenBalance = await GetTokens(wallet)
 
     if (!tokenBalance) {
         return res.status(404).send({ error: "Wallet not found" });
