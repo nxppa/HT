@@ -5,7 +5,7 @@ const BackupIp = "146.190.214.255"
 
 const server = app.listen(port, BackupIp, function (err) {
     if (err) console.log(err);
-    console.log("Server listening on PORT", PORT);
+    console.log("Server listening on PORT", port);
   });
 
   app.get("*", async (req, res) => {
