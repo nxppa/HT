@@ -617,6 +617,7 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
   const CurrentWalletFactor = Math.min(await myWalletBalanceInSol / WalletSize, 1)
   const TheirLastTokens = await GetTokens(Wallet);
 
+/*
   if (InitialFetch) {
     NumWalletsAdded += 1
 
@@ -627,23 +628,23 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
       ProgressString += x <= PlaceEnding ? Filled : Unfilled
     }
     const EstimatedTimeLeft = (NumWalletsTotal - NumWalletsAdded) * 6
-    ProgressString += `\] ${Progress * 100}%\n ETA: ${EstimatedTimeLeft} seconds` //TODO make it so it calculates based on average time to get token accounts
+    ProgressString += `\] ${Progress * 100}%\n ETA: ${EstimatedTimeLeft} seconds`
     console.log(ProgressString)
     if (NumWalletsAdded == NumWalletsTotal) {
       StartedLogging = true
       let StartInidicator = SetParameters.Halted ? "🟨" : "🟩"
       const Msg = StartInidicator + SetParameters.Halted ? "Finished adding wallets. Bot is halted" : "Finished adding wallets. Bot is active" + StartInidicator
       for (id in IDToName) {
-        SendStandaloneMessage((id).toString(), Msg, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
+        //SendStandaloneMessage((id).toString(), Msg, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
       }
-
     } else {
       for (id in IDToName) {
-        SendStandaloneMessage((id).toString(), ProgressString, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
+        //SendStandaloneMessage((id).toString(), ProgressString, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
 
       }
     }
   }
+  */
 
   targetWallets[Wallet] = [CurrentWalletFactor, null, TheirLastTokens, WalletSize, Alias,]
   subscribeToWalletTransactions(Wallet);
