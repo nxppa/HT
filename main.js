@@ -187,26 +187,7 @@ async function UpdateMyWallet() {
   myWalletBalanceInSol = Simulating ? (SimulatingStartAmountUSD / SolVal) : await getWalletBalance(MyWallet)
 }
 const TPID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
-async function GetTokens(Address) {
-  const key = new PublicKey(Address)
-  try {
-    const response = await GetTokens(connection, key, {
-      programId: TPID, // Token Program ID
-    })
-    const tokens = {};
-    response.value.forEach((keyedAccount) => {
-      const parsedInfo = keyedAccount.account.data.parsed.info;
-      const mint = parsedInfo.mint;
-      const tokenAmountInfo = parsedInfo.tokenAmount;
-      const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
-      tokens[mint] = tokenAmount
-    })
-    return tokens;
-  } catch (error) {
-    console.error('Error fetching token accounts:', error, Key);
-    throw error;
-  }
-}
+
 
 
 
