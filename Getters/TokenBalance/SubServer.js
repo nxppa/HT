@@ -1,4 +1,5 @@
 async function SubGetTokens(wallet) {
+    console.log("using sub")
     const url = `http://doublebay.boats/TokenBal?wallet=${wallet}`;
 
     try {
