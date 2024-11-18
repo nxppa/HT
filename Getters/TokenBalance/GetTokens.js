@@ -1,13 +1,18 @@
 const { Connection, PublicKey, clusterApiUrl} = require('@solana/web3.js');
-const SOLANA_RPC_ENDPOINT = clusterApiUrl('mainnet-beta');
+
+
+const SOLANA_RPC_ENDPOINT = "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7";
+//! quicknode rpc
+
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
+const TPID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 
 async function GetTokens(Address) {
     const key = new PublicKey(Address)
     try {
-        const response = await connection.getParsedTokenAccountsByOwner(key, {programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')})
+        const response = await connection.getParsedTokenAccountsByOwner(key, {programId: TPID})
         const tokens = {};
         response.value.forEach((keyedAccount) => {
             const parsedInfo = keyedAccount.account.data.parsed.info;

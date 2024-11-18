@@ -186,11 +186,12 @@ function roundToDigits(number, digits) {
 async function UpdateMyWallet() {
   myWalletBalanceInSol = Simulating ? (SimulatingStartAmountUSD / SolVal) : await getWalletBalance(MyWallet)
 }
+const TPID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 async function GetTokens(Address) {
   const key = new PublicKey(Address)
   try {
     const response = await rateLimitedGetParsedTokenAccountsByOwner(connection, key, {
-      programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'), // Token Program ID
+      programId: TPID, // Token Program ID
     })
     const tokens = {};
     response.value.forEach((keyedAccount) => {
