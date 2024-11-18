@@ -186,10 +186,6 @@ function roundToDigits(number, digits) {
 async function UpdateMyWallet() {
   myWalletBalanceInSol = Simulating ? (SimulatingStartAmountUSD / SolVal) : await getWalletBalance(MyWallet)
 }
-const TPID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
-
-
-
 
 function AreDictionariesEqual(dict1, dict2) {
   const keys1 = Object.keys(dict1);
