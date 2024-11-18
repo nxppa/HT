@@ -6,6 +6,7 @@ const { FetchSolVal } = require('./Getters/SolVal/Jupiter.js');
 const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
+const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const EndpointUsing = "PumpPortal"
 //*--------constants-------*\\
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
@@ -15,7 +16,6 @@ const SigCheckBaseAddress = "https://solscan.io/tx/"
 
 const SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112'; // SOL
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
-const { rateLimitedGetParsedTokenAccountsByOwner } = require('./rateLimitedFunctions.js'); // Import the rate-limited function
 const MyWalletPubKey = new PublicKey(MyWallet)
 const axios = require("axios")
 const fs = require('fs');
@@ -190,7 +190,7 @@ const TPID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 async function GetTokens(Address) {
   const key = new PublicKey(Address)
   try {
-    const response = await rateLimitedGetParsedTokenAccountsByOwner(connection, key, {
+    const response = await GetTokens(connection, key, {
       programId: TPID, // Token Program ID
     })
     const tokens = {};
