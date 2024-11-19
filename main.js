@@ -55,7 +55,7 @@ SetParameters.Halted = null
 
 let myWalletBalanceInSol = null
 
-const SOLANA_RPC_ENDPOINT = clusterApiUrl('mainnet-beta');
+const SOLANA_RPC_ENDPOINT = "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7";
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
