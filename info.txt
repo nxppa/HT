@@ -2,12 +2,14 @@
 
 So11111111111111111111111111111111111111112
 
-ngrok http http://localhost:4040
-
-pm2 restart main
-
-pm2 logs
-
-
 gitkey
 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
+
+
+sudo lsof -i :80
+
+kill -9 1647
+
+
+tmux attach
+tmux ls
