@@ -100,6 +100,7 @@ function inferTransactionType(amount) {
 
 process.on('uncaughtException', (error) => {
   console.log('Uncaught exception:', error);
+  error = error || 0
   SendToAll("Error: " + error.toString(), "Markdown")
   //process.exit(1)
 });
