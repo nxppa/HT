@@ -13,3 +13,6 @@ kill -9 1647
 
 tmux attach
 tmux ls
+
+
+https://flashy-radial-needle.SOLANA_MAINNET.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7
