@@ -560,6 +560,7 @@ async function handleSwap(Mint, InpAmount, transactionType) {
 let subscriptions = {}
 function subscribeToWalletTransactions(WalletAdd) {
   const CurrWalletPubKey = new PublicKey(WalletAdd)
+  console.log("subcrivesdes")
   const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
 
     if (!targetWallets[WalletAdd]) {
