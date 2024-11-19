@@ -1,8 +1,8 @@
 const { Connection, PublicKey, clusterApiUrl} = require('@solana/web3.js');
 
 
-const SOLANA_RPC_ENDPOINT = clusterApiUrl('mainnet-beta');
-
+const SOLANA_RPC_ENDPOINT = "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7";
+//! quicknode rpc
 
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
