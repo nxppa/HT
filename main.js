@@ -706,6 +706,7 @@ async function main() {
   for (const i in Arr) {
     const newWallet = Arr[i]
     if (isEthereumOrSolanaAddress(newWallet)) {
+      console.log("adding new wallet: ", newWallet)
       AddWallet(newWallet, null, true, Arr.length - 1)
     }
   }
