@@ -203,21 +203,20 @@ function AreDictionariesEqual(dict1, dict2) {
 }
 
 
-async function checkTokenBalances(signature, TransType, Addy, logs) {
+async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
+  if (deep >= 2){
+    console.log("max retries for changes logged exceeded")
+    return
+  }
   try {
     const TheirLastTokens = targetWallets[Addy][2]
     const TheirCurrentTokens = await GetTokens(Addy);
     if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens)) {
-      if (TransType == "Program log: Instruction: PumpSell"){
-        console.log("no change for sell. retrying", TransType, logs, Addy)
-        checkTokenBalances(signature, TransType, Addy, logs)
-        
-      } else {
-        console.log("no change for wallet.", TransType, logs, Addy)
-      }
+      console.log("no change in wallet detected. Retrying")
+      checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
       return
-      //TODO make it so it retries if a transaction was actually made (if transaction type was a sell)
+      //TODO make it so it retries if a transaction was actually made (ONLY if transaction type was a sell)
     }
     const WalletFactor = targetWallets[Addy][0]
     for (const mint in TheirCurrentTokens) {
@@ -282,7 +281,6 @@ async function checkTokenBalances(signature, TransType, Addy, logs) {
     }
   }
   if (!Diagnosed) {
-    //checkTokenBalances(signature, TransType, Addy)
     console.log("?no change?", TransType, logs)
   }
 
@@ -293,7 +291,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs) {
 function handleTradeEvent(signature, TransType, Address, logs) {
   if (!CompletedCopies.includes(signature)) {
     CompletedCopies.push(signature)
-    checkTokenBalances(signature, TransType, Address, logs)
+    checkTokenBalances(signature, TransType, Address, logs, 0)
 
   } else {
     console.log("FOR SOME REASON GEEKED")
