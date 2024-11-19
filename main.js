@@ -55,7 +55,7 @@ SetParameters.Halted = null
 
 let myWalletBalanceInSol = null
 
-const SOLANA_RPC_ENDPOINT = clusterApiUrl('mainnet-beta');
+const SOLANA_RPC_ENDPOINT = "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7";
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
@@ -100,6 +100,7 @@ function inferTransactionType(amount) {
 
 process.on('uncaughtException', (error) => {
   console.log('Uncaught exception:', error);
+  error = error || 0
   SendToAll("Error: " + error.toString(), "Markdown")
   //process.exit(1)
 });
@@ -558,6 +559,7 @@ async function handleSwap(Mint, InpAmount, transactionType) {
 let subscriptions = {}
 function subscribeToWalletTransactions(WalletAdd) {
   const CurrWalletPubKey = new PublicKey(WalletAdd)
+  console.log("subcrivesdes")
   const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
 
     if (!targetWallets[WalletAdd]) {
@@ -645,7 +647,7 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
     }
   }
   */
-
+  StartedLogging = true
   targetWallets[Wallet] = [CurrentWalletFactor, null, TheirLastTokens, WalletSize, Alias,]
   subscribeToWalletTransactions(Wallet);
 }
@@ -704,6 +706,7 @@ async function main() {
   for (const i in Arr) {
     const newWallet = Arr[i]
     if (isEthereumOrSolanaAddress(newWallet)) {
+      console.log("adding new wallet: ", newWallet)
       AddWallet(newWallet, null, true, Arr.length - 1)
     }
   }
