@@ -315,7 +315,6 @@ function LoadDB(Database) {
   }
 }
 
-// Call loadTrades when your script starts
 
 
 function AddData(Database, NewData) {
@@ -569,14 +568,7 @@ function subscribeToWalletTransactions(WalletAdd) {
       targetWallets[WalletAdd][2] = await GetTokens(WalletAdd)
       return
     }
-    async function UpdateWalletFactor() {
-      const WalletSize = await getWalletBalance(WalletAdd)
-      const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1)
-      targetWallets[WalletAdd][0] = CurrentWalletFactor
-      targetWallets[WalletAdd][3] = WalletSize
-      console.log(`Wallet update for ${WalletAdd}: `, myWalletBalanceInSol, WalletSize)
-    }
-    UpdateWalletFactor()
+
     const ToSearchFor = [`Program log: Instruction: PumpSell`, `Program log: Instruction: PumpBuy`, `Program log: Instruction: CloseAccount`, `Program log: Create`, `Program log: Instruction: Sell`, `Program log: Instruction: Buy`]
     const InString = findMatchingStrings(logs.logs, ToSearchFor, false)
     if (InString && !logs.err) {
@@ -586,6 +578,14 @@ function subscribeToWalletTransactions(WalletAdd) {
       console.log("Useless data: ", logs)
     }
   }, 'confirmed')
+  async function UpdateWalletFactor() {
+    const WalletSize = await getWalletBalance(WalletAdd)
+    const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1)
+    targetWallets[WalletAdd][0] = CurrentWalletFactor
+    targetWallets[WalletAdd][3] = WalletSize
+    console.log(`Wallet update for ${WalletAdd}: `, myWalletBalanceInSol, WalletSize)
+  }
+  UpdateWalletFactor()
   subscriptions[WalletAdd] = id
 }
 
