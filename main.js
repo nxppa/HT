@@ -647,7 +647,7 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
     }
   }
   */
-
+  StartedLogging = true
   targetWallets[Wallet] = [CurrentWalletFactor, null, TheirLastTokens, WalletSize, Alias,]
   subscribeToWalletTransactions(Wallet);
 }
