@@ -55,7 +55,7 @@ SetParameters.Halted = null
 
 let myWalletBalanceInSol = null
 
-const SOLANA_RPC_ENDPOINT = clusterApiUrl('mainnet-beta');
+const SOLANA_RPC_ENDPOINT = clusterApiUrl('mainnet-beta')
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
@@ -209,8 +209,11 @@ async function checkTokenBalances(signature, TransType, Addy, logs) {
     const TheirLastTokens = targetWallets[Addy][2]
     const TheirCurrentTokens = await GetTokens(Addy);
     if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens)) {
-      console.log("no change?", TransType, logs)
-      //checkTokenBalances(signature, TransType, Addy, logs)
+      if (TransType == "Program log: Instruction: PumpSell"){
+        console.log("no change for sell. retrying", TransType, logs, Addy)
+        checkTokenBalances(signature, TransType, Addy, logs)
+
+      }
       return
       //TODO make it so it retries if a transaction was actually made (if transaction type was a sell)
     }
