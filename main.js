@@ -67,7 +67,6 @@ function isEthereumOrSolanaAddress(address) {
 
 
 let MyTokens = {}
-let swapQueue = [];
 let SolVal = FetchSolVal() //TODO in future make it so no trades are enqueued until solvalue is procured 
 async function updateValue() {
   const Fetched = await FetchSolVal()
@@ -172,8 +171,6 @@ function findMatchingStrings(stringsArray, substringsArray, Includes) {
           return substringsArray[j]
         }
       }
-
-
     }
   }
   return null
@@ -196,7 +193,7 @@ function AreDictionariesEqual(dict1, dict2) {
     const val1 = dict1[key];
     const val2 = dict2[key];
     if (val1 === val2) continue;
-    if (isNaN(val1) && isNaN(val2)) continue;  // Handle NaN comparison
+    if (isNaN(val1) && isNaN(val2)) continue
     return false;
   }
   return true;
@@ -336,6 +333,7 @@ function AddData(Database, NewData) {
 
 async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, Wallet, Signature, NumTheyreBuying, TheirLogs) {
   let NumTokens = AmountOfTokensToSwap
+  const WalletFactor = targetWallets[Wallet][0]
 
 
   const InfoMapping = {
@@ -344,7 +342,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     0.75: "two thirds of their position of the mint",
     1: "all of their mint position of the mint",
   }
-  //TODO do something with this
+  //TODO do something with this shit
   //const InfoSelling = InfoMapping[FactorSold] ?  InfoMapping[FactorSold] : FactorSold*100 + "% of their mint"
 
 
@@ -410,7 +408,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
       SendToAll(`🔶 Max spending proportion exceeded (${ProportionSpending*100}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
     }
     if (CostInUsd < SetParameters.MinimumSpending) {
-      SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)}), ${NumTokens}, ${tokenPriceInUsd}, ${NumTheyreBuying}`);
+      SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)}), ${NumTokens}, ${tokenPriceInUsd}, ${NumTheyreBuying}, ${WalletFactor}`);
       return;
     }
   } else if (transactionType === "sell") {
@@ -941,7 +939,6 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["settings"] },
     { text: ActionTexts["managewallets"] },
   ]
-
   const messageText = messageObj.text || "";
   // Check if user is in the process of changing priority fee
   if (userStates[chatId]) {
@@ -1014,7 +1011,6 @@ async function handleMessage(messageObj) {
             console.log(CurrentWallet)
           }
         }
-
         userStates[chatId].waitingForWalletAddressToRemove = false;
         SendToAll(`Removed wallet: ${removing}.`)
       }
