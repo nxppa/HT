@@ -358,9 +358,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     }
 */
   const Emoji = transactionType == "buy" ? "🟢" : "🔴"
-  let Indic = SetParameters.Halted ? "🟡" : "🟢"
-  Indic = Simulating ? "🔵" : Indic
-  let DetectionMessage = `${Indic} Detected a *${transactionType}* at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
+  let DetectionMessage = `${Emoji} Detected a *${transactionType}* at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
 
   const ToGo = "🟡"
   const Done = "🟢"
@@ -422,8 +420,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   } else if (transactionType === "sell") {
     const balance = MyTokens[mintAddress] || 0;
     if (balance <= 0) {
-      const Indic = SetParameters.Halted || Simulating ? "🟠" : "🪙";
-      const NoTokensMessage = `${Indic} No tokens available for ${GetMintEmbed("mint", mintAddress)}; swap skipped.`
+      const NoTokensMessage = `🪙 No tokens available for ${GetMintEmbed("mint", mintAddress)}; swap skipped.`
       DetectionMessage += "\n" + NoTokensMessage
       SendToAll(DetectionMessage, "Markdown");
       return;
@@ -477,7 +474,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   }
 
   if (SetParameters.Halted && transactionType == 'buy') {
-    const HaltedMessage = `${Indic} Buying is halted; didn't buy ${GetMintEmbed("mint", mintAddress)}` 
+    const HaltedMessage = `🟡 Buying is halted; didn't buy ${GetMintEmbed("mint", mintAddress)}` 
     DetectionMessage += "\n" + HaltedMessage
     SendToAll(DetectionMessage, "Markdown")
     return
