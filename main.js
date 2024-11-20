@@ -243,6 +243,8 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
               Wallet: Addy,
               Signature: signature,
               logs: logs,
+              AmountTheyreBuying: CurrentMintAmount,
+
             }
 
             await enqueueSwap(SwapData);
@@ -403,7 +405,8 @@ async function enqueueSwap(SwapData) {
   const InfoSelling = InfoMapping[FactorSold] ? InfoMapping[FactorSold] : FactorSold * 100 + "% of their mint"
 
   const RoundedAmount = roundToDigits(FactorSold, 3)
-  const ExtraInfo = SwapData.transactionType == "sell" ? `(${RoundedAmount*100}%)` : `(${SwapData.AmountTheyreBuying})`
+  const RoundedTheyreBuying = Math.floor(SwapData.AmountTheyreBuying + 0.5)
+  const ExtraInfo = SwapData.transactionType == "sell" ? `(${RoundedAmount*100}%)` : `(${RoundedTheyreBuying})`
   const Emoji = SwapData.transactionType == "buy" ? "🟢" : "🔴"
   let DetectionMessage = `${Emoji} Detected a *${SwapData.transactionType}* at ${GetTime(true)} ${ExtraInfo}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
 
