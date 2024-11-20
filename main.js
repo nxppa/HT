@@ -202,7 +202,7 @@ function AreDictionariesEqual(dict1, dict2) {
 
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
-  if (deep >= 2){
+  if (deep >= 3){
     console.log("max retries for changes logged exceeded")
     return
   }
@@ -211,7 +211,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
     const TheirCurrentTokens = await GetTokens(Addy);
     if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens)) {
       console.log("no change in wallet detected. Retrying")
-      checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
+      checkTokenBalances(signature, TransType, Addy, logs, deep + 1, GetTime())
       return
       //TODO make it so it retries if a transaction was actually made (ONLY if transaction type was a sell)
     }
@@ -278,7 +278,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
     }
   }
   if (!Diagnosed) {
-    console.log("?no change? retrying", TransType, logs)
+    console.log("?no change? retrying", TransType, logs, GetTime())
     checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
     return
   }
