@@ -360,7 +360,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   const Emoji = transactionType == "buy" ? "🟢" : "🔴"
   let Indic = SetParameters.Halted ? "🟡" : "🟢"
   Indic = Simulating ? "🔵" : Indic
-  const Message = `${Indic} Detected a *${transactionType}* at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
+  let DetectionMessage = `${Indic} Detected a *${transactionType}* at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
 
   const ToGo = "🟡"
   const Done = "🟢"
@@ -382,10 +382,11 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   }
 
 
-  SendToAll(Message, "Markdown");
   if (transactionType === "buy") {
     if (!IsPumpCoin(mintAddress)) {
-      SendToAll(`⚠️ ${GetMintEmbed("Mint", mintAddress)} is not a pump token; trade skipped`);
+      const NotPumpMessage = `⚠️ ${GetMintEmbed("Mint", mintAddress)} is not a pump token; trade skipped`
+      DetectionMessage += "\n" + NotPumpMessage
+      SendToAll(DetectionMessage, "Markdown");
       return
     }
     const tokenPriceInUsd = await GetPrice(mintAddress);
@@ -394,32 +395,39 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     const CostInUsd = (NumTokens * tokenPriceInUsd)
     console.log("cost in usd: ", CostInUsd)
     if (!tokenPriceInUsd) {
-      SendToAll(`🚫 Could not fetch price for ${GetMintEmbed("mint", mintAddress)}; trade skipped.`);
+      const CouldntGetPriceMessage = `🚫 Could not fetch price for ${GetMintEmbed("mint", mintAddress)}; trade skipped.`
+      DetectionMessage += "\n" + CouldntGetPriceMessage
+      SendToAll(DetectionMessage, "Markdown");
       return;
     }
     if (FactorOfMarketCap > 0.03) {
-      SendToAll(`⚠️ Exceeded market cap proportion; trade skipped ${GetMintEmbed("mint", mintAddress)} (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`);
+      const ExceededMarketCapMessage = `⚠️ Exceeded market cap proportion; trade skipped ${GetMintEmbed("mint", mintAddress)} (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`
+      DetectionMessage += "\n" + ExceededMarketCapMessage
+      SendToAll(DetectionMessage, "Markdown");
       return;
     }
     const ProportionSpending = CostInUsd/(myWalletBalanceInSol*SolVal)
     const MaxAmountSpendingInUsd = myWalletBalanceInSol * SolVal * SetParameters.MaxProportionSpending
     if (ProportionSpending > SetParameters.MaxProportionSpending) {
       NumTokens = MaxAmountSpendingInUsd/tokenPriceInUsd
-      SendToAll(`🔶 Max spending proportion exceeded (${ProportionSpending*100}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
+      const MaxProportionExceededMessage = `🔶 Max spending proportion exceeded (${ProportionSpending*100}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`
+      DetectionMessage += "\n" + MaxProportionExceededMessage
     }
     if (CostInUsd < SetParameters.MinimumSpending) {
-      SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)}), ${NumTokens}, ${tokenPriceInUsd}, ${NumTheyreBuying}, ${WalletFactor}`);
+      const BelowMinimumSpendingMessage = `⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)})`
+      DetectionMessage += "\n" + BelowMinimumSpendingMessage
+      SendToAll(DetectionMessage, "Markdown");
       return;
     }
   } else if (transactionType === "sell") {
     const balance = MyTokens[mintAddress] || 0;
-
     if (balance <= 0) {
       const Indic = SetParameters.Halted || Simulating ? "🟠" : "";
-      SendToAll(`${Indic} No tokens available for ${GetMintEmbed("mint", mintAddress)}; swap skipped.`);
+      const NoTokensMessage = `${Indic} No tokens available for ${GetMintEmbed("mint", mintAddress)}; swap skipped.`
+      DetectionMessage += "\n" + NoTokensMessage
+      SendToAll(DetectionMessage, "Markdown");
       return;
     }
-
     if (ConsecutiveSells[mintAddress] >= ConsecutiveSellsThreshold) {
       NumTokens = MyTokens[mintAddress];
       //TODO Add timeframe
@@ -469,7 +477,9 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   }
 
   if (SetParameters.Halted && transactionType == 'buy') {
-    SendToAll(`${Indic} Buying is halted; didn't buy ${GetMintEmbed("mint", mintAddress)}`)
+    const HaltedMessage = `${Indic} Buying is halted; didn't buy ${GetMintEmbed("mint", mintAddress)}` 
+    DetectionMessage += "\n" + HaltedMessage
+    SendToAll(DetectionMessage, "Markdown")
     return
   }
 
