@@ -238,7 +238,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
 
             const SwapData = {
               transactionType: "buy",
-              mint: mint,
+              mintAddress: mint,
               AmountOfTokensToSwap: HowManyTokensToBuy,
               Wallet: Addy,
               Signature: signature,
@@ -256,7 +256,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
 
             const SwapData = {
               transactionType: "sell",
-              mint: mint,
+              mintAddress: mint,
               AmountOfTokensToSwap: MyTokenAmountSelling,
               Wallet: Addy,
               Signature: signature,
@@ -279,7 +279,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
 
         const SwapData = {
           transactionType: "buy",
-          mint: mint,
+          mintAddress: mint,
           AmountOfTokensToSwap: HowManyTokensToBuy,
           Wallet: Addy,
           Signature: signature,
@@ -300,7 +300,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
 
         const SwapData = {
           transactionType: "sell",
-          mint: mint,
+          mintAddress: mint,
           AmountOfTokensToSwap: AllMyMint,
           Wallet: Addy,
           Signature: signature,
