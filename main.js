@@ -405,7 +405,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     const MaxAmountSpendingInUsd = myWalletBalanceInSol * SolVal * SetParameters.MaxProportionSpending
     if (ProportionSpending > SetParameters.MaxProportionSpending) {
       NumTokens = MaxAmountSpendingInUsd/tokenPriceInUsd
-      SendToAll(`🔶 Max spending proportion exceeded (${ProportionSpending}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
+      SendToAll(`🔶 Max spending proportion exceeded (${ProportionSpending*100}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
     }
     if (CostInUsd < SetParameters.MinimumSpending) {
       SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)}), ${NumTokens}, ${tokenPriceInUsd}, ${NumTheyreBuying}`);
