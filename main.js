@@ -129,24 +129,24 @@ function GetTime(raw) {
 function ToDecimalString(num) {
   // Handle small numbers explicitly
   if (Math.abs(num) < 1e-6) {
-      return num.toFixed(20).replace(/\.?0+$/, ""); // Use a large number of decimals and strip trailing zeros
+    return num.toFixed(20).replace(/\.?0+$/, ""); // Use a large number of decimals and strip trailing zeros
   }
 
   // Convert numbers without using scientific notation
   let [integerPart, fractionalPart] = num.toString().split('e');
   if (!fractionalPart) {
-      return integerPart; // Return directly if there's no scientific notation
+    return integerPart; // Return directly if there's no scientific notation
   }
 
   // Handle scientific notation
   let exponent = parseInt(fractionalPart, 10);
   if (exponent > 0) {
-      // Positive exponent - shift the decimal point to the right
-      return integerPart.replace('.', '') + '0'.repeat(exponent - (integerPart.split('.')[1]?.length || 0));
+    // Positive exponent - shift the decimal point to the right
+    return integerPart.replace('.', '') + '0'.repeat(exponent - (integerPart.split('.')[1]?.length || 0));
   } else {
-      // Negative exponent - shift the decimal point to the left
-      let digits = integerPart.replace('.', '');
-      return '0.' + '0'.repeat(Math.abs(exponent) - 1) + digits;
+    // Negative exponent - shift the decimal point to the left
+    let digits = integerPart.replace('.', '');
+    return '0.' + '0'.repeat(Math.abs(exponent) - 1) + digits;
   }
 }
 
@@ -202,7 +202,7 @@ function AreDictionariesEqual(dict1, dict2) {
 
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
-  if (deep >= 2){
+  if (deep >= 2) {
     console.log("max retries for changes logged exceeded")
     return
   }
@@ -336,14 +336,6 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   const WalletFactor = targetWallets[Wallet][0]
 
 
-  const InfoMapping = {
-    0.25: "a quater of their position of the mint",
-    0.5: "half of their position of the mint",
-    0.75: "two thirds of their position of the mint",
-    1: "all of their mint position of the mint",
-  }
-  //TODO do something with this shit
-  //const InfoSelling = InfoMapping[FactorSold] ?  InfoMapping[FactorSold] : FactorSold*100 + "% of their mint"
 
 
   /*  STRUCTURE FOR TRADE DATABASE
@@ -357,8 +349,20 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     Amount = amount of tokens bought or sold,
     }
 */
+
+  const InfoMapping = {
+    0.25: "a quater of their position of the mint",
+    0.5: "half of their position of the mint",
+    0.75: "two thirds of their position of the mint",
+    1: "all of their mint position of the mint",
+  }
+  //TODO do something with this shit
+  const InfoSelling = InfoMapping[FactorSold] ? InfoMapping[FactorSold] : FactorSold * 100 + "% of their mint"
+
+  const RoundedAmount = roundToDigits(FactorSold, 3)
+  const SellInfo = transactionType == "sell" ? `(${RoundedAmount*100}%)` : ""
   const Emoji = transactionType == "buy" ? "🟢" : "🔴"
-  let DetectionMessage = `${Emoji} Detected a *${transactionType}* at ${GetTime(true)}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
+  let DetectionMessage = `${Emoji} Detected a *${transactionType}* at ${GetTime(true)} ${SellInfo}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
 
   const ToGo = "🟡"
   const Done = "🟢"
@@ -404,11 +408,11 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
       SendToAll(DetectionMessage, "Markdown");
       return;
     }
-    const ProportionSpending = CostInUsd/(myWalletBalanceInSol*SolVal)
+    const ProportionSpending = CostInUsd / (myWalletBalanceInSol * SolVal)
     const MaxAmountSpendingInUsd = myWalletBalanceInSol * SolVal * SetParameters.MaxProportionSpending
     if (ProportionSpending > SetParameters.MaxProportionSpending) {
-      NumTokens = MaxAmountSpendingInUsd/tokenPriceInUsd
-      const MaxProportionExceededMessage = `🔶 Max spending proportion exceeded (${ProportionSpending*100}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`
+      NumTokens = MaxAmountSpendingInUsd / tokenPriceInUsd
+      const MaxProportionExceededMessage = `🔶 Max spending proportion exceeded (${ProportionSpending * 100}%); setting amount purchasing to ${SetParameters.MaxProportionSpending * 100}%`
       DetectionMessage += "\n" + MaxProportionExceededMessage
     }
     if (CostInUsd < SetParameters.MinimumSpending) {
@@ -474,7 +478,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   }
 
   if (SetParameters.Halted && transactionType == 'buy') {
-    const HaltedMessage = `🟡 Buying is halted; didn't buy ${GetMintEmbed("mint", mintAddress)}` 
+    const HaltedMessage = `🟡 Buying is halted; didn't buy ${GetMintEmbed("mint", mintAddress)}`
     DetectionMessage += "\n" + HaltedMessage
     SendToAll(DetectionMessage, "Markdown")
     return
@@ -630,34 +634,34 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
   const CurrentWalletFactor = Math.min(await myWalletBalanceInSol / WalletSize, 1)
   const TheirLastTokens = await GetTokens(Wallet);
 
-/*
-  if (InitialFetch) {
-    NumWalletsAdded += 1
-
-    const Progress = roundToDigits(NumWalletsAdded / NumWalletsTotal, 2)
-    const PlaceEnding = Math.floor(BarSize * Progress + 0.5)
-    let ProgressString = "\\["
-    for (let x = 1; x < BarSize + 1; x++) {
-      ProgressString += x <= PlaceEnding ? Filled : Unfilled
-    }
-    const EstimatedTimeLeft = (NumWalletsTotal - NumWalletsAdded) * 6
-    ProgressString += `\] ${Progress * 100}%\n ETA: ${EstimatedTimeLeft} seconds`
-    console.log(ProgressString)
-    if (NumWalletsAdded == NumWalletsTotal) {
-      StartedLogging = true
-      let StartInidicator = SetParameters.Halted ? "🟨" : "🟩"
-      const Msg = StartInidicator + SetParameters.Halted ? "Finished adding wallets. Bot is halted" : "Finished adding wallets. Bot is active" + StartInidicator
-      for (id in IDToName) {
-        //SendStandaloneMessage((id).toString(), Msg, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
+  /*
+    if (InitialFetch) {
+      NumWalletsAdded += 1
+  
+      const Progress = roundToDigits(NumWalletsAdded / NumWalletsTotal, 2)
+      const PlaceEnding = Math.floor(BarSize * Progress + 0.5)
+      let ProgressString = "\\["
+      for (let x = 1; x < BarSize + 1; x++) {
+        ProgressString += x <= PlaceEnding ? Filled : Unfilled
       }
-    } else {
-      for (id in IDToName) {
-        //SendStandaloneMessage((id).toString(), ProgressString, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
-
+      const EstimatedTimeLeft = (NumWalletsTotal - NumWalletsAdded) * 6
+      ProgressString += `\] ${Progress * 100}%\n ETA: ${EstimatedTimeLeft} seconds`
+      console.log(ProgressString)
+      if (NumWalletsAdded == NumWalletsTotal) {
+        StartedLogging = true
+        let StartInidicator = SetParameters.Halted ? "🟨" : "🟩"
+        const Msg = StartInidicator + SetParameters.Halted ? "Finished adding wallets. Bot is halted" : "Finished adding wallets. Bot is active" + StartInidicator
+        for (id in IDToName) {
+          //SendStandaloneMessage((id).toString(), Msg, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
+        }
+      } else {
+        for (id in IDToName) {
+          //SendStandaloneMessage((id).toString(), ProgressString, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
+  
+        }
       }
     }
-  }
-  */
+    */
   StartedLogging = true
   targetWallets[Wallet] = [CurrentWalletFactor, null, TheirLastTokens, WalletSize, Alias,]
   subscribeToWalletTransactions(Wallet);
@@ -774,7 +778,7 @@ function getAxiosInstance() {
 
 async function SendToAll(text, Mode = "Markdown", Method = "sendMessage", MessageToEdit) { //TODO make it so that there is a way to make sure a message is specifically sent after the other
   console.log(text, Mode)
-  
+
   for (const chatId in IDToName) {
     const data = await SendStandaloneMessage(chatId, text, Mode, Method, MessageToEdit)
     if (!InitialMessageIDForEach[chatId]) {
