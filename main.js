@@ -235,7 +235,17 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
             //const AmountOfSolana = CostInUsd / SolVal
             console.log("mint comparison: ", CurrentMintAmount, LastMintAmount, TheirLastTokens, TheirCurrentTokens)
             console.log(GetTime(), "BUYING", HowManyTokensToBuy, balanceChange, WalletFactor, logs)
-            await enqueueSwap('buy', mint, HowManyTokensToBuy, Addy, signature, CurrentMintAmount, logs);
+
+            const SwapData = {
+              transactionType: "buy",
+              mint: mint,
+              AmountOfTokensToSwap: HowManyTokensToBuy,
+              Wallet: Addy,
+              Signature: signature,
+              logs: logs,
+            }
+
+            await enqueueSwap(SwapData);
             Diagnosed = true
           } else if (transactionType == "sell") {
             // token amount IN MINT
@@ -243,7 +253,18 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
             const MyTokenAmountSelling = MyTokens[mint] * FactorSold || 0
             console.log(balanceChange, LastMintAmount, MyTokens, FactorSold, MyTokenAmountSelling, null, logs)
             console.log(GetTime(), "SELLING", MyTokenAmountSelling, mint)
-            await enqueueSwap("sell", mint, MyTokenAmountSelling, Addy, signature);
+
+            const SwapData = {
+              transactionType: "sell",
+              mint: mint,
+              AmountOfTokensToSwap: MyTokenAmountSelling,
+              Wallet: Addy,
+              Signature: signature,
+              logs: logs,
+              FactorSold: FactorSold,
+            }
+
+            await enqueueSwap(SwapData);
             Diagnosed = true
           }
         }
@@ -255,7 +276,19 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
         //const AmountOfSolana = CostInUsd / SolVal
         console.log(HowManyTokensToBuy, SolVal, CurrentMintAmount, WalletFactor, mint)
         console.log(GetTime(), "BUYING INITIAL", HowManyTokensToBuy)
-        await enqueueSwap('buy', mint, HowManyTokensToBuy, Addy, signature, CurrentMintAmount, logs);
+
+        const SwapData = {
+          transactionType: "buy",
+          mint: mint,
+          AmountOfTokensToSwap: HowManyTokensToBuy,
+          Wallet: Addy,
+          Signature: signature,
+          logs: logs,
+          AmountTheyreBuying: CurrentMintAmount,
+
+        }
+
+        await enqueueSwap(SwapData);
         Diagnosed = true
 
       }
@@ -264,7 +297,18 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       if (TheirCurrentTokens[mint] == null) {
         const AllMyMint = MyTokens[mint] || 0;
         console.log(GetTime(), "SELLING ALL", AllMyMint);
-        await enqueueSwap("sell", mint, AllMyMint, Addy, signature, null, logs);
+
+        const SwapData = {
+          transactionType: "sell",
+          mint: mint,
+          AmountOfTokensToSwap: AllMyMint,
+          Wallet: Addy,
+          Signature: signature,
+          logs: logs,
+          FactorSold: 1,
+        }
+
+        await enqueueSwap(SwapData);
         Diagnosed = true;
       }
     }
@@ -331,12 +375,11 @@ function AddData(Database, NewData) {
   fs.writeFileSync(Path, JSON.stringify(Info, null, 2));
 }
 
-async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, Wallet, Signature, NumTheyreBuying, TheirLogs) {
-  let NumTokens = AmountOfTokensToSwap
-  const WalletFactor = targetWallets[Wallet][0]
-
-
-
+async function enqueueSwap(FactorSold) {
+  const Wallet = SwapData.Wallet
+  const FactorSold = SwapData.FactorSold
+  const Signature = SwapData.Signature
+  let NumTokens = SwapData.AmountOfTokensToSwap
 
   /*  STRUCTURE FOR TRADE DATABASE
   Data = {
@@ -360,9 +403,9 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   const InfoSelling = InfoMapping[FactorSold] ? InfoMapping[FactorSold] : FactorSold * 100 + "% of their mint"
 
   const RoundedAmount = roundToDigits(FactorSold, 3)
-  const SellInfo = transactionType == "sell" ? `(${RoundedAmount*100}%)` : ""
-  const Emoji = transactionType == "buy" ? "🟢" : "🔴"
-  let DetectionMessage = `${Emoji} Detected a *${transactionType}* at ${GetTime(true)} ${SellInfo}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
+  const ExtraInfo = SwapData.transactionType == "sell" ? `(${RoundedAmount*100}%)` : `(${SwapData.AmountTheyreBuying})`
+  const Emoji = SwapData.transactionType == "buy" ? "🟢" : "🔴"
+  let DetectionMessage = `${Emoji} Detected a *${SwapData.transactionType}* at ${GetTime(true)} ${ExtraInfo}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
 
   const ToGo = "🟡"
   const Done = "🟢"
@@ -384,26 +427,26 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   }
 
 
-  if (transactionType === "buy") {
-    if (!IsPumpCoin(mintAddress)) {
-      const NotPumpMessage = `⚠️ ${GetMintEmbed("Mint", mintAddress)} is not a pump token; trade skipped`
+  if (SwapData.transactionType === "buy") {
+    if (!IsPumpCoin(SwapData.mintAddress)) {
+      const NotPumpMessage = `⚠️ ${GetMintEmbed("Mint", SwapData.mintAddress)} is not a pump token; trade skipped`
       DetectionMessage += "\n" + NotPumpMessage
       SendToAll(DetectionMessage, "Markdown");
       return
     }
-    const tokenPriceInUsd = await GetPrice(mintAddress);
+    const tokenPriceInUsd = await GetPrice(SwapData.mintAddress);
     const MarketCap = tokenPriceInUsd * Bil;
-    const FactorOfMarketCap = (NumTheyreBuying * tokenPriceInUsd) / MarketCap;
+    const FactorOfMarketCap = (SwapData.AmountTheyreBuying * tokenPriceInUsd) / MarketCap;
     const CostInUsd = (NumTokens * tokenPriceInUsd)
     console.log("cost in usd: ", CostInUsd)
     if (!tokenPriceInUsd) {
-      const CouldntGetPriceMessage = `🚫 Could not fetch price for ${GetMintEmbed("mint", mintAddress)}; trade skipped.`
+      const CouldntGetPriceMessage = `🚫 Could not fetch price for ${GetMintEmbed("mint", SwapData.mintAddress)}; trade skipped.`
       DetectionMessage += "\n" + CouldntGetPriceMessage
       SendToAll(DetectionMessage, "Markdown");
       return;
     }
     if (FactorOfMarketCap > 0.03) {
-      const ExceededMarketCapMessage = `⚠️ Exceeded market cap proportion; trade skipped ${GetMintEmbed("mint", mintAddress)} (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`
+      const ExceededMarketCapMessage = `⚠️ Exceeded market cap proportion; trade skipped ${GetMintEmbed("mint", SwapData.mintAddress)} (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`
       DetectionMessage += "\n" + ExceededMarketCapMessage
       SendToAll(DetectionMessage, "Markdown");
       return;
@@ -421,16 +464,16 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
       SendToAll(DetectionMessage, "Markdown");
       return;
     }
-  } else if (transactionType === "sell") {
-    const balance = MyTokens[mintAddress] || 0;
+  } else if (SwapData.transactionType === "sell") {
+    const balance = MyTokens[SwapData.mintAddress] || 0;
     if (balance <= 0) {
-      const NoTokensMessage = `🪙 No tokens available for ${GetMintEmbed("mint", mintAddress)}; swap skipped.`
+      const NoTokensMessage = `🪙 No tokens available for ${GetMintEmbed("mint", SwapData.mintAddress)}; swap skipped.`
       DetectionMessage += "\n" + NoTokensMessage
       SendToAll(DetectionMessage, "Markdown");
       return;
     }
-    if (ConsecutiveSells[mintAddress] >= ConsecutiveSellsThreshold) {
-      NumTokens = MyTokens[mintAddress];
+    if (ConsecutiveSells[SwapData.mintAddress] >= ConsecutiveSellsThreshold) {
+      NumTokens = MyTokens[SwapData.mintAddress];
       //TODO Add timeframe
     }
   }
@@ -438,14 +481,14 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
 
   if (Simulating) {
     if (!NumTokens) {
-      console.log("invalid amount of tokens to log: ", NumTokens, GetTime(), Wallet, mintAddress)
+      console.log("invalid amount of tokens to log: ", NumTokens, GetTime(), Wallet, SwapData.mintAddress)
       return
     }
     const AddedSimulationSeconds = 10
     setTimeout(() => {
-      GetPrice(mintAddress).then(result => {
+      GetPrice(SwapData.mintAddress).then(result => {
         if (!result) {
-          if (transactionType == "buy") {
+          if (SwapData.transactionType == "buy") {
             return
           } else {
             //TODO make it try again here
@@ -455,19 +498,19 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
         Data.Cost = parseFloat(result)
         Data.Amount = NumTokens
         Data.Wallet = Wallet
-        Data.Type = transactionType
-        Data.Mint = mintAddress
+        Data.Type = SwapData.transactionType
+        Data.Mint = SwapData.mintAddress
         Data.Time = GetTime()
         AddData("OurTrades.json", Data)
-        let Message = `🔵 Simulated a *${transactionType}* at ${GetTime(true)} copying wallet: ${GetWalletEmbed(Wallet, Wallet)} for mint: ${GetMintEmbed(mintAddress, mintAddress)} ${Emoji}`
+        let Message = `🔵 Simulated a *${SwapData.transactionType}* at ${GetTime(true)} copying wallet: ${GetWalletEmbed(Wallet, Wallet)} for mint: ${GetMintEmbed(SwapData.mintAddress, SwapData.mintAddress)} ${Emoji}`
         SendToAll(Message, "MarkdownV2")
-        if (transactionType == "buy") {
-          MyTokens[mintAddress] = MyTokens[mintAddress] || 0
-          MyTokens[mintAddress] += NumTokens
+        if (SwapData.transactionType == "buy") {
+          MyTokens[SwapData.mintAddress] = MyTokens[SwapData.mintAddress] || 0
+          MyTokens[SwapData.mintAddress] += NumTokens
           SimulatingStartAmountUSD -= NumTokens * Data.Cost
         } else {
-          if (MyTokens[mintAddress]) {
-            MyTokens[mintAddress] -= NumTokens
+          if (MyTokens[SwapData.mintAddress]) {
+            MyTokens[SwapData.mintAddress] -= NumTokens
             SimulatingStartAmountUSD += NumTokens * Data.Cost
           }
         }
@@ -477,8 +520,8 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     return
   }
 
-  if (SetParameters.Halted && transactionType == 'buy') {
-    const HaltedMessage = `🟡 Buying is halted; didn't buy ${GetMintEmbed("mint", mintAddress)}`
+  if (SetParameters.Halted && SwapData.transactionType == 'buy') {
+    const HaltedMessage = `🟡 Buying is halted; didn't buy ${GetMintEmbed("mint", SwapData.mintAddress)}`
     DetectionMessage += "\n" + HaltedMessage
     SendToAll(DetectionMessage, "Markdown")
     return
@@ -488,15 +531,15 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
 
   Data.Amount = NumTokens
   Data.Wallet = Wallet
-  Data.Type = transactionType
-  Data.Mint = mintAddress
+  Data.Type = SwapData.transactionType
+  Data.Mint = SwapData.mintAddress
   Data.Time = GetTime()
 
   let ParsedSignature = undefined
   let ParsedLogs = undefined
-  for (let i = transactionType === "buy" ? MaxRetries - 1 : 1; i < MaxRetries; i++) {
+  for (let i = SwapData.transactionType === "buy" ? MaxRetries - 1 : 1; i < MaxRetries; i++) {
     const AmountSwapping = NumTokens // amount in number of tokens 
-    const { Signature, Successful, logs } = await handleSwap(mintAddress, AmountSwapping, transactionType);
+    const { Signature, Successful, logs } = await handleSwap(SwapData.mintAddress, AmountSwapping, SwapData.transactionType);
     ParsedSignature = Signature
     ParsedLogs = logs
     ParsedLogs.err = ParsedLogs.err || "failed"
@@ -506,13 +549,13 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
 
     console.log("swapped. Status: ", Successful)
     if (!Successful) {
-      if (transactionType == "sell") {
-        console.log(`failed to ${transactionType}` + transactionType == "sell" ? ". retrying" : ".")
+      if (SwapData.transactionType == "sell") {
+        console.log(`failed to ${SwapData.transactionType}` + SwapData.transactionType == "sell" ? ". retrying" : ".")
       } else {
         // buy
         console.log("key stuff", logs)
         //console.log(Object.keys(logs.err)[0])
-        const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(ParsedLogs.err)}` //TODO make it log error
+        const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(ParsedLogs.err)}` //TODO make it log error
         SendToAll(Message, "MarkdownV2")
         Data.Successful = false
         AddData("OurOrders.json", Data)
@@ -520,22 +563,22 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
       }
     } else {
       console.log("did operation successfully")
-      if (transactionType == "buy") {
-        MyTokens[mintAddress] = MyTokens[mintAddress] ? MyTokens[mintAddress] : 0
-        MyTokens[mintAddress] += NumTokens
+      if (SwapData.transactionType == "buy") {
+        MyTokens[SwapData.mintAddress] = MyTokens[SwapData.mintAddress] ? MyTokens[SwapData.mintAddress] : 0
+        MyTokens[SwapData.mintAddress] += NumTokens
       } else {
-        if (!ConsecutiveSells[mintAddress]) {
-          ConsecutiveSells[mintAddress] = 1
+        if (!ConsecutiveSells[SwapData.mintAddress]) {
+          ConsecutiveSells[SwapData.mintAddress] = 1
         } else {
-          ConsecutiveSells[mintAddress] += 1
+          ConsecutiveSells[SwapData.mintAddress] += 1
         }
-        MyTokens[mintAddress] -= NumTokens
+        MyTokens[SwapData.mintAddress] -= NumTokens
         //TODO make it so that it minuses the correct amount of tokens
       }
       break
     }
     if (i == MaxRetries) {
-      const Message = `🚫 Failed to ${transactionType}`
+      const Message = `🚫 Failed to ${SwapData.transactionType}`
       SendToAll(Message, "Markdown")
       return
     }
@@ -543,7 +586,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   Data.Successful = true
   AddData("OurOrders.json", Data)
 
-  const ExecutedMessage = `🛒 Executed a *${transactionType}* at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", ParsedSignature)} `
+  const ExecutedMessage = `🛒 Executed a *${SwapData.transactionType}* at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", ParsedSignature)} `
   //TODO make it so that it replies to the message above
   SendToAll(ExecutedMessage, "MarkdownV2")
 }
