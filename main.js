@@ -408,7 +408,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
       SendToAll(`🔶 Max spending proportion exceeded (${ProportionSpending}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
     }
     if (CostInUsd < SetParameters.MinimumSpending) {
-      SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)}), ${NumTokens}, ${tokenPriceInUsd}`);
+      SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)}), ${NumTokens}, ${tokenPriceInUsd}, ${NumTheyreBuying}`);
       return;
     }
   } else if (transactionType === "sell") {
@@ -577,7 +577,7 @@ function subscribeToWalletTransactions(WalletAdd) {
     const ToSearchFor = [`Program log: Instruction: PumpSell`, `Program log: Instruction: PumpBuy`, `Program log: Instruction: CloseAccount`, `Program log: Create`, `Program log: Instruction: Sell`, `Program log: Instruction: Buy`]
     const InString = findMatchingStrings(logs.logs, ToSearchFor, false)
     if (InString && !logs.err) {
-      console.log("good data: ", logs)
+      console.log(WalletAdd, "good data: ", logs)
       handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs);
     } else {
       console.log("Useless data: ", logs)
