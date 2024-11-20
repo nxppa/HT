@@ -375,7 +375,7 @@ function AddData(Database, NewData) {
   fs.writeFileSync(Path, JSON.stringify(Info, null, 2));
 }
 
-async function enqueueSwap(FactorSold) {
+async function enqueueSwap(SwapData) {
   const Wallet = SwapData.Wallet
   const FactorSold = SwapData.FactorSold
   const Signature = SwapData.Signature
