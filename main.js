@@ -358,7 +358,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     }
 */
   const Emoji = transactionType == "buy" ? "🟢" : "🔴"
-  let DetectionMessage = `${Emoji} Detected a *${transactionType}* at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
+  let DetectionMessage = `${Emoji} Detected a *${transactionType}* at ${GetTime(true)}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
 
   const ToGo = "🟡"
   const Done = "🟢"
