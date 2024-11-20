@@ -408,7 +408,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
       SendToAll(`🔶 Max spending proportion exceeded (${ProportionSpending}%); setting amount purchasing to ${SetParameters.MaxProportionSpending*100}%`);
     }
     if (CostInUsd < SetParameters.MinimumSpending) {
-      SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)})`);
+      SendToAll(`⚠️ Below minimum spending; trade skipped ($${ToDecimalString(CostInUsd)}), ${NumTokens}, ${tokenPriceInUsd}`);
       return;
     }
   } else if (transactionType === "sell") {
