@@ -281,7 +281,9 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
     }
   }
   if (!Diagnosed) {
-    console.log("?no change?", TransType, logs)
+    console.log("?no change? retrying", TransType, logs)
+    checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
+    return
   }
 
 
@@ -488,6 +490,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
     const { Signature, Successful, logs } = await handleSwap(mintAddress, AmountSwapping, transactionType);
     ParsedSignature = Signature
     ParsedLogs = logs
+    ParsedLogs.err = ParsedLogs.err || "failed"
 
     Data.Signature = Signature
     Data.MyLogs = logs
@@ -500,7 +503,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
         // buy
         console.log("key stuff", logs)
         //console.log(Object.keys(logs.err)[0])
-        const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(logs.err)}` //TODO make it log error
+        const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(ParsedLogs.err)}` //TODO make it log error
         SendToAll(Message, "MarkdownV2")
         Data.Successful = false
         AddData("OurOrders.json", Data)
