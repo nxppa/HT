@@ -422,7 +422,7 @@ async function enqueueSwap(transactionType, mintAddress, AmountOfTokensToSwap, W
   } else if (transactionType === "sell") {
     const balance = MyTokens[mintAddress] || 0;
     if (balance <= 0) {
-      const Indic = SetParameters.Halted || Simulating ? "🟠" : "";
+      const Indic = SetParameters.Halted || Simulating ? "🟠" : "🪙";
       const NoTokensMessage = `${Indic} No tokens available for ${GetMintEmbed("mint", mintAddress)}; swap skipped.`
       DetectionMessage += "\n" + NoTokensMessage
       SendToAll(DetectionMessage, "Markdown");
