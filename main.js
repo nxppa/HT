@@ -54,7 +54,7 @@ SetParameters.Halted = null
 
 let myWalletBalanceInSol = null
 
-const SOLANA_RPC_ENDPOINT = clusterApiUrl('mainnet-beta')
+const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f" //clusterApiUrl('mainnet-beta')
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
