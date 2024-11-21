@@ -13,7 +13,6 @@ const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
 const SigCheckBaseAddress = "https://solscan.io/tx/"
 
-
 const SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112'; // SOL
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
 const MyWalletPubKey = new PublicKey(MyWallet)
@@ -210,7 +209,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
     const TheirLastTokens = targetWallets[Addy][2]
     const TheirCurrentTokens = await GetTokens(Addy);
     if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
-      console.log("no change in wallet detected. Retrying")
+      console.log("no change in wallet detected. Retrying", deep + 1)
       await checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
       return
       //TODO make it so it retries if a transaction was actually made (ONLY if transaction type was a sell)
@@ -324,7 +323,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
     }
   }
   if (!Diagnosed && deep == 0) {
-    console.log("?no change? retrying", TransType, logs, GetTime())
+    console.log("?no change? retrying", TransType, logs, GetTime(), deep + 1)
     await checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
     return
   }
@@ -378,11 +377,19 @@ function AddData(Database, NewData) {
 }
 
 async function enqueueSwap(SwapData) {
+
+
+
   const Wallet = SwapData.Wallet
   const FactorSold = SwapData.FactorSold
   const Signature = SwapData.Signature
   let NumTokens = SwapData.AmountOfTokensToSwap
 
+
+  if (CompletedCopies.includes(Signature)){
+    console.log("duplicate transaction detected. skipping")
+    return
+  }
   /*  STRUCTURE FOR TRADE DATABASE
   Data = {
     Time = GetTime(),
@@ -395,14 +402,13 @@ async function enqueueSwap(SwapData) {
     }
 */
 
-  const InfoMapping = {
+  const InfoMapping = { 
     0.25: "a quater of their position of the mint",
     0.5: "half of their position of the mint",
     0.75: "two thirds of their position of the mint",
     1: "all of their mint position of the mint",
   }
-  //TODO do something with this shit
-  const InfoSelling = InfoMapping[FactorSold] ? InfoMapping[FactorSold] : FactorSold * 100 + "% of their mint"
+  const InfoSelling = InfoMapping[FactorSold] ? InfoMapping[FactorSold] : FactorSold * 100 + "% of their mint" //TODO do something with this 
 
   const RoundedAmount = roundToDigits(FactorSold, 3)
   const RoundedTheyreBuying = Math.floor(SwapData.AmountTheyreBuying + 0.5)
@@ -415,12 +421,13 @@ async function enqueueSwap(SwapData) {
   const Fail = "🔴"
   let NumChecksPassed = 0
   const DescriptionMapping = [
+    "Pump Token Check",
     "Market Cap Check",
     "Minimum Spending Check",
     "Maximum Spending Check"
   ]
   let NumChecks = DescriptionMapping.length
-  function GetStatus(FailedAt) {
+  function GetStatus(FailedAt) { //TODO also do something with this 
     let str = ""
     for (let i = 0; i < NumChecks; i++) {
 
@@ -429,13 +436,14 @@ async function enqueueSwap(SwapData) {
     return str
   }
 
-
   if (SwapData.transactionType === "buy") {
     if (!IsPumpCoin(SwapData.mintAddress)) {
       const NotPumpMessage = `⚠️ ${GetMintEmbed("Mint", SwapData.mintAddress)} is not a pump token; trade skipped`
       DetectionMessage += "\n" + NotPumpMessage
       SendToAll(DetectionMessage, "Markdown");
       return
+    } else {
+
     }
     const tokenPriceInUsd = await GetPrice(SwapData.mintAddress);
     const MarketCap = tokenPriceInUsd * Bil;
@@ -600,7 +608,7 @@ async function handleSwap(Mint, InpAmount, transactionType) {
   console.log("InpAmount: ", InpAmount)
   console.log("signature: ", Signature)
   let Successful = false
-  let logs = ""
+  let logs = {}
   if (!Signature) {
     return { Signature, Successful, logs }
   }
