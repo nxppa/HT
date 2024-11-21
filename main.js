@@ -334,7 +334,6 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
 
 function handleTradeEvent(signature, TransType, Address, logs) {
   if (!CompletedCopies.includes(signature)) {
-    CompletedCopies.push(signature)
     checkTokenBalances(signature, TransType, Address, logs, 0)
 
   } else {
@@ -387,6 +386,7 @@ async function enqueueSwap(SwapData) {
 
 
   if (CompletedCopies.includes(Signature)){
+    CompletedCopies.push(signature)
     console.log("duplicate transaction detected. skipping")
     return
   }
