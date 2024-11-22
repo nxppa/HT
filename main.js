@@ -184,7 +184,7 @@ function AreDictionariesEqual(dict1, dict2) {
 
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
-  if (deep >= 2) {
+  if (deep >= 8) {
     console.log("max retries for changes logged exceeded")
     return
   }
@@ -606,37 +606,70 @@ async function handleSwap(Mint, InpAmount, transactionType) {
     return { Signature, Successful, MyAnalysis }
   }
 }
-let subscriptions = {}
-function subscribeToWalletTransactions(WalletAdd) {
-  const CurrWalletPubKey = new PublicKey(WalletAdd)
-  const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
-    if (!targetWallets[WalletAdd]) {
-      connection.removeOnLogsListener(subscriptions[WalletAdd])
-      return
-    }
-    if (!StartedLogging) {
-      targetWallets[WalletAdd][2] = await GetTokens(WalletAdd)
-      return
-    }
 
-    const ToSearchFor = [`Program log: Instruction: PumpSell`, `Program log: Instruction: PumpBuy`, `Program log: Instruction: CloseAccount`, `Program log: Create`, `Program log: Instruction: Sell`, `Program log: Instruction: Buy`]
-    const InString = findMatchingStrings(logs.logs, ToSearchFor, false)
-    if (InString && !logs.err) {
-      console.log(WalletAdd, "good data: ", logs)
-      handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs);
-    } else {
-      console.log("Useless data: ", logs)
+
+
+
+// Array of RPC endpoints
+const SOLANA_RPC_ENDPOINTS = [
+  "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
+  "https://api.mainnet-beta.solana.com",
+];
+
+const connections = {};
+SOLANA_RPC_ENDPOINTS.forEach((endpoint, index) => {
+  connections[index] = new Connection(endpoint, { commitment: 'confirmed' });
+});
+
+let LoggedSignature = [];
+let subscriptions = {};
+
+function subscribeToWalletTransactions(WalletAdd) {
+  const CurrWalletPubKey = new PublicKey(WalletAdd);
+  for (const index in connections) {
+    const connection = connections[index];
+    const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
+      if (!targetWallets[WalletAdd]) {
+        connection.removeOnLogsListener(subscriptions[WalletAdd][index]);
+        return;
+      }
+      if (!StartedLogging) {
+        targetWallets[WalletAdd][2] = await GetTokens(WalletAdd);
+        return;
+      }
+      if (LoggedSignature.includes(logs.signature)) {
+        return;
+      }
+      LoggedSignature.push(logs.signature);
+      const ToSearchFor = [
+        `Program log: Instruction: PumpSell`,
+        `Program log: Instruction: PumpBuy`,
+        `Program log: Instruction: CloseAccount`,
+        `Program log: Create`,
+        `Program log: Instruction: Sell`,
+        `Program log: Instruction: Buy`
+      ];
+      const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
+      if (InString && !logs.err) {
+        console.log(WalletAdd, "good data: ", logs);
+        handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs);
+      } else {
+        console.log("Useless data: ", logs);
+      }
+    }, 'confirmed');
+    if (!subscriptions[WalletAdd]) {
+      subscriptions[WalletAdd] = {};
     }
-  }, 'confirmed')
-  async function UpdateWalletFactor() {
-    const WalletSize = await getWalletBalance(WalletAdd)
-    const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1)
-    targetWallets[WalletAdd][0] = CurrentWalletFactor
-    targetWallets[WalletAdd][3] = WalletSize
-    console.log(`Wallet update for ${WalletAdd}: `, myWalletBalanceInSol, WalletSize)
+    subscriptions[WalletAdd][index] = id;
   }
-  UpdateWalletFactor()
-  subscriptions[WalletAdd] = id
+  async function UpdateWalletFactor() {
+    const WalletSize = await getWalletBalance(WalletAdd);
+    const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1);
+    targetWallets[WalletAdd][0] = CurrentWalletFactor;
+    targetWallets[WalletAdd][3] = WalletSize;
+    console.log(`Wallet update for ${WalletAdd}: `, myWalletBalanceInSol, WalletSize);
+  }
+  UpdateWalletFactor();
 }
 
 
