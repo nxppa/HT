@@ -2,7 +2,7 @@ let targetWallets = {}
 const MyWallet = "5DtSqQQbbVKtgMosGsgRDDPKPizTeFijA9DEEfK9Exfe" //* public wallet address
 //*------- API Callers-------\\
 const { getWalletBalance } = require('./Getters/SolBalance/Solana.js');
-const { FetchSolVal } = require('./Getters/SolVal/Jupiter.js');
+const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
