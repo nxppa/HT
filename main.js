@@ -386,10 +386,10 @@ async function enqueueSwap(SwapData) {
 
 
   if (CompletedCopies.includes(Signature)){
-    CompletedCopies.push(signature)
     console.log("duplicate transaction detected. skipping")
     return
   }
+  CompletedCopies.push(signature)
   /*  STRUCTURE FOR TRADE DATABASE
   Data = {
     Time = GetTime(),
