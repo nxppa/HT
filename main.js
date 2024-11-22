@@ -207,6 +207,11 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   }
   try {
     const TheirLastTokens = targetWallets[Addy][2]
+    if (CompletedCopies.includes(Signature)){
+      console.log("duplicate transaction detected. skipping")
+      return
+    }
+    CompletedCopies.push(Signature)
     const TheirCurrentTokens = await GetTokens(Addy);
     if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
       console.log("no change in wallet detected. Retrying", deep + 1)
@@ -385,11 +390,7 @@ async function enqueueSwap(SwapData) {
   let NumTokens = SwapData.AmountOfTokensToSwap
 
 
-  if (CompletedCopies.includes(Signature)){
-    console.log("duplicate transaction detected. skipping")
-    return
-  }
-  CompletedCopies.push(signature)
+
   /*  STRUCTURE FOR TRADE DATABASE
   Data = {
     Time = GetTime(),
