@@ -614,6 +614,7 @@ async function handleSwap(Mint, InpAmount, transactionType) {
 const SOLANA_RPC_ENDPOINTS = [
   "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
   "https://api.mainnet-beta.solana.com",
+  "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7"
 ];
 
 const connections = {};
