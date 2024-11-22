@@ -63,8 +63,6 @@ function isEthereumOrSolanaAddress(address) {
   return /^0x[a-fA-F0-9]{40}$/.test(address) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
 }
 
-
-
 let MyTokens = {}
 let SolVal = FetchSolVal() //TODO in future make it so no trades are enqueued until solvalue is procured 
 async function updateValue() {
@@ -78,8 +76,6 @@ function startConstantUpdate() {
     await updateValue()
   }, 10000)
 }
-
-
 
 updateValue()
 startConstantUpdate()
@@ -105,45 +101,32 @@ process.on('uncaughtException', (error) => {
 
 function GetTime(raw) {
   const now = new Date();
-
-  // Use Intl.DateTimeFormat to format time in Sydney with milliseconds
   const formatter = new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
     minute: 'numeric',
     second: 'numeric',
-    fractionalSecondDigits: 3, // Includes milliseconds
+    fractionalSecondDigits: 3,
     hour12: false,
-    timeZone: 'Australia/Sydney', // Specifies Sydney timezone
+    timeZone: 'Australia/Sydney', 
   });
-
-  // Format the time string
   const timeString = formatter.format(now);
-
-  // Add brackets if 'raw' is false
   const time = raw ? timeString : `[${timeString}]`;
 
   return time;
 }
 
 function ToDecimalString(num) {
-  // Handle small numbers explicitly
   if (Math.abs(num) < 1e-6) {
-    return num.toFixed(20).replace(/\.?0+$/, ""); // Use a large number of decimals and strip trailing zeros
+    return num.toFixed(20).replace(/\.?0+$/, "")
   }
-
-  // Convert numbers without using scientific notation
   let [integerPart, fractionalPart] = num.toString().split('e');
   if (!fractionalPart) {
-    return integerPart; // Return directly if there's no scientific notation
+    return integerPart
   }
-
-  // Handle scientific notation
   let exponent = parseInt(fractionalPart, 10);
   if (exponent > 0) {
-    // Positive exponent - shift the decimal point to the right
     return integerPart.replace('.', '') + '0'.repeat(exponent - (integerPart.split('.')[1]?.length || 0));
   } else {
-    // Negative exponent - shift the decimal point to the left
     let digits = integerPart.replace('.', '');
     return '0.' + '0'.repeat(Math.abs(exponent) - 1) + digits;
   }
@@ -220,7 +203,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       const CurrentMintAmount = TheirCurrentTokens[mint]
       const LastMintAmount = TheirLastTokens[mint]
       if (mint in TheirLastTokens) {
-        const balanceChange = CurrentMintAmount - LastMintAmount; // The amount of the token traded. 
+        const balanceChange = CurrentMintAmount - LastMintAmount; // amount of token traded
         if (Math.abs(balanceChange) < 0.01) { //Not a real transaction; a fee or smth
           //!Diagnosed = true
           continue
@@ -626,9 +609,7 @@ async function handleSwap(Mint, InpAmount, transactionType) {
 let subscriptions = {}
 function subscribeToWalletTransactions(WalletAdd) {
   const CurrWalletPubKey = new PublicKey(WalletAdd)
-  console.log("subcrivesdes")
   const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
-
     if (!targetWallets[WalletAdd]) {
       connection.removeOnLogsListener(subscriptions[WalletAdd])
       return

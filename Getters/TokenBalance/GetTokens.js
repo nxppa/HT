@@ -10,6 +10,7 @@ const connection = new Connection(SOLANA_RPC_ENDPOINT, {
 const TPID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 
 async function GetTokens(Address) {
+    const st = Date.now()
     const key = new PublicKey(Address)
     try {
         const response = await connection.getParsedTokenAccountsByOwner(key, {programId: TPID})
@@ -23,6 +24,8 @@ async function GetTokens(Address) {
                 tokens[mint] = tokenAmount
             }
         })
+        const et = Date.now()
+        console.log(`Time taken for GetTokens for wallet ${Address}: `, (et - st)/1000)
         return tokens;
     } catch (error) {
         console.error('Error fetching token accounts:', error, key);
