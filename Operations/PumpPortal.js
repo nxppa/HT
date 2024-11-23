@@ -27,7 +27,6 @@ const MyWallet = PrivToPub(REPLICATING_WALLET_PRIVATE_KEY) //* public wallet add
 
 const { PublicKey, VersionedTransaction, Connection, Keypair } = require('@solana/web3.js')
 const SOLANA_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
-const bs58 = require("bs58").default
 const MyWalletPubKey = new PublicKey(MyWallet)
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
