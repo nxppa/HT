@@ -1,7 +1,6 @@
 node_modules/
-/db/
+db/TargetWallets
 /test.js
 /temp
 /burner.js
-/db
 /.env
