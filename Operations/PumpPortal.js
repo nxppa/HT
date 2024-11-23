@@ -1,8 +1,28 @@
-const REPLICATING_WALLET_PRIVATE_KEY = '28L65yF3ont5Jrb2DuHdnMb7ohQ1Wo2kLzSi4ujJcTsQcDyNaBmNBMKEqLXA35Q7kvinvYsbj43JBEA3BhF7gB3r' //* private wallet key
-const MyWallet = "5DtSqQQbbVKtgMosGsgRDDPKPizTeFijA9DEEfK9Exfe" //* public wallet address
+require('dotenv').config();
+
+
+const REPLICATING_WALLET_PRIVATE_KEY = process.env.PrivateKey //* private wallet key
+
+
+function PrivToPub(PrivateKey) {
+  try {
+    // Decode the Base58 private key string into a Uint8Array
+    const privateKeyArray = bs58.decode(PrivateKey);
+    console.log(privateKeyArray)
+    // Create a Keypair from the private key
+    const keypair = Keypair.fromSecretKey(privateKeyArray);
+    
+    // Return the public key as a Base58 string
+    return keypair.publicKey.toBase58();
+  } catch (error) {
+    console.log(error)
+    throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
+  }
+}
 
 //TODO Make a universal variable for these
 
+const MyWallet = PrivToPub(REPLICATING_WALLET_PRIVATE_KEY) //* public wallet address
 
 const { PublicKey, VersionedTransaction, Connection, Keypair } = require('@solana/web3.js')
 const SOLANA_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';

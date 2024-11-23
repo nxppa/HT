@@ -1,6 +1,8 @@
 // Helius.js
+require('dotenv').config();
+
 async function getAsset(assetId) {
-    const url = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f";
+    const url = `https://mainnet.helius-rpc.com/?api-key=${process.env.HeliusApiKey}`;
 
     const body = {
         "jsonrpc": "2.0",

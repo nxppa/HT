@@ -1,6 +1,6 @@
 //! needs birdeye api key
 //! limited to 30k calls each month
-const fetch = require('node-fetch');
+require('dotenv').config();
 
 async function FetchSolVal() {
     const options = {
@@ -8,7 +8,7 @@ async function FetchSolVal() {
         headers: {
           accept: 'application/json',
           'x-chain': 'solana',
-          'X-API-KEY': '27dd9a2f9c1d49bcb82b5d450f22b4f8'
+          'X-API-KEY': `${process.env.BirdEyeApiKey}`
         }
       };
 

@@ -1,6 +1,8 @@
+require('dotenv').config();
+
+
 async function HeliusPrice(Mint) {
-    const apiKey = '62867695-c3eb-46cb-b5bc-1953cf48659f'; // Replace with your actual API key
-    const url = `https://mainnet.helius-rpc.com/?api-key=${apiKey}`;
+    const url = `https://mainnet.helius-rpc.com/?api-key=${process.env.HeliusApiKey}`;
     
     const payload = {
       "jsonrpc": "2.0",

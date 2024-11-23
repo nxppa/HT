@@ -22,7 +22,7 @@ const MyWallet = PrivToPub(process.env.PrivateKey)
 console.log(MyWallet)
 const MyWalletPubKey = new PublicKey(MyWallet)
 const fs = require('fs');
-const MY_TOKEN = "7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE";
+const MY_TOKEN = process.env.TelegramKey;
 const Simulating = false
 const ConsecutiveSellsThreshold = 4
 const Unfilled = "□"
@@ -57,10 +57,7 @@ SetParameters.Halted = null
 
 let myWalletBalanceInSol = null
 
-const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f" //clusterApiUrl('mainnet-beta')
-const connection = new Connection(SOLANA_RPC_ENDPOINT, {
-  commitment: 'confirmed',
-});
+
 
 function isEthereumOrSolanaAddress(address) {
   return /^0x[a-fA-F0-9]{40}$/.test(address) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
@@ -137,10 +134,17 @@ function ToDecimalString(num) {
 
 
 //-------My Wallet Logs ------\\
+
 let MyWalletAnalysis = {}
+const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f" //TODO make it so that there is multiple of thses
+const connection = new Connection(SOLANA_RPC_ENDPOINT, {
+  commitment: 'confirmed',
+});
 connection.onLogs(MyWalletPubKey, async (logs, ctx) => {
-  MyWalletAnalysis[logs.signature] = logs
-  UpdateMyWallet()
+  if (!MyWalletAnalysis[logs.signature]){
+    MyWalletAnalysis[logs.signature] = logs
+    UpdateMyWallet()
+  }
 }, 'confirmed')
 
 function findMatchingStrings(stringsArray, substringsArray, Includes) {
