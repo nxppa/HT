@@ -488,6 +488,9 @@ async function enqueueSwap(SwapData) {
     }
   }
 
+  const PassedChecksMessage = `✅ Passed all checks. Enqueueing swap for ${GetMintEmbed("mint", SwapData.mintAddress)}`
+  DetectionMessage += "\n" + PassedChecksMessage
+  SendToAll(DetectionMessage, "Markdown")
 
   if (Simulating) {
     if (!NumTokens) {
