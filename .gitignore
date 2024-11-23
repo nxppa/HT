@@ -3,3 +3,4 @@ node_modules/
 /temp
 /burner.js
 /db
+/.env

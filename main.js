@@ -1,6 +1,5 @@
 let targetWallets = {}
-const MyWallet = "5DtSqQQbbVKtgMosGsgRDDPKPizTeFijA9DEEfK9Exfe" //* public wallet address
-//TODO add .env file for addresses and keys and stuff
+require('dotenv').config();
 //*------- API Callers-------\\
 const { getWalletBalance } = require('./Getters/SolBalance/Solana.js');
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
@@ -13,10 +12,15 @@ const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
 const SigCheckBaseAddress = "https://solscan.io/tx/"
 
+
+
 const SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112'; // SOL
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
-const MyWalletPubKey = new PublicKey(MyWallet)
 const axios = require("axios")
+const bs58 = require("bs58").default
+const MyWallet = PrivToPub(process.env.PrivateKey)
+console.log(MyWallet)
+const MyWalletPubKey = new PublicKey(MyWallet)
 const fs = require('fs');
 const MY_TOKEN = "7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE";
 const Simulating = false
@@ -178,6 +182,21 @@ function AreDictionariesEqual(dict1, dict2) {
     return false;
   }
   return true;
+}
+function PrivToPub(PrivateKey) {
+  try {
+      // Decode the Base58 private key string into a Uint8Array
+      const privateKeyArray = bs58.decode(PrivateKey);
+      console.log(privateKeyArray)
+      // Create a Keypair from the private key
+      const keypair = Keypair.fromSecretKey(privateKeyArray);
+
+      // Return the public key as a Base58 string
+      return keypair.publicKey.toBase58();
+  } catch (error) {
+    console.log(error)
+      throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
+  }
 }
 
 
@@ -604,9 +623,10 @@ async function handleSwap(Mint, InpAmount, transactionType) {
 }
 
 const SOLANA_RPC_ENDPOINTS = [
-  "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
   "https://api.mainnet-beta.solana.com",
-  "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7"
+  "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
+  "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7",
+  
 ];
 
 const connections = {};
