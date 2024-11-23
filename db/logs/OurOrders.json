@@ -1,0 +1,29 @@
+[
+  {
+    "Amount": 12901.983365861128,
+    "Wallet": "DpNVrtA3ERfKzX4F8Pi2CVykdJJjoNxyY5QgoytAwD26",
+    "Type": "buy",
+    "Mint": "E84iV8No8TQYPCp5sdA3ZysU2dBPceQWK7nbceQTpump",
+    "Time": "[8:20:15.293]",
+    "Signature": "3fhE5jmLWUXRhGEwJmBMuQ527ppdsvcf1x7t3JoCVw3Kv6StSVemoamTn4qkVQtNTZUjE77uQfsgCYXvwquMgEV3",
+    "Successful": true
+  },
+  {
+    "Amount": 4261.411257910246,
+    "Wallet": "6LChaYRYtEYjLEHhzo4HdEmgNwu2aia8CM8VhR9wn6n7",
+    "Type": "buy",
+    "Mint": "HoCMNnSGhgubRWpGDwBh3AjK3PKEcaisRBFUoQWFpump",
+    "Time": "[5:43:23.337]",
+    "Signature": "5LtjFNifgruUfk91JyNXbQAwDsFxAHVFnkzf3beDxPxYp52CCw5REaS6WSCtv2f4koEmLaaevdswzvY1KKVghJE5",
+    "Successful": true
+  },
+  {
+    "Amount": 4261.411257910246,
+    "Wallet": "6LChaYRYtEYjLEHhzo4HdEmgNwu2aia8CM8VhR9wn6n7",
+    "Type": "sell",
+    "Mint": "HoCMNnSGhgubRWpGDwBh3AjK3PKEcaisRBFUoQWFpump",
+    "Time": "[5:46:14.345]",
+    "Signature": "57BDzXhesxZhYJCCQiMqvQCxvEag68jtLHc3CLf7qy3RJmQBQiCq9eVJRAzsFd7EdwX4dhqjgJwC2bchLYxVfC1s",
+    "Successful": true
+  }
+]
