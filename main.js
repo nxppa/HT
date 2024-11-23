@@ -549,7 +549,14 @@ async function enqueueSwap(SwapData) {
   Data.Time = GetTime()
 
   let ParsedSignature = undefined
-  for (let i = SwapData.transactionType === "buy" ? MaxRetries - 1 : 1; i < MaxRetries; i++) {
+  let MaxNumRetrying = MaxRetries
+  if (SwapData.transactionType == "buy"){
+    MyTokens[SwapData.mintAddress] = MyTokens[SwapData.mintAddress] ? MyTokens[SwapData.mintAddress] : 0
+    MyTokens[SwapData.mintAddress] += NumTokens //! imaginary tokens
+    MaxNumRetrying = 1
+  }
+
+  for (let i = 1; i < MaxNumRetrying; i++) {
     const AmountSwapping = NumTokens // amount in number of tokens 
     const { Signature, Successful, logs } = await handleSwap(SwapData.mintAddress, AmountSwapping, SwapData.transactionType);
     ParsedSignature = Signature
@@ -565,6 +572,7 @@ async function enqueueSwap(SwapData) {
         // buy
         console.log("key stuff", logs)
         //console.log(Object.keys(logs.err)[0])
+        MyTokens[SwapData.mintAddress] -= NumTokens //! removing imaginary tokens
         const err = "unknown error"
         const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(err)}` //TODO make it log error
         SendToAll(Message, "MarkdownV2")
@@ -575,8 +583,6 @@ async function enqueueSwap(SwapData) {
     } else {
       console.log("did operation successfully")
       if (SwapData.transactionType == "buy") {
-        MyTokens[SwapData.mintAddress] = MyTokens[SwapData.mintAddress] ? MyTokens[SwapData.mintAddress] : 0
-        MyTokens[SwapData.mintAddress] += NumTokens
         ConsecutiveSells[SwapData.mintAddress] = 0
       } else {
         if (!ConsecutiveSells[SwapData.mintAddress]) {
