@@ -10,6 +10,7 @@ async function FetchSolVal() {
     const SolData = data.data["So11111111111111111111111111111111111111112"]
     if (!SolData){
       console.log("failed to get sol val")
+      return undefined
     }
     return SolData.price
   } catch (err) {

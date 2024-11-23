@@ -1193,7 +1193,7 @@ async function handleMessage(messageObj) {
         SetParameters.MinimumSpending = NewMin
         userStates[chatId].waitingForMinimum = false;
         updateValueInFile("MinimumSpending", NewMin)
-        SendToAll(`Minimum spent changed to ${NewMin} Dollars.`)
+        SendToAll(`Minimum spent changed to ${NewMin} USD.`)
       }
       ReturnToMenu()
       return;
