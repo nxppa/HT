@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const bs58 = require("bs58").default
 
 const REPLICATING_WALLET_PRIVATE_KEY = process.env.PrivateKey //* private wallet key
 
