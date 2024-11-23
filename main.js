@@ -549,13 +549,10 @@ async function enqueueSwap(SwapData) {
   Data.Time = GetTime()
 
   let ParsedSignature = undefined
-  let ParsedLogs = undefined
   for (let i = SwapData.transactionType === "buy" ? MaxRetries - 1 : 1; i < MaxRetries; i++) {
     const AmountSwapping = NumTokens // amount in number of tokens 
     const { Signature, Successful, logs } = await handleSwap(SwapData.mintAddress, AmountSwapping, SwapData.transactionType);
     ParsedSignature = Signature
-    ParsedLogs = logs
-    ParsedLogs.err = ParsedLogs.err || "failed"
 
     Data.Signature = Signature
     Data.MyLogs = logs
@@ -563,12 +560,13 @@ async function enqueueSwap(SwapData) {
     console.log("swapped. Status: ", Successful)
     if (!Successful) {
       if (SwapData.transactionType == "sell") {
-        console.log(`failed to ${SwapData.transactionType}` + SwapData.transactionType == "sell" ? ". retrying" : ".")
+        console.log(`failed to sell. retrying`)
       } else {
         // buy
         console.log("key stuff", logs)
         //console.log(Object.keys(logs.err)[0])
-        const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(ParsedLogs.err)}` //TODO make it log error
+        const err = "unknown error"
+        const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(err)}` //TODO make it log error
         SendToAll(Message, "MarkdownV2")
         Data.Successful = false
         AddData("OurOrders.json", Data)
