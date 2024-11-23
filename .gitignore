@@ -1,7 +1,7 @@
 node_modules/
+/db/
 /test.js
 /temp
 /burner.js
 /db
 /.env
-db/
