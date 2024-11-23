@@ -4,5 +4,4 @@ node_modules/
 /burner.js
 /db
 /.env
-db/TargetWallets.txt
-db/Values.txt
+db/
