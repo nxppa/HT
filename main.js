@@ -1,5 +1,6 @@
 let targetWallets = {}
 const MyWallet = "5DtSqQQbbVKtgMosGsgRDDPKPizTeFijA9DEEfK9Exfe" //* public wallet address
+//TODO add .env file for addresses and keys and stuff
 //*------- API Callers-------\\
 const { getWalletBalance } = require('./Getters/SolBalance/Solana.js');
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
@@ -7,7 +8,6 @@ const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
-const EndpointUsing = "PumpPortal"
 //*--------constants-------*\\
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
@@ -18,7 +18,6 @@ const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Mes
 const MyWalletPubKey = new PublicKey(MyWallet)
 const axios = require("axios")
 const fs = require('fs');
-const http = require("http")
 const MY_TOKEN = "7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE";
 const Simulating = false
 const ConsecutiveSellsThreshold = 4
@@ -107,7 +106,7 @@ function GetTime(raw) {
     second: 'numeric',
     fractionalSecondDigits: 3,
     hour12: false,
-    timeZone: 'Australia/Sydney', 
+    timeZone: 'Australia/Sydney',
   });
   const timeString = formatter.format(now);
   const time = raw ? timeString : `[${timeString}]`;
@@ -300,7 +299,6 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
     targetWallets[Addy][2] = TheirCurrentTokens
   } catch (error) {
     if (error.response && error.response.status === 429) {
-      // Handle rate limiting
       console.warn('Encountered 429 Too Many Requests. Please slow down.');
     } else {
       console.error('Unexpected error during token balance check:', error);
@@ -360,15 +358,12 @@ function AddData(Database, NewData) {
 }
 
 async function enqueueSwap(SwapData) {
-
-
-
   const Wallet = SwapData.Wallet
   const FactorSold = SwapData.FactorSold
   const Signature = SwapData.Signature
   let NumTokens = SwapData.AmountOfTokensToSwap
 
-  if (CompletedCopies.includes(Signature)){
+  if (CompletedCopies.includes(Signature)) {
     console.log("duplicate transaction detected. skipping")
     return
   }
@@ -386,7 +381,7 @@ async function enqueueSwap(SwapData) {
     }
 */
 
-  const InfoMapping = { 
+  const InfoMapping = {
     0.25: "a quater of their position of the mint",
     0.5: "half of their position of the mint",
     0.75: "two thirds of their position of the mint",
@@ -396,7 +391,7 @@ async function enqueueSwap(SwapData) {
 
   const RoundedAmount = roundToDigits(FactorSold, 3)
   const RoundedTheyreBuying = Math.floor(SwapData.AmountTheyreBuying + 0.5)
-  const ExtraInfo = SwapData.transactionType == "sell" ? `(${RoundedAmount*100}%)` : `(${RoundedTheyreBuying})`
+  const ExtraInfo = SwapData.transactionType == "sell" ? `(${RoundedAmount * 100}%)` : `(${RoundedTheyreBuying})`
   const Emoji = SwapData.transactionType == "buy" ? "🟢" : "🔴"
   let DetectionMessage = `${Emoji} Detected a *${SwapData.transactionType}* at ${GetTime(true)} ${ExtraInfo}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}`
 
@@ -558,6 +553,7 @@ async function enqueueSwap(SwapData) {
       if (SwapData.transactionType == "buy") {
         MyTokens[SwapData.mintAddress] = MyTokens[SwapData.mintAddress] ? MyTokens[SwapData.mintAddress] : 0
         MyTokens[SwapData.mintAddress] += NumTokens
+        ConsecutiveSells[SwapData.mintAddress] = 0
       } else {
         if (!ConsecutiveSells[SwapData.mintAddress]) {
           ConsecutiveSells[SwapData.mintAddress] = 1
@@ -607,10 +603,6 @@ async function handleSwap(Mint, InpAmount, transactionType) {
   }
 }
 
-
-
-
-// Array of RPC endpoints
 const SOLANA_RPC_ENDPOINTS = [
   "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
   "https://api.mainnet-beta.solana.com",

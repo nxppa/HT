@@ -12,6 +12,7 @@ function GetTime(raw) {
     return time;
 }
 async function GetPrice(Mint) {
+    const st = Date.now()
     const priceGetters = {
         DevPrice: DevPrice(Mint),
         GeckoPrice: GeckoPrice(Mint),
@@ -29,6 +30,8 @@ async function GetPrice(Mint) {
         );
     }
     try {
+        const et = Date.now()
+        console.log(`Time taken for GetPrice for mint ${Mint}: `, (et - st)/1000)
         return await Promise.any(promises);
     } catch (error) {
         console.error("All price getters failed or returned undefined.");

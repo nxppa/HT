@@ -7,7 +7,11 @@ async function FetchSolVal() {
     if(!data.data){
       console.log(data)
     }
-    return data.data["So11111111111111111111111111111111111111112"].price
+    const SolData = data.data["So11111111111111111111111111111111111111112"]
+    if (!SolData){
+      console.log("failed to get sol val")
+    }
+    return SolData.price
   } catch (err) {
     console.error('Error fetching token price:', err);
     throw err; // Rethrow the error if needed
