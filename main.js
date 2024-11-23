@@ -1,13 +1,13 @@
 let targetWallets = {}
 require('dotenv').config();
-//*------- API Callers-------\\
+//------- API Callers-------
 const { getWalletBalance } = require('./Getters/SolBalance/Solana.js');
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
-//*--------constants-------*\\
+//------- API Callers-------
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
 const SigCheckBaseAddress = "https://solscan.io/tx/"
@@ -45,7 +45,7 @@ const IDToName = {
   679687518: "Sasha the basher"
 
 }
-//*--------------*\\
+
 let subscriptionId = null;
 let CompletedCopies = []
 let SetParameters = {}
@@ -327,7 +327,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       console.error('Unexpected error during token balance check:', error);
     }
   }
-  if (!Diagnosed && deep == 0) {
+  if (!Diagnosed) {
     console.log("?no change? retrying", TransType, logs, GetTime(), deep + 1)
     await checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
     return
@@ -1125,6 +1125,7 @@ async function handleMessage(messageObj) {
       } else {
         userStates[chatId].waitingForWalletToView = false;
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
+        //Get wallet 
       }
       ReturnToMenu()
       return
@@ -1332,9 +1333,9 @@ async function handleMessage(messageObj) {
 
     case ActionTexts["mybal"]:
       async function showbal() {
-        sendMessage(chatId, `Getting balance for wallet ${GetWalletEmbed(MyWallet, MyWallet)}`, "MarkdownV2")
-        const SolBal = roundToDigits(await getWalletBalance(MyWallet), 5);
-        const USDBal = roundToDigits(await SolVal * SolBal, 3)
+        sendMessage(chatId, `Getting balance for ${GetWalletEmbed("Wallet", MyWallet)}`, "MarkdownV2")
+        const SolBal = roundToDigits(await myWalletBalanceInSol, 5);
+        const USDBal = roundToDigits(await SolVal * myWalletBalanceInSol, 3)
         const AUDBal = roundToDigits(await AUDTOUSD(USDBal), 3)
 
         let BalanceMessage = `*💵 USD: ${USDBal}\n💸 AUD: ${AUDBal}\n💜 SOL: ${SolBal}`;
