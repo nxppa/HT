@@ -10,7 +10,7 @@ const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
 const SigCheckBaseAddress = "https://solscan.io/tx/"
 
-const SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112'
+const SOL_MINT_ADDRESS = process.env.SOL
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
 const axios = require("axios")
 const express = require('express');
@@ -222,6 +222,10 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       await checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
       return
       //TODO make it so it retries if a transaction was actually made (ONLY if transaction type was a sell)
+    } else {
+      if (deep != 0){
+        console.log("deepness: ", deep)
+      }
     }
     const WalletFactor = targetWallets[Addy][0]
     for (const mint in TheirCurrentTokens) {
