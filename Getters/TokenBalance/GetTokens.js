@@ -3,10 +3,7 @@ const { Connection, PublicKey, clusterApiUrl} = require('@solana/web3.js');
 
 const SOLANA_RPC_ENDPOINT = "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7";
 //! quicknode rpc
-const SpecialTokens = {
-    EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: "USDC",
-    So11111111111111111111111111111111111111112: "WSOL"
-  }
+
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
@@ -23,7 +20,7 @@ async function GetTokens(Address) {
             const mint = parsedInfo.mint;
             const tokenAmountInfo = parsedInfo.tokenAmount;
             const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
-            if (tokenAmount && !SpecialTokens[mint]){
+            if (tokenAmount){
                 tokens[mint] = tokenAmount
             }
         })

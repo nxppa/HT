@@ -30,7 +30,10 @@ const Filled = "■"
 const BarSize = 10
 const Bil = 1000000000
 const MaxRetries = 20
-
+const SpecialTokens = {
+  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: "USDC",
+  So11111111111111111111111111111111111111112: "WSOL"
+}
 
 let StartedLogging = false
 let NumWalletsAdded = 0
@@ -206,6 +209,7 @@ function PrivToPub(PrivateKey) {
 
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
+  
   if (deep >= 8) {
     console.log("max retries for changes logged exceeded")
     return
@@ -226,8 +230,8 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       const LastMintAmount = TheirLastTokens[mint]
       if (mint in TheirLastTokens) {
         const balanceChange = CurrentMintAmount - LastMintAmount; // amount of token traded
-        if (Math.abs(balanceChange) < 0.01) { //Not a real transaction; a fee or smth
-          //!Diagnosed = true
+        if (SpecialTokens[mint]) { //Not a real transaction; a fee or smth
+          Diagnosed = true
           continue
         }
         const transactionType = inferTransactionType(balanceChange);
