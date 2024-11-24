@@ -232,13 +232,14 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       const CurrentMintAmount = TheirCurrentTokens[mint]
       const LastMintAmount = TheirLastTokens[mint]
       if (mint in TheirLastTokens) {
-        const balanceChange = CurrentMintAmount - LastMintAmount; // amount of token traded
-        if (SpecialTokens[mint]) { //Not a real transaction; a fee or smth
-          Diagnosed = true
-          continue
-        }
+        const balanceChange = CurrentMintAmount - LastMintAmount
+
         const transactionType = inferTransactionType(balanceChange);
         if (transactionType !== 'no change') {
+          if (SpecialTokens[mint]) {
+            Diagnosed = true
+            continue
+          }
           if (transactionType == "buy") {
             // token amount IN MINT
             const HowManyTokensToBuy = balanceChange * WalletFactor
@@ -256,9 +257,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
               Signature: signature,
               logs: logs,
               AmountTheyreBuying: CurrentMintAmount,
-
             }
-
             await enqueueSwap(SwapData);
             Diagnosed = true
           } else if (transactionType == "sell") {
@@ -321,7 +320,6 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
           logs: logs,
           FactorSold: 1,
         }
-
         await enqueueSwap(SwapData);
         Diagnosed = true;
       }
