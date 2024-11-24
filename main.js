@@ -611,7 +611,7 @@ async function enqueueSwap(SwapData) {
 
   const ExecutedMessage = `🛒 Executed a *${SwapData.transactionType}* at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", ParsedSignature)} `
   //TODO make it so that it replies to the message above
-  SendToAll(ExecutedMessage, "MarkdownV2")
+  SendToAll(ExecutedMessage, "Markdown")
 }
 
 
