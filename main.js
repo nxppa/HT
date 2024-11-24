@@ -459,8 +459,8 @@ async function enqueueSwap(SwapData) {
       SendToAll(DetectionMessage, "Markdown");
       return;
     }
-    if (FactorOfMarketCap > 0.03) {
-      const ExceededMarketCapMessage = `⚠️ Exceeded market cap proportion; trade skipped ${GetMintEmbed("mint", SwapData.mintAddress)} (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`
+    if (FactorOfMarketCap > SetParameters.MaxMarketCap) {
+      const ExceededMarketCapMessage = `⚠️ Exceeded market cap proportion; trade skipped (${roundToDigits(FactorOfMarketCap * 100, 3)}%)`
       DetectionMessage += "\n" + ExceededMarketCapMessage
       SendToAll(DetectionMessage, "Markdown");
       return;
