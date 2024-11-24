@@ -21,6 +21,9 @@ async function PumpPrice(Mint) {
         const marketCapText = divTextContent.replace('Market cap: $', '').trim();
         const marketCapValue = parseFloat(marketCapText.replace(/,/g, ''));
         const TP = marketCapValue/Bil
+        if (!TP){
+            return undefined
+        }
         console.log("PumpPrice: ", TP)
         return TP
 
