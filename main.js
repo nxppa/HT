@@ -1,28 +1,26 @@
-let targetWallets = {}
 require('dotenv').config();
-//------- API Callers-------
 const { getWalletBalance } = require('./Getters/SolBalance/Solana.js');
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
-//------- API Callers-------
+
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
 const SigCheckBaseAddress = "https://solscan.io/tx/"
 
-
-
-const SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112'; // SOL
+const SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112'
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
 const axios = require("axios")
+const express = require('express');
 const bs58 = require("bs58").default
-const MyWallet = PrivToPub(process.env.PrivateKey)
-console.log(MyWallet)
-const MyWalletPubKey = new PublicKey(MyWallet)
 const fs = require('fs');
-const MY_TOKEN = process.env.TelegramKey;
+
+const MyWallet = PrivToPub(process.env.PrivateKey)
+const MyWalletPubKey = new PublicKey(MyWallet)
+const TelegramKey = process.env.TelegramKey;
+
 const Simulating = false
 const ConsecutiveSellsThreshold = 4
 const Unfilled = "□"
@@ -40,6 +38,7 @@ let NumWalletsAdded = 0
 
 let SimulatingStartAmountUSD = 189.04
 
+let targetWallets = {}
 let ConsecutiveSells = {}
 let InitialMessageIDForEach = {}
 const IDToName = {
@@ -763,7 +762,7 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
 //ngrok http http://localhost:4040
 
 function SetWebhook() {
-  const WebhookUrl = `https://api.telegram.org/bot${MY_TOKEN}/setWebhook?url=${ngrokUrl}/`
+  const WebhookUrl = `https://api.telegram.org/bot${TelegramKey}/setWebhook?url=${ngrokUrl}/`
 
   fetch(WebhookUrl, {
     method: 'GET',
@@ -826,8 +825,7 @@ main()
 
 
 
-const PORT = process.env.PORT || 80;
-const express = require('express');
+const PORT = process.env.PORT
 const app = express();
 app.use(express.json());
 app.post("*", async (req, res) => {
@@ -843,14 +841,14 @@ app.post("*", async (req, res) => {
 app.get("*", async (req, res) => {
   res.send("t.me/nappa2");
 });
-const server = app.listen(PORT, '174.138.92.212', function (err) {
+const server = app.listen(PORT, process.env.WebIP, function (err) {
   if (err) console.log(err);
   console.log("Server listening on PORT", PORT);
 });
 //server.keepAliveTimeout = 61*1000
 
 
-const BASE_URL = `https://api.telegram.org/bot${MY_TOKEN}/`;
+const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`;
 function getAxiosInstance() {
   return {
     get(method, params) {
@@ -883,7 +881,7 @@ async function SendToAll(text, Mode = "Markdown", Method = "sendMessage", Messag
 }
 
 async function SendStandaloneMessage(chatId, text, Mode, Method, MessageID) {
-  const url = `https://api.telegram.org/bot${MY_TOKEN}/${Method}`;
+  const url = `https://api.telegram.org/bot${TelegramKey}/${Method}`;
   try {
     const Input = {
       chat_id: chatId,

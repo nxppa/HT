@@ -1,13 +1,14 @@
+require('dotenv').config();
 const { Connection, PublicKey, clusterApiUrl} = require('@solana/web3.js');
 
 
-const SOLANA_RPC_ENDPOINT = "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7";
+const SOLANA_RPC_ENDPOINT = process.env.QuickNodeRPC
 //! quicknode rpc
 
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
-const TPID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
+const TPID = new PublicKey(process.env.ProgramID)
 
 async function GetTokens(Address) {
     const st = Date.now()
