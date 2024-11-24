@@ -580,7 +580,7 @@ async function enqueueSwap(SwapData) {
         MyTokens[SwapData.mintAddress] -= NumTokens //! removing imaginary tokens
         const err = "unknown error"
         const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(err)}` //TODO make it log error
-        SendToAll(Message, "MarkdownV2")
+        SendToAll(Message, "Markdown")
         Data.Successful = false
         AddData("OurOrders.json", Data)
         return
