@@ -41,6 +41,8 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
       "pool": "pump"
     })
   });
+
+  
   if (response.status === 200) {
     const data = await response.arrayBuffer();
     const tx = VersionedTransaction.deserialize(new Uint8Array(data));
@@ -48,7 +50,7 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
     const EncodedAndSigned = bs58.encode(tx.serialize())
     console.log(EncodedAndSigned)
     try {
-      const jitoResponse = await fetch(`https://mainnet.block-engine.jito.wtf/api/v1/transactions`, {
+      const jitoResponse = await fetch(`https://ny.mainnet.block-engine.jito.wtf/api/v1/transactions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
