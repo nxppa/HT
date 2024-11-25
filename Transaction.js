@@ -8,4 +8,4 @@ function GetTime(raw) {
     return time;
 }
 console.log(GetTime())
-Swap("DG8QKfNzD2b9JWbYWX3yYzPReM7GCDyi12PLnf8Kpump", 1, 40, 0.001, "buy")
+Swap("DG8QKfNzD2b9JWbYWX3yYzPReM7GCDyi12PLnf8Kpump", 1, 40, 0.0001, "buy")
