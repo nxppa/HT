@@ -493,9 +493,8 @@ async function enqueueSwap(SwapData) {
     }
   }
 
-  const PassedChecksMessage = `✅ Passed all checks. Enqueueing swap for ${GetMintEmbed("mint", SwapData.mintAddress)}`
+  const PassedChecksMessage = `✅ Passed all checks. for ${GetMintEmbed("mint", SwapData.mintAddress)}`
   DetectionMessage += "\n" + PassedChecksMessage
-  SendToAll(DetectionMessage, "Markdown")
 
   if (Simulating) {
     if (!NumTokens) {
@@ -565,10 +564,8 @@ async function enqueueSwap(SwapData) {
     const AmountSwapping = NumTokens // amount in number of tokens 
     const { Signature, Successful, logs } = await handleSwap(SwapData.mintAddress, AmountSwapping, SwapData.transactionType);
     ParsedSignature = Signature
-
     Data.Signature = Signature
     Data.MyLogs = logs
-
     console.log("swapped. Status: ", Successful)
     if (!Successful) {
       if (SwapData.transactionType == "sell") {
