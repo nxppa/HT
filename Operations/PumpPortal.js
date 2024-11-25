@@ -46,9 +46,14 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
   if (response.status === 200) {
     const data = await response.arrayBuffer();
     const tx = VersionedTransaction.deserialize(new Uint8Array(data));
+    console.log(tx)
+    
     tx.sign([Keypair.fromSecretKey(bs58.decode(process.env.PrivateKey))])
     const EncodedAndSigned = bs58.encode(tx.serialize())
-    console.log(EncodedAndSigned)
+    const sigs = VersionedTransaction.deserialize(new Uint8Array(bs58.decode(EncodedAndSigned)));
+    const ProperSig = sigs.signatures[0]
+    const SigString = bs58.encode(ProperSig)
+
     try {
       const jitoResponse = await fetch(`https://ny.mainnet.block-engine.jito.wtf/api/v1/transactions`, {
         method: "POST",
@@ -64,7 +69,7 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
           ]
         })
       });
-      console.log(jitoResponse);
+      return SigString
     } catch (e) {
       console.error(e.message);
     }
