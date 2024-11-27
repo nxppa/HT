@@ -220,8 +220,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   }
   try {
     const TheirLastTokens = targetWallets[Addy][2]
-
-    const TheirCurrentTokens = await GetTokens(Addy);
+    const TheirCurrentTokens = await GetTokens(Addy, TheirLastTokens);
     if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
       console.log("no change in wallet detected. Retrying", deep + 1)
       await checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
