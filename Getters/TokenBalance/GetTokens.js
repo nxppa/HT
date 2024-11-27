@@ -19,7 +19,6 @@ async function fetchTokensFromEndpoint(rpc, address, programId) {
         commitment: 'confirmed',
     });
 
-    const st = Date.now();
     const response = await connection.getParsedTokenAccountsByOwner(address, { programId });
     const tokens = {};
 
@@ -33,13 +32,12 @@ async function fetchTokensFromEndpoint(rpc, address, programId) {
         }
     });
 
-    const et = Date.now();
-    console.log(`Success from RPC ${rpc}. Time taken: ${(et - st) / 1000}s`);
     return tokens;
 }
 
 async function GetTokens(Address) {
     const key = new PublicKey(Address);
+    const startTime = Date.now();
 
     // Create an array of promises, one for each RPC endpoint
     const fetchPromises = SOLANA_RPC_ENDPOINTS.map((rpc) =>
@@ -47,11 +45,14 @@ async function GetTokens(Address) {
     );
 
     try {
-        // Use Promise.race to resolve as soon as the first successful response is received
+        // Use Promise.any to resolve as soon as the first successful response is received
         const tokens = await Promise.any(fetchPromises);
+        const endTime = Date.now();
+        console.log(`Total operation time for GetTokens: ${(endTime - startTime) / 1000}s`);
         return tokens;
     } catch (errors) {
-        console.error('All RPC endpoints failed:', errors);
+        const endTime = Date.now();
+        console.log(`Total operation time for GetTokens (failed): ${(endTime - startTime) / 1000}s`);
         throw new Error('All RPC endpoints failed to fetch token accounts.');
     }
 }
