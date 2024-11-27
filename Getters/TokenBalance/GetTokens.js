@@ -2,9 +2,9 @@ require('dotenv').config();
 const { Connection, PublicKey } = require('@solana/web3.js');
 
 const SOLANA_RPC_ENDPOINTS = [
-    "https://api.mainnet-beta.solana.com",
-    "https://solana-mainnet.core.chainstack.com/155d8d316c41d2ab16e07ee9190e409c",
-    "https://solana-mainnet.api.syndica.io/api-key/4MPquh8r1sBddBwSk6bN3pEHWF241B15QjPVGM5NJCTaetdXSKWyKiGrbw2XtM6YLa6EnYUExb6c5Hras1ocYuUks3YvmtMKDNj",
+    ///"https://api.mainnet-beta.solana.com",
+    ///"https://solana-mainnet.core.chainstack.com/155d8d316c41d2ab16e07ee9190e409c",
+    ///"https://solana-mainnet.api.syndica.io/api-key/4MPquh8r1sBddBwSk6bN3pEHWF241B15QjPVGM5NJCTaetdXSKWyKiGrbw2XtM6YLa6EnYUExb6c5Hras1ocYuUks3YvmtMKDNj",
     "https://solana-rpc.publicnode.com/",
     "https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec",
     "https://rpc-mainnet.solanatracker.io/?api_key=81b71925-ca06-487c-ac6c-155d8a9e3cda",
@@ -39,9 +39,12 @@ async function GetTokens(Address) {
     const key = new PublicKey(Address);
     const startTime = Date.now();
 
-    // Create an array of promises, one for each RPC endpoint
-    const fetchPromises = SOLANA_RPC_ENDPOINTS.map((rpc) =>
-        fetchTokensFromEndpoint(rpc, key, TPID)
+    // Create an array of promises from the dictionary of endpoints
+    const fetchPromises = Object.entries(SOLANA_RPC_ENDPOINTS).map(([name, rpc]) =>
+        fetchTokensFromEndpoint(rpc, key, TPID).catch((error) => {
+            console.error(`Error with RPC ${name}:`, error.message);
+            return null; // Return null on failure to avoid rejecting the entire Promise.any
+        })
     );
 
     try {
