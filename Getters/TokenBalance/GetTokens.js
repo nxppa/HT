@@ -12,7 +12,36 @@ const SOLANA_RPC_ENDPOINTS = {
     "quiknode-2": "https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec",
 };
 
+
+
+
 const TPID = new PublicKey(process.env.ProgramID);
+
+// Function to compare two objects deeply
+function deepEqual(obj1, obj2) {
+    // Check if both are objects and not null
+    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
+        return obj1 === obj2;
+    }
+
+    // Get the keys of both objects
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    // Check if both objects have the same number of keys
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    // Compare each key and its corresponding value
+    for (const key of keys1) {
+        if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 async function fetchTokensFromEndpoint(rpc, address, programId) {
     const connection = new Connection(rpc, {
@@ -39,51 +68,40 @@ async function GetTokens(Address, previousTokens = null) {
     const key = new PublicKey(Address);
     const startTime = Date.now();
     let matchingTokens = null;
-
-    // Create an array of promises from the dictionary of endpoints
     const fetchPromises = Object.entries(SOLANA_RPC_ENDPOINTS).map(([name, rpc]) =>
         fetchTokensFromEndpoint(rpc, key, TPID).catch((error) => {
             console.error(`Error with RPC ${name}:`, error.message);
-            return null; // Return null on failure to avoid rejecting the entire Promise.any
+            return null
         })
     );
-
     try {
-        // Use Promise.any to resolve as soon as the first successful response is received
         const tokensList = await Promise.any(fetchPromises);
-
-        // If previousTokens is provided, compare each result with previousTokens
         if (previousTokens) {
-            // Loop through the tokensList to check if any match previousTokens
             let skipMatched = false;
+            for (let i = 0; i < fetchPromises.length; i++) {
+                const tokens = await fetchPromises[i];
 
-            for (let i = 0; i < tokensList.length; i++) {
-                if (tokensList[i] && JSON.stringify(tokensList[i]) !== JSON.stringify(previousTokens)) {
-                    matchingTokens = tokensList[i];
+                if (tokens && !deepEqual(tokens, previousTokens)) {
+                    matchingTokens = tokens;
                     break;
-                } else if (tokensList[i] && JSON.stringify(tokensList[i]) === JSON.stringify(previousTokens)) {
-                    // If tokens match, skip it and try another one
+                } else if (tokens && deepEqual(tokens, previousTokens)) {
                     skipMatched = true;
                 }
             }
-
-            // If all RPC calls matched the previousTokens, return the last one
             if (skipMatched && !matchingTokens) {
-                matchingTokens = tokensList[tokensList.length - 1];
+                matchingTokens = tokensList
             }
         } else {
-            matchingTokens = tokensList.find((tokens) => tokens !== null); // Just return the first valid response
+            matchingTokens = tokensList
         }
 
         const endTime = Date.now();
         console.log(`Total operation time for GetTokens: ${(endTime - startTime) / 1000}s`);
-        return matchingTokens || tokensList[tokensList.length - 1]; // If no matching found, return the last one
-
+        return matchingTokens || tokensList
     } catch (errors) {
         const endTime = Date.now();
         console.log(`Total operation time for GetTokens (failed): ${(endTime - startTime) / 1000}s`);
         throw new Error('All RPC endpoints failed to fetch token accounts.');
     }
 }
-
 module.exports = GetTokens;
