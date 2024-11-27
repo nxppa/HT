@@ -42,7 +42,7 @@ async function GetTokens(Address) {
     // Create an array of promises from the dictionary of endpoints
     const fetchPromises = Object.entries(SOLANA_RPC_ENDPOINTS).map(([name, rpc]) =>
         fetchTokensFromEndpoint(rpc, key, TPID).catch((error) => {
-            console.error(`Error with RPC ${name}:`, error.message);
+            console.log(`Error with RPC ${name}:`, error.message);
             return null; // Return null on failure to avoid rejecting the entire Promise.any
         })
     );
