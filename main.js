@@ -1369,11 +1369,8 @@ async function handleMessage(messageObj) {
       let WalletString = `Wallets: \n`
       Object.keys(targetWallets).forEach(key => {
         const Alias = targetWallets[key][4]
-
         const PrePend = Alias ? Alias + ": " : "Account: "
-        
-
-        WalletString += (PrePend + GetWalletEmbed(GetShorthandVersion(key, 5), key, true) + "\n")
+        WalletString += (PrePend + GetWalletEmbed(GetShorthandVersion(key, 8), key, true) + "\n")
 
       });
       console.log(WalletString)
