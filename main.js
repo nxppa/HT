@@ -247,9 +247,6 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
           if (transactionType == "buy") {
             // token amount IN MINT
             const HowManyTokensToBuy = balanceChange * WalletFactor
-            //const TokenToUsdExRate = await GetPrice(mint)
-            //const CostInUsd = HowManyTokensToBuy * TokenToUsdExRate
-            //const AmountOfSolana = CostInUsd / SolVal
             console.log("mint comparison: ", CurrentMintAmount, LastMintAmount, TheirLastTokens, TheirCurrentTokens)
             console.log(GetTime(), "BUYING", HowManyTokensToBuy, balanceChange, WalletFactor, logs)
 
@@ -288,9 +285,6 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       } else {
         //Token amount IN MINT
         const HowManyTokensToBuy = CurrentMintAmount * WalletFactor
-        //const TokenToUsdExRate = await GetPrice(mint)
-        //const CostInUsd = HowManyTokensToBuy * TokenToUsdExRate
-        //const AmountOfSolana = CostInUsd / SolVal
         console.log(HowManyTokensToBuy, SolVal, CurrentMintAmount, WalletFactor, mint)
         console.log(GetTime(), "BUYING INITIAL", HowManyTokensToBuy)
 
@@ -497,7 +491,7 @@ async function enqueueSwap(SwapData) {
     }
   }
 
-  const PassedChecksMessage = `✅ Passed all checks. for ${GetMintEmbed("mint", SwapData.mintAddress)}`
+  const PassedChecksMessage = `✅ Passed all checks for ${GetMintEmbed("mint", SwapData.mintAddress)}`
   DetectionMessage += "\n" + PassedChecksMessage
 
   if (Simulating) {
@@ -708,7 +702,6 @@ function subscribeToWalletTransactions(WalletAdd) {
 
 process.on('SIGINT', async () => {
   console.info('Received SIGINT. Shutting down at ', GetTime());
-  // Remove subscription
   if (subscriptionId !== null) {
     await connection.removeOnLogsListener(subscriptionId);
   }
@@ -765,38 +758,10 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
   targetWallets[Wallet] = [CurrentWalletFactor, null, TheirLastTokens, WalletSize, Alias,]
   subscribeToWalletTransactions(Wallet);
 }
-//ngrok http http://localhost:4040
 
-function SetWebhook() {
-  const WebhookUrl = `https://api.telegram.org/bot${TelegramKey}/setWebhook?url=${ngrokUrl}/`
 
-  fetch(WebhookUrl, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Connection': 'keep-alive',
-      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Expose-Headers': 'Content-Length,Content-Type,Date,Server,Connection'
-    }
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json(); // Parse response as JSON
-    })
-    .then(data => {
-      console.log(data); // Handle the response data
-    })
-    .catch(error => {
-      console.log('There was an error with the request:', error);
-    });
-}
 
 async function main() {
-  //SetWebhook()
   MyTrades = LoadDB("OurTrades.json")
   console.log(MyTrades)
   MyTokens = await GetTokens(MyWalletPubKey)
