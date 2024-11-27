@@ -140,6 +140,9 @@ function ToDecimalString(num) {
   }
 }
 
+function GetShorthandVersion(str, NumChar){
+  return str.slice(0, NumChar).toString() + "..."
+}
 
 //-------My Wallet Logs ------\\
 let MyWalletAnalysis = {}
@@ -209,7 +212,6 @@ function PrivToPub(PrivateKey) {
       throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
   }
 }
-
 
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
@@ -1367,8 +1369,9 @@ async function handleMessage(messageObj) {
         const Alias = targetWallets[key][4]
 
         const PrePend = Alias ? Alias + ": " : "Account: "
+        
 
-        WalletString += (PrePend + `[${key}](${WalletCheckBaseAddress + key})` + "\n")
+        WalletString += (PrePend + GetWalletEmbed(GetShorthandVersion(key, 5), key) + "\n")
 
       });
       console.log(WalletString)
