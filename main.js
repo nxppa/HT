@@ -140,13 +140,10 @@ function ToDecimalString(num) {
   }
 }
 
-function GetShorthandVersion(str, NumChar, Clean){
-  if (Clean){
-    return str.slice(0, NumChar).toString() + "\\.\\.\\."
+function GetShorthandVersion(str, NumChar){
 
-  } else { 
-  return str.slice(0, NumChar).toString() + "..."
-  }
+  return str.slice(0, NumChar).toString() + "․․․"
+  
 }
 
 //-------My Wallet Logs ------\\
