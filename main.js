@@ -50,7 +50,7 @@ const IDToName = {
   679687518: "Sasha the basher"
 }
 
-for (const ID in IDToName){
+for (const ID in IDToName) {
   TransactionDetectionIDToMessageIDForEach[ID] = {}
 }
 
@@ -140,10 +140,8 @@ function ToDecimalString(num) {
   }
 }
 
-function GetShorthandVersion(str, NumChar){
-
+function GetShorthandVersion(str, NumChar) {
   return str.slice(0, NumChar).toString() + "․․․"
-  
 }
 
 //-------My Wallet Logs ------\\
@@ -153,7 +151,7 @@ const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
 connection.onLogs(MyWalletPubKey, async (logs, ctx) => {
-  if (!MyWalletAnalysis[logs.signature]){
+  if (!MyWalletAnalysis[logs.signature]) {
     MyWalletAnalysis[logs.signature] = logs
     UpdateMyWallet()
   }
@@ -201,23 +199,23 @@ function AreDictionariesEqual(dict1, dict2) {
 }
 function PrivToPub(PrivateKey) {
   try {
-      // Decode the Base58 private key string into a Uint8Array
-      const privateKeyArray = bs58.decode(PrivateKey);
-      console.log(privateKeyArray)
-      // Create a Keypair from the private key
-      const keypair = Keypair.fromSecretKey(privateKeyArray);
+    // Decode the Base58 private key string into a Uint8Array
+    const privateKeyArray = bs58.decode(PrivateKey);
+    console.log(privateKeyArray)
+    // Create a Keypair from the private key
+    const keypair = Keypair.fromSecretKey(privateKeyArray);
 
-      // Return the public key as a Base58 string
-      return keypair.publicKey.toBase58();
+    // Return the public key as a Base58 string
+    return keypair.publicKey.toBase58();
   } catch (error) {
     console.log(error)
-      throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
+    throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
   }
 }
 
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
-  
+
   if (deep >= 8) {
     console.log("max retries for changes logged exceeded")
     return
@@ -230,7 +228,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       await checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
       return
     } else {
-      if (deep != 0){
+      if (deep != 0) {
         console.log("deepness: ", deep)
       }
     }
@@ -443,7 +441,7 @@ async function enqueueSwap(SwapData) {
     }
     return str
   }
-  
+
   /*
   if (!IsPumpCoin(SwapData.mintAddress)) {
     const NotPumpMessage = `⚠️ ${GetMintEmbed("Mint", SwapData.mintAddress)} is not a pump token; trade skipped`
@@ -559,7 +557,7 @@ async function enqueueSwap(SwapData) {
 
   let ParsedSignature = undefined
   let MaxNumRetrying = MaxRetries
-  if (SwapData.transactionType == "buy"){
+  if (SwapData.transactionType == "buy") {
     MyTokens[SwapData.mintAddress] = MyTokens[SwapData.mintAddress] ? MyTokens[SwapData.mintAddress] : 0
     MyTokens[SwapData.mintAddress] += NumTokens //! imaginary tokens
     MaxNumRetrying = 1
@@ -991,6 +989,7 @@ async function handleMessage(messageObj) {
     "info": "ℹ️ Info",
     "mybal": "💰 Get Balance",
     "settings": "⚙️ Settings",
+    "actions": "📋 Actions",
     "changepriofee": "💸 Change Priority Fee",
     "changemaxpropspending": "⚖️ Change Max Proportion Spending",
     "changemaxpermc": "🧢 Change Max Percent of Market Cap",
@@ -1010,6 +1009,7 @@ async function handleMessage(messageObj) {
     "importwallets": "📥 Import Wallets",
     "clearwallets": "❌ Clear Wallets",
     "confirmation": "✔️ Yes",
+    "walletgen": "🗝️ Generate Wallet"
   }
 
   if (!IDToName[chatId]) {
@@ -1018,11 +1018,12 @@ async function handleMessage(messageObj) {
   const StartOptions = [
     { text: ActionTexts["info"] },
     { text: ActionTexts["settings"] },
+    { text: ActionTexts["actions"] },
     { text: ActionTexts["managewallets"] },
   ]
   const messageText = messageObj.text || "";
   // Check if user is in the process of changing priority fee
-  if (userStates[chatId]) {
+  if (userStates[chatId]) { //TODO make this better managed
     if (userStates[chatId].waitingForFee) {
       // Parse and set the new priority fee
       if (messageText == ActionTexts["back"]) {
@@ -1314,7 +1315,13 @@ async function handleMessage(messageObj) {
       WalletsToSelectFrom.push(ActionTexts["back"])
       userStates[chatId] = { waitingForWalletToView: true };
       return sendMessage(chatId, "Select a wallet to appraise: ", null, GetKeyBoard(WalletsToSelectFrom, true, false));
-
+    case ActionTexts["walletgen"]:
+      const keypair = Keypair.generate();
+      const PubKey = keypair.publicKey.toBase58()
+      const PrivKey = Buffer.from(keypair.secretKey).toString("hex")
+      const msg = `💼 Wallet: ${GetWalletEmbed(PubKey, PubKey)} \n 🗝️ Key: ${PrivKey}`
+      sendMessage(chatId, msg)
+      return
     case ActionTexts["mybal"]:
       async function showbal() {
         sendMessage(chatId, `Getting balance for ${GetWalletEmbed("Wallet", MyWallet)}`, "MarkdownV2")
@@ -1355,6 +1362,14 @@ async function handleMessage(messageObj) {
       ]
       const InfoKB = GetKeyBoard(InfoOptions, true, false)
       return await sendMessage(chatId, "Info: ", null, InfoKB)
+    case ActionTexts["actions"]:
+      const ActionOptions = [
+        { text: ActionTexts["walletgen"] },
+      ]
+
+      const ActionKB = GetKeyBoard(ActionOptions, true, false)
+      return await sendMessage(chatId, "Info: ", null, ActionKB)
+
     case ActionTexts["managewallets"]:
       const WalletsOptions = [
         { text: ActionTexts["addwallet"] },
