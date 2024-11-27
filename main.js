@@ -1320,7 +1320,7 @@ async function handleMessage(messageObj) {
       const PubKey = keypair.publicKey.toBase58()
       const PrivKey = Buffer.from(keypair.secretKey).toString("hex")
       const msg = `💼 Wallet: ${GetWalletEmbed(PubKey, PubKey)} \n 🗝️ Key: \`\`\`${PrivKey}\`\`\` ` //TODO make a rate limit for this
-      sendMessage(chatId, msg)
+      sendMessage(chatId, msg, "MarkdownV2")
       return
     case ActionTexts["mybal"]:
       async function showbal() {
