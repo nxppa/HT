@@ -1,3 +1,8 @@
+
+require('dotenv').config();
+
+const TelegramKey = process.env.TelegramKey;
+
 function SetWebhook() {
     const WebhookUrl = `https://api.telegram.org/bot${TelegramKey}/setWebhook?url=${ngrokUrl}/`
 
