@@ -440,12 +440,16 @@ async function enqueueSwap(SwapData) {
     }
     return str
   }
+  
+  /*
   if (!IsPumpCoin(SwapData.mintAddress)) {
     const NotPumpMessage = `⚠️ ${GetMintEmbed("Mint", SwapData.mintAddress)} is not a pump token; trade skipped`
     DetectionMessage += "\n" + NotPumpMessage
     SendToAll(DetectionMessage, "Markdown");
     return
   }
+  */
+
   if (SwapData.transactionType === "buy") {
     const tokenPriceInUsd = await GetPrice(SwapData.mintAddress);
     const MarketCap = tokenPriceInUsd * Bil;
