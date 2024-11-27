@@ -417,7 +417,7 @@ async function enqueueSwap(SwapData) {
   }
   const InfoSelling = InfoMapping[FactorSold] ? InfoMapping[FactorSold] : FactorSold * 100 + "% of their mint" //TODO do something with this 
 
-  const RoundedAmount = roundToDigits(FactorSold, 3)
+  const RoundedAmount = roundToDigits(FactorSold, 5)
   const RoundedTheyreBuying = Math.floor(SwapData.AmountTheyreBuying + 0.5)
   const ExtraInfo = SwapData.transactionType == "sell" ? `(${RoundedAmount * 100}%)` : `(${RoundedTheyreBuying})`
   const Emoji = SwapData.transactionType == "buy" ? "🟢" : "🔴"
@@ -538,7 +538,7 @@ async function enqueueSwap(SwapData) {
   }
 
   if (SetParameters.Halted && SwapData.transactionType == 'buy') {
-    const HaltedMessage = `🟡 Buying is halted; didn't buy ${GetMintEmbed("mint", SwapData.mintAddress)}`
+    const HaltedMessage = `🛑 Buying is halted; didn't buy ${GetMintEmbed("mint", SwapData.mintAddress)}`
     DetectionMessage += "\n" + HaltedMessage
     SendToAll(DetectionMessage, "Markdown")
     return
@@ -639,7 +639,7 @@ const SOLANA_RPC_ENDPOINTS = [
   "https://api.mainnet-beta.solana.com",
   "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
   "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7",
-  
+  "https://rpc-mainnet.solanatracker.io/?api_key=81b71925-ca06-487c-ac6c-155d8a9e3cda",
 ];
 
 const connections = {};
