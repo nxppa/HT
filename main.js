@@ -1319,7 +1319,7 @@ async function handleMessage(messageObj) {
       const keypair = Keypair.generate();
       const PubKey = keypair.publicKey.toBase58()
       const PrivKey = Buffer.from(keypair.secretKey).toString("hex")
-      const msg = `💼 Wallet: ${GetWalletEmbed(PubKey, PubKey)} \n 🗝️ Key: ${PrivKey}` //TODO make a rate limit for this
+      const msg = `💼 Wallet: ${GetWalletEmbed(PubKey, PubKey)} \n 🗝️ Key: \`\`\`${PrivKey}\`\`\` ` //TODO make a rate limit for this
       sendMessage(chatId, msg)
       return
     case ActionTexts["mybal"]:
