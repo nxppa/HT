@@ -69,7 +69,7 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
           ]
         })
       });
-      console.log(jitoResponse)
+      console.log(jitoResponse, SigString)
       return SigString
     } catch (e) {
       console.log(e.message);
