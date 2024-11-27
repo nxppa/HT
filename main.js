@@ -22,7 +22,7 @@ const MyWalletPubKey = new PublicKey(MyWallet)
 const TelegramKey = process.env.TelegramKey;
 
 const Simulating = false
-const ConsecutiveSellsThreshold = 4
+const ConsecutiveSellsThreshold = 1000
 const Unfilled = "□"
 const Filled = "■"
 const BarSize = 10
@@ -41,11 +41,17 @@ let SimulatingStartAmountUSD = 189.04
 let targetWallets = {}
 let ConsecutiveSells = {}
 let InitialMessageIDForEach = {}
+let TransactionDetectionIDToMessageIDForEach = {}
+
+
 const IDToName = {
-  6050162852: "Nappa",
+  6050162852: "Naps",
   1788282135: "Revvin Dev",
   679687518: "Sasha the basher"
+}
 
+for (const ID in IDToName){
+  TransactionDetectionIDToMessageIDForEach[ID] = {}
 }
 
 let subscriptionId = null;
@@ -136,7 +142,6 @@ function ToDecimalString(num) {
 
 
 //-------My Wallet Logs ------\\
-
 let MyWalletAnalysis = {}
 const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f" //TODO make it so that there is multiple of thses
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
@@ -221,7 +226,6 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       console.log("no change in wallet detected. Retrying", deep + 1)
       await checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
       return
-      //TODO make it so it retries if a transaction was actually made (ONLY if transaction type was a sell)
     } else {
       if (deep != 0){
         console.log("deepness: ", deep)
@@ -640,6 +644,9 @@ const SOLANA_RPC_ENDPOINTS = [
   "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
   "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7",
   "https://rpc-mainnet.solanatracker.io/?api_key=81b71925-ca06-487c-ac6c-155d8a9e3cda",
+  "https://solana-mainnet.core.chainstack.com/155d8d316c41d2ab16e07ee9190e409c",
+  "https://solana-mainnet.api.syndica.io/api-key/4MPquh8r1sBddBwSk6bN3pEHWF241B15QjPVGM5NJCTaetdXSKWyKiGrbw2XtM6YLa6EnYUExb6c5Hras1ocYuUks3YvmtMKDNj",
+  "https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec"
 ];
 
 const connections = {};
@@ -867,9 +874,8 @@ function getAxiosInstance() {
   };
 }
 
-async function SendToAll(text, Mode = "Markdown", Method = "sendMessage", MessageToEdit) { //TODO make it so that there is a way to make sure a message is specifically sent after the other
+async function SendToAll(text, Mode = "Markdown", Method = "sendMessage", MessageToEdit) {
   console.log(text, Mode)
-
   for (const chatId in IDToName) {
     const data = await SendStandaloneMessage(chatId, text, Mode, Method, MessageToEdit)
     if (!InitialMessageIDForEach[chatId]) {

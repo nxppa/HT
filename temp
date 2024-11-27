@@ -10,5 +10,3 @@ connection.onLogs(pubkey, async (logs, ctx) => {
 
 // Example usage:
 require('dotenv').config();
-
-console.log(process.env.TelegramKey)
