@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const TelegramKey = process.env.TelegramKey;
-const Domain = "bayharbour.boats"
+const Domain = process.env.Domain
 function SetWebhook() {
     const WebhookUrl = `https://api.telegram.org/bot${TelegramKey}/setWebhook?url=${Domain}/`
 
