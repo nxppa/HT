@@ -140,8 +140,13 @@ function ToDecimalString(num) {
   }
 }
 
-function GetShorthandVersion(str, NumChar){
+function GetShorthandVersion(str, NumChar, Clean){
+  if (Clean){
+    return str.slice(0, NumChar).toString() + "\\.\\.\\."
+
+  } else { 
   return str.slice(0, NumChar).toString() + "..."
+  }
 }
 
 //-------My Wallet Logs ------\\
@@ -1371,7 +1376,7 @@ async function handleMessage(messageObj) {
         const PrePend = Alias ? Alias + ": " : "Account: "
         
 
-        WalletString += (PrePend + GetWalletEmbed(GetShorthandVersion(key, 5), key) + "\n")
+        WalletString += (PrePend + GetWalletEmbed(GetShorthandVersion(key, 5), key, true) + "\n")
 
       });
       console.log(WalletString)
