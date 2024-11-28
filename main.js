@@ -5,6 +5,8 @@ const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
+const MAX_SIGNATURES = 1000;  // Define a maximum size for the array
+
 
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
@@ -659,6 +661,7 @@ let subscriptions = {};
 
 function subscribeToWalletTransactions(WalletAdd) {
   const CurrWalletPubKey = new PublicKey(WalletAdd);
+
   for (const index in connections) {
     const connection = connections[index];
     const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
@@ -673,7 +676,10 @@ function subscribeToWalletTransactions(WalletAdd) {
       if (LoggedSignature.includes(logs.signature)) {
         return;
       }
-      LoggedSignature.push(logs.signature);
+      if (LoggedSignature.length > MAX_SIGNATURES) {
+        LoggedSignature.shift()
+      }
+      LoggedSignature.push(logs.signature)
       const ToSearchFor = [
         `Program log: Instruction: PumpSell`,
         `Program log: Instruction: PumpBuy`,
@@ -825,8 +831,8 @@ const server = app.listen(PORT, process.env.WebIP, function (err) {
 //server.keepAliveTimeout = 61*1000
 
 
-const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`;
-function getAxiosInstance() {
+const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
+function getAxiosInstance() { 
   return {
     get(method, params) {
       return axios.get(`/${method}`, {
