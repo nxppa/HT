@@ -5,7 +5,7 @@ const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
-const MAX_SIGNATURES = 1000;  // Define a maximum size for the array
+const MAX_SIGNATURES = 100
 
 
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
