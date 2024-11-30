@@ -34,7 +34,7 @@ async function GetPrice(Mint) {
         console.log(`Time taken for GetPrice for mint ${Mint}: `, (et - st)/1000)
         return await Promise.any(promises);
     } catch (error) {
-        console.error("All price getters failed or returned undefined.");
+        console.log("All price getters failed or returned undefined.");
         return null; // or handle the no valid price case as needed
     }
 }
