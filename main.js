@@ -1014,7 +1014,8 @@ async function handleMessage(messageObj) {
     "importwallets": "📥 Import Wallets",
     "clearwallets": "❌ Clear Wallets",
     "confirmation": "✔️ Yes",
-    "walletgen": "🗝️ Generate Wallet"
+    "walletgen": "🗝️ Generate Wallet",
+    "kill": "🔪 Kill bot"
   }
 
   if (!IDToName[chatId]) {
@@ -1327,6 +1328,8 @@ async function handleMessage(messageObj) {
       const msg = `💼 Wallet: \`\`\`${PubKey}\`\`\` \n 🗝️ Key: \`\`\`${PrivKey}\`\`\` ` //TODO make a rate limit for this
       sendMessage(chatId, msg, "MarkdownV2")
       return
+    case ActionTexts["kill"]:
+      process.exit(0)
     case ActionTexts["mybal"]:
       async function showbal() {
         sendMessage(chatId, `Getting balance for ${GetWalletEmbed("Wallet", MyWallet)}`, "MarkdownV2")
@@ -1370,6 +1373,7 @@ async function handleMessage(messageObj) {
     case ActionTexts["actions"]:
       const ActionOptions = [
         { text: ActionTexts["walletgen"] },
+        { text: ActionTexts["kill"] },
         { text: ActionTexts["back"] },
       ]
 
