@@ -444,14 +444,12 @@ async function enqueueSwap(SwapData) {
     return str
   }
 
-  /*
   if (!IsPumpCoin(SwapData.mintAddress)) {
     const NotPumpMessage = `⚠️ ${GetMintEmbed("Mint", SwapData.mintAddress)} is not a pump token; trade skipped`
     DetectionMessage += "\n" + NotPumpMessage
     SendToAll(DetectionMessage, "Markdown");
     return
   }
-  */
 
   if (SwapData.transactionType === "buy") {
     const tokenPriceInUsd = await GetPrice(SwapData.mintAddress);
@@ -475,6 +473,7 @@ async function enqueueSwap(SwapData) {
     const MaxAmountSpendingInUsd = myWalletBalanceInSol * SolVal * SetParameters.MaxProportionSpending
     if (ProportionSpending > SetParameters.MaxProportionSpending) {
       NumTokens = MaxAmountSpendingInUsd / tokenPriceInUsd
+
       const MaxProportionExceededMessage = `🔶 Max spending proportion exceeded (${ProportionSpending * 100}%); setting amount purchasing to ${SetParameters.MaxProportionSpending * 100}%`
       DetectionMessage += "\n" + MaxProportionExceededMessage
     }
@@ -720,7 +719,7 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-const StringWalletFilePath = './db/TargetWallets.txt'
+const StringWalletFilePath = './db/TargetWallets.txt' //TODO make these json files instead of text files
 const StringValuesFilePath = './db/Values.txt'
 
 async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
