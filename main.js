@@ -1115,7 +1115,7 @@ async function handleMessage(messageObj) {
 
         //TODO give details for wallet (pnl, most recent trade etc.)
       }
-      //ReturnToMenu()
+      ReturnToMenu()
       return
     } else if (userStates[chatId].waitingForGCMessage) {
       if (messageText == ActionTexts["back"]) {
