@@ -84,7 +84,6 @@ async function updateValue() {
 }
 function startConstantUpdate() {
   setInterval(async () => {
-    const memoryUsage = process.memoryUsage();
     console.log(`Memory Usage: ${os.freemem()} / ${os.totalmem()}`);
     //!here
     await updateValue()

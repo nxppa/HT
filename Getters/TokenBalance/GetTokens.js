@@ -14,98 +14,87 @@ const SOLANA_RPC_ENDPOINTS = {
 };
 
 const TPID = new PublicKey(process.env.ProgramID);
-
-// Function to compare two objects deeply
 function deepEqual(obj1, obj2) {
-    // ... (same as before)
-}
-
-// Create a connections dictionary to store and reuse Connection instances
-const connections = {};
-const connectionPromises = {}; // To track connection initialization
-
-for (const [name, rpc] of Object.entries(SOLANA_RPC_ENDPOINTS)) {
-    connectionPromises[name] = new Promise((resolve, reject) => {
-        const connection = new Connection(rpc, { commitment: 'confirmed' });
-        // Optionally, perform an initial request to ensure the connection is ready
-        connection.getVersion()
-            .then(() => {
-                connections[name] = connection;
-                resolve();
-            })
-            .catch((error) => {
-                console.log(`Error initializing connection to ${name}:`, error.message);
-                reject(error);
-            });
-    });
-}
-
-async function fetchTokensFromEndpoint(name, address, programId) {
-    try {
-        // Wait for the connection to be ready
-        await connectionPromises[name];
-        const connection = connections[name];
-        const response = await connection.getParsedTokenAccountsByOwner(address, { programId });
-        const tokens = {};
-
-        response.value.forEach((keyedAccount) => {
-            const parsedInfo = keyedAccount.account.data.parsed.info;
-            const mint = parsedInfo.mint;
-            const tokenAmountInfo = parsedInfo.tokenAmount;
-            const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
-            if (tokenAmount) {
-                tokens[mint] = tokenAmount;
-            }
-        });
-
-        return tokens;
-    } catch (error) {
-        console.log(`Error fetching tokens from ${name}:`, error.message);
-        return null;
+    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
+        return obj1 === obj2;
     }
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+    for (const key of keys1) {
+        if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
+            return false;
+        }
+    }
+    return true;
+}
+const connections = {};
+for (const [name, rpc] of Object.entries(SOLANA_RPC_ENDPOINTS)) {
+    connections[name] = new Connection(rpc, { commitment: 'confirmed' });
+}
+
+async function fetchTokensFromEndpoint(rpc, address, programId) {
+    if (!connections[rpc]){
+        connection = new Connection(rpc, { commitment: 'confirmed' });
+        connections[rpc] = connection
+    } else {
+        connection = connections[rpc]
+    }
+    const response = await connection.getParsedTokenAccountsByOwner(address, { programId });
+    const tokens = {};
+
+    response.value.forEach((keyedAccount) => {
+        const parsedInfo = keyedAccount.account.data.parsed.info;
+        const mint = parsedInfo.mint;
+        const tokenAmountInfo = parsedInfo.tokenAmount;
+        const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
+        if (tokenAmount) {
+            tokens[mint] = tokenAmount;
+        }
+    });
+
+    return tokens;
 }
 
 async function GetTokens(Address, previousTokens = null) {
     const key = new PublicKey(Address);
     const startTime = Date.now();
-
+    let matchingTokens = null;
+    const fetchPromises = Object.entries(SOLANA_RPC_ENDPOINTS).map(([name, rpc]) =>
+        fetchTokensFromEndpoint(rpc, key, TPID).catch((error) => {
+            console.log(`Error with RPC ${name}:`, error.message);
+            return null
+        })
+    )
     try {
-        // Wait for all connections to be initialized
-        await Promise.allSettled(Object.values(connectionPromises));
+        const tokensList = await Promise.any(fetchPromises);
+        if (previousTokens) {
+            let skipMatched = false;
+            for (let i = 0; i < fetchPromises.length; i++) {
+                const tokens = await fetchPromises[i];
 
-        const fetchPromises = Object.keys(SOLANA_RPC_ENDPOINTS).map((name) =>
-            fetchTokensFromEndpoint(name, key, TPID)
-        );
-
-        const settledResults = await Promise.allSettled(fetchPromises);
-
-        let matchingTokens = null;
-        for (const result of settledResults) {
-            if (result.status === 'fulfilled' && result.value) {
-                const tokens = result.value;
-                if (previousTokens && !deepEqual(tokens, previousTokens)) {
+                if (tokens && !deepEqual(tokens, previousTokens)) {
                     matchingTokens = tokens;
                     break;
-                } else if (!previousTokens) {
-                    matchingTokens = tokens;
-                    break;
+                } else if (tokens && deepEqual(tokens, previousTokens)) {
+                    skipMatched = true;
                 }
             }
+            if (skipMatched && !matchingTokens) {
+                matchingTokens = tokensList
+            }
+        } else {
+            matchingTokens = tokensList
         }
-
         const endTime = Date.now();
         console.log(`Total operation time for GetTokens: ${(endTime - startTime) / 1000}s`);
-
-        if (matchingTokens) {
-            return matchingTokens;
-        } else {
-            throw new Error('All RPC endpoints failed to fetch token accounts.');
-        }
-    } catch (error) {
+        return matchingTokens || tokensList
+    } catch (errors) {
         const endTime = Date.now();
         console.log(`Total operation time for GetTokens (failed): ${(endTime - startTime) / 1000}s`);
-        throw error;
+        throw new Error('All RPC endpoints failed to fetch token accounts.');
     }
 }
-
 module.exports = GetTokens;
