@@ -31,12 +31,10 @@ function deepEqual(obj1, obj2) {
     return true;
 }
 const connections = {};
-for (const [name, rpc] of Object.entries(SOLANA_RPC_ENDPOINTS)) {
-    connections[name] = new Connection(rpc, { commitment: 'confirmed' });
-}
 
 async function fetchTokensFromEndpoint(rpc, address, programId) {
     if (!connections[rpc]){
+        console.log("creating connection")
         connection = new Connection(rpc, { commitment: 'confirmed' });
         connections[rpc] = connection
     } else {
