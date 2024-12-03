@@ -83,6 +83,9 @@ async function updateValue() {
 }
 function startConstantUpdate() {
   setInterval(async () => {
+    const memoryUsage = process.memoryUsage();
+    console.log(`Memory Usage: ${memoryUsage.heapUsed} / ${memoryUsage.heapTotal}`);
+    //!here
     await updateValue()
   }, 10000)
 }
@@ -1111,6 +1114,7 @@ async function handleMessage(messageObj) {
         userStates[chatId].waitingForWalletToView = false;
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
         const TheirBal = await getWalletBalance(Viewing)
+
         sendMessage(chatId, TheirBal)
 
         //TODO give details for wallet (pnl, most recent trade etc.)
