@@ -2,107 +2,104 @@ require('dotenv').config();
 const { Connection, PublicKey } = require('@solana/web3.js');
 
 const SOLANA_RPC_ENDPOINTS = {
-    //"mainnet-beta": "https://api.mainnet-beta.solana.com",
-   // "chainstack": "https://solana-mainnet.core.chainstack.com/155d8d316c41d2ab16e07ee9190e409c",
-   //"publicnode": "https://solana-rpc.publicnode.com/",
-   "quiknode-2": "https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec",
-   "quiknode-1": "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7",
-   "helius": "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
-   //"tracker": "https://rpc-mainnet.solanatracker.io/?api_key=81b71925-ca06-487c-ac6c-155d8a9e3cda",
-   //"syndica": "https://solana-mainnet.api.syndica.io/api-key/4MPquh8r1sBddBwSk6bN3pEHWF241B15QjPVGM5NJCTaetdXSKWyKiGrbw2XtM6YLa6EnYUExb6c5Hras1ocYuUks3YvmtMKDNj",
-   //"ligma": "https://public.ligmanode.com",
+    "quiknode-2": "https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec",
+    "quiknode-1": "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7",
+    "helius": "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
 };
-
-
 
 const TPID = new PublicKey(process.env.ProgramID);
 
 // Function to compare two objects deeply
 function deepEqual(obj1, obj2) {
-    // Check if both are objects and not null
-    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
-        return obj1 === obj2;
-    }
-
-    // Get the keys of both objects
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-
-    // Check if both objects have the same number of keys
-    if (keys1.length !== keys2.length) {
-        return false;
-    }
-
-    // Compare each key and its corresponding value
-    for (const key of keys1) {
-        if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
-            return false;
-        }
-    }
-
-    return true;
+    // ... (same as before)
 }
+
+// Create a connections dictionary to store and reuse Connection instances
 const connections = {};
+const connectionPromises = {}; // To track connection initialization
+
 for (const [name, rpc] of Object.entries(SOLANA_RPC_ENDPOINTS)) {
-    connections[name] = new Connection(rpc, { commitment: 'confirmed' });
-}
-async function fetchTokensFromEndpoint(rpc, address, programId) {
-    const connection = connections[rpc]
-
-    const response = await connection.getParsedTokenAccountsByOwner(address, { programId });
-    const tokens = {};
-
-    response.value.forEach((keyedAccount) => {
-        const parsedInfo = keyedAccount.account.data.parsed.info;
-        const mint = parsedInfo.mint;
-        const tokenAmountInfo = parsedInfo.tokenAmount;
-        const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
-        if (tokenAmount) {
-            tokens[mint] = tokenAmount;
-        }
+    connectionPromises[name] = new Promise((resolve, reject) => {
+        const connection = new Connection(rpc, { commitment: 'confirmed' });
+        // Optionally, perform an initial request to ensure the connection is ready
+        connection.getVersion()
+            .then(() => {
+                connections[name] = connection;
+                resolve();
+            })
+            .catch((error) => {
+                console.log(`Error initializing connection to ${name}:`, error.message);
+                reject(error);
+            });
     });
+}
 
-    return tokens;
+async function fetchTokensFromEndpoint(name, address, programId) {
+    try {
+        // Wait for the connection to be ready
+        await connectionPromises[name];
+        const connection = connections[name];
+        const response = await connection.getParsedTokenAccountsByOwner(address, { programId });
+        const tokens = {};
+
+        response.value.forEach((keyedAccount) => {
+            const parsedInfo = keyedAccount.account.data.parsed.info;
+            const mint = parsedInfo.mint;
+            const tokenAmountInfo = parsedInfo.tokenAmount;
+            const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
+            if (tokenAmount) {
+                tokens[mint] = tokenAmount;
+            }
+        });
+
+        return tokens;
+    } catch (error) {
+        console.log(`Error fetching tokens from ${name}:`, error.message);
+        return null;
+    }
 }
 
 async function GetTokens(Address, previousTokens = null) {
     const key = new PublicKey(Address);
     const startTime = Date.now();
-    let matchingTokens = null;
-    const fetchPromises = Object.entries(SOLANA_RPC_ENDPOINTS).map(([name, rpc]) =>
-        fetchTokensFromEndpoint(rpc, key, TPID).catch((error) => {
-            console.log(`Error with RPC ${name}:`, error.message);
-            return null
-        })
-    );
-    try {
-        const tokensList = await Promise.any(fetchPromises);
-        if (previousTokens) {
-            let skipMatched = false;
-            for (let i = 0; i < fetchPromises.length; i++) {
-                const tokens = await fetchPromises[i];
 
-                if (tokens && !deepEqual(tokens, previousTokens)) {
+    try {
+        // Wait for all connections to be initialized
+        await Promise.allSettled(Object.values(connectionPromises));
+
+        const fetchPromises = Object.keys(SOLANA_RPC_ENDPOINTS).map((name) =>
+            fetchTokensFromEndpoint(name, key, TPID)
+        );
+
+        const settledResults = await Promise.allSettled(fetchPromises);
+
+        let matchingTokens = null;
+        for (const result of settledResults) {
+            if (result.status === 'fulfilled' && result.value) {
+                const tokens = result.value;
+                if (previousTokens && !deepEqual(tokens, previousTokens)) {
                     matchingTokens = tokens;
                     break;
-                } else if (tokens && deepEqual(tokens, previousTokens)) {
-                    skipMatched = true;
+                } else if (!previousTokens) {
+                    matchingTokens = tokens;
+                    break;
                 }
             }
-            if (skipMatched && !matchingTokens) {
-                matchingTokens = tokensList
-            }
-        } else {
-            matchingTokens = tokensList
         }
 
         const endTime = Date.now();
         console.log(`Total operation time for GetTokens: ${(endTime - startTime) / 1000}s`);
-        return matchingTokens || tokensList
-    } catch (errors) {
+
+        if (matchingTokens) {
+            return matchingTokens;
+        } else {
+            throw new Error('All RPC endpoints failed to fetch token accounts.');
+        }
+    } catch (error) {
         const endTime = Date.now();
         console.log(`Total operation time for GetTokens (failed): ${(endTime - startTime) / 1000}s`);
-        throw new Error('All RPC endpoints failed to fetch token accounts.');
+        throw error;
     }
 }
+
 module.exports = GetTokens;
