@@ -1,5 +1,4 @@
 require('dotenv').config();
-const { getWalletBalance } = require('./Getters/SolBalance/Solana.js');
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
@@ -125,7 +124,11 @@ function GetTime(raw) {
 
   return time;
 }
+async function getWalletBalance(Wallet){
 
+  return await connection.getBalance(new PublicKey(Wallet))/Bil //TODO make it so it uses multiple endpoints
+
+}
 function ToDecimalString(num) {
   if (Math.abs(num) < 1e-6) {
     return num.toFixed(20).replace(/\.?0+$/, "")
@@ -149,7 +152,7 @@ function GetShorthandVersion(str, NumChar) {
 
 //-------My Wallet Logs ------\\
 let MyWalletAnalysis = {}
-const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f" //TODO make it so that there is multiple of thses
+const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f" //TODO make it so that it uses multiple endpoints
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
@@ -659,7 +662,6 @@ async function UpdateWalletFactor(WalletAdd) {
 }
 function subscribeToWalletTransactions(WalletAdd) {
   const CurrWalletPubKey = new PublicKey(WalletAdd);
-
   for (const index in connections) {
     const connection = connections[index];
     const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
@@ -699,7 +701,6 @@ function subscribeToWalletTransactions(WalletAdd) {
     }
     subscriptions[WalletAdd][index] = id;
   }
-
   UpdateWalletFactor(WalletAdd);
 }
 
