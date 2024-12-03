@@ -19,6 +19,7 @@ const axios = require("axios")
 const express = require('express');
 const bs58 = require("bs58").default
 const fs = require('fs');
+const os = require("os")
 
 const MyWallet = PrivToPub(process.env.PrivateKey)
 const MyWalletPubKey = new PublicKey(MyWallet)
@@ -84,7 +85,7 @@ async function updateValue() {
 function startConstantUpdate() {
   setInterval(async () => {
     const memoryUsage = process.memoryUsage();
-    console.log(`Memory Usage: ${memoryUsage.heapUsed} / ${memoryUsage.heapTotal}`);
+    console.log(`Memory Usage: ${os.freemem()} / ${os.totalmem()}`);
     //!here
     await updateValue()
   }, 10000)
