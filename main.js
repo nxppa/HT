@@ -1110,12 +1110,12 @@ async function handleMessage(messageObj) {
       } else {
         userStates[chatId].waitingForWalletToView = false;
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
-        const TheirBal = getWalletBalance(Viewing)
+        const TheirBal = await getWalletBalance(Viewing)
         sendMessage(chatId, TheirBal)
 
         //TODO give details for wallet (pnl, most recent trade etc.)
       }
-      ReturnToMenu()
+      //ReturnToMenu()
       return
     } else if (userStates[chatId].waitingForGCMessage) {
       if (messageText == ActionTexts["back"]) {
