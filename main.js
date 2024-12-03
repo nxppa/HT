@@ -14,6 +14,8 @@ const SigCheckBaseAddress = "https://solscan.io/tx/"
 
 const SOL_MINT_ADDRESS = process.env.SOL
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
+//TODO fix logssubscribe errors.
+
 const axios = require("axios")
 const express = require('express');
 const bs58 = require("bs58").default
@@ -49,14 +51,13 @@ let TransactionDetectionIDToMessageIDForEach = {}
 const IDToName = {
   6050162852: "Naps",
   1788282135: "Revvin Dev",
-  679687518: "Sasha the basher"
+  679687518: "Sasha the basher",
 }
 
 for (const ID in IDToName) {
   TransactionDetectionIDToMessageIDForEach[ID] = {}
 }
 
-let subscriptionId = null;
 let CompletedCopies = []
 let SetParameters = {}
 SetParameters.PriorityFee = null
@@ -201,13 +202,9 @@ function AreDictionariesEqual(dict1, dict2) {
 }
 function PrivToPub(PrivateKey) {
   try {
-    // Decode the Base58 private key string into a Uint8Array
     const privateKeyArray = bs58.decode(PrivateKey);
     console.log(privateKeyArray)
-    // Create a Keypair from the private key
     const keypair = Keypair.fromSecretKey(privateKeyArray);
-
-    // Return the public key as a Base58 string
     return keypair.publicKey.toBase58();
   } catch (error) {
     console.log(error)
@@ -217,7 +214,6 @@ function PrivToPub(PrivateKey) {
 
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
-
   if (deep >= 8) {
     console.log("max retries for changes logged exceeded")
     return
@@ -240,7 +236,6 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
       const LastMintAmount = TheirLastTokens[mint]
       if (mint in TheirLastTokens) {
         const balanceChange = CurrentMintAmount - LastMintAmount
-
         const transactionType = inferTransactionType(balanceChange);
         if (transactionType !== 'no change') {
           if (SpecialTokens[mint]) {
@@ -392,7 +387,7 @@ async function enqueueSwap(SwapData) {
   const Signature = SwapData.Signature
   let NumTokens = SwapData.AmountOfTokensToSwap
 
-  if (CompletedCopies.includes(Signature)) {
+  if (CompletedCopies.includes(Signature)) { //TODO make it shift and clear old signatures
     console.log("duplicate transaction detected. skipping")
     return
   }
@@ -402,7 +397,6 @@ async function enqueueSwap(SwapData) {
   Data = {
     Time = GetTime(),
     Wallet = Wallet address,
-
     Type = Type of transaction (Buy or sell),
     Mint = Mint address of coin traded,
     Cost = Cost of coin at that moment in time,
@@ -473,7 +467,6 @@ async function enqueueSwap(SwapData) {
     const MaxAmountSpendingInUsd = myWalletBalanceInSol * SolVal * SetParameters.MaxProportionSpending
     if (ProportionSpending > SetParameters.MaxProportionSpending) {
       NumTokens = MaxAmountSpendingInUsd / tokenPriceInUsd
-
       const MaxProportionExceededMessage = `🔶 Max spending proportion exceeded (${ProportionSpending * 100}%); setting amount purchasing to ${SetParameters.MaxProportionSpending * 100}%`
       DetectionMessage += "\n" + MaxProportionExceededMessage
     }
@@ -499,7 +492,6 @@ async function enqueueSwap(SwapData) {
 
   const PassedChecksMessage = `✅ Passed all checks for ${GetMintEmbed("mint", SwapData.mintAddress)}`
   DetectionMessage += "\n" + PassedChecksMessage
-
   if (Simulating) {
     if (!NumTokens) {
       console.log("invalid amount of tokens to log: ", NumTokens, GetTime(), Wallet, SwapData.mintAddress)
@@ -648,6 +640,7 @@ const SOLANA_RPC_ENDPOINTS = [ //TODO make it so that this is a universal variab
   "https://solana-rpc.publicnode.com/",
   "https://solana-mainnet.api.syndica.io/api-key/4MPquh8r1sBddBwSk6bN3pEHWF241B15QjPVGM5NJCTaetdXSKWyKiGrbw2XtM6YLa6EnYUExb6c5Hras1ocYuUks3YvmtMKDNj",
   "https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec",
+  "https://public.ligmanode.com",
 ];
 
 const connections = {};
@@ -657,7 +650,13 @@ SOLANA_RPC_ENDPOINTS.forEach((endpoint, index) => {
 
 let LoggedSignature = [];
 let subscriptions = {};
-
+async function UpdateWalletFactor(WalletAdd) {
+  const WalletSize = await getWalletBalance(WalletAdd);
+  const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1);
+  targetWallets[WalletAdd][0] = CurrentWalletFactor;
+  targetWallets[WalletAdd][3] = WalletSize;
+  console.log(`Wallet update for ${WalletAdd}: `, myWalletBalanceInSol, WalletSize);
+}
 function subscribeToWalletTransactions(WalletAdd) {
   const CurrWalletPubKey = new PublicKey(WalletAdd);
 
@@ -678,7 +677,6 @@ function subscribeToWalletTransactions(WalletAdd) {
       if (LoggedSignature.length > MAX_SIGNATURES) {
         LoggedSignature.shift()
       }
-      LoggedSignature.push(logs.signature)
       const ToSearchFor = [
         `Program log: Instruction: PumpSell`,
         `Program log: Instruction: PumpBuy`,
@@ -689,6 +687,7 @@ function subscribeToWalletTransactions(WalletAdd) {
       ];
       const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
       if (InString && !logs.err) {
+        LoggedSignature.push(logs.signature)
         console.log(WalletAdd, "good data: ", logs);
         handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs);
       } else {
@@ -700,22 +699,21 @@ function subscribeToWalletTransactions(WalletAdd) {
     }
     subscriptions[WalletAdd][index] = id;
   }
-  async function UpdateWalletFactor() {
-    const WalletSize = await getWalletBalance(WalletAdd);
-    const CurrentWalletFactor = Math.min(myWalletBalanceInSol / WalletSize, 1);
-    targetWallets[WalletAdd][0] = CurrentWalletFactor;
-    targetWallets[WalletAdd][3] = WalletSize;
-    console.log(`Wallet update for ${WalletAdd}: `, myWalletBalanceInSol, WalletSize);
-  }
-  UpdateWalletFactor();
+
+  UpdateWalletFactor(WalletAdd);
 }
 
 
 process.on('SIGINT', async () => {
   console.info('Received SIGINT. Shutting down at ', GetTime());
-  if (subscriptionId !== null) {
-    await connection.removeOnLogsListener(subscriptionId);
+
+  for (const wallet in subscriptions) {
+    for (const index in subscriptions[wallet]) {
+      await connections[index].removeOnLogsListener(subscriptions[wallet][index]);
+    }
   }
+
+
   process.exit(0);
 });
 
@@ -769,8 +767,6 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
   targetWallets[Wallet] = [CurrentWalletFactor, null, TheirLastTokens, WalletSize, Alias,]
   subscribeToWalletTransactions(Wallet);
 }
-
-
 
 async function main() {
   MyTrades = LoadDB("OurTrades.json")
@@ -1027,10 +1023,8 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["managewallets"] },
   ]
   const messageText = messageObj.text || "";
-  // Check if user is in the process of changing priority fee
   if (userStates[chatId]) { //TODO make this better managed
     if (userStates[chatId].waitingForFee) {
-      // Parse and set the new priority fee
       if (messageText == ActionTexts["back"]) {
         userStates[chatId].waitingForFee = false;
         return ReturnToMenu()
@@ -1115,7 +1109,7 @@ async function handleMessage(messageObj) {
       } else {
         userStates[chatId].waitingForWalletToView = false;
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
-        //Get wallet 
+        //TODO give details for wallet (pnl, most recent trade etc.)
       }
       ReturnToMenu()
       return
