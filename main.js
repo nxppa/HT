@@ -719,7 +719,10 @@ process.on('SIGINT', async () => {
 });
 
 async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
-  EditValue("TargetWallets", GetData("TargetWallets").length, Wallet)
+  if (!InitialFetch){
+    EditValue("TargetWallets", GetData("TargetWallets").length, Wallet)
+  }
+
   const WalletSize = await getWalletBalance(Wallet)
   const CurrentWalletFactor = Math.min(await myWalletBalanceInSol / WalletSize, 1)
   const TheirLastTokens = await GetTokens(Wallet);
@@ -767,13 +770,13 @@ async function main() {
   SetParameters = Info
   const walletdata = fs.readFileSync(BaseFilePath + "TargetWallets.json");
   const Arr = JSON.parse(walletdata)
-  const Msg = `Starting bot. Adding ${Arr.length - 1} wallets`
+  const Msg = `Starting bot. Adding ${Arr.length} wallets`
   SendToAll(Msg, "Markdown", "sendMessage")
   for (const i in Arr) {
     const newWallet = Arr[i]
     if (isEthereumOrSolanaAddress(newWallet)) {
       console.log("adding new wallet: ", newWallet)
-      AddWallet(newWallet, null, true, Arr.length - 1)
+      AddWallet(newWallet, null, true)
     }
   }
 
