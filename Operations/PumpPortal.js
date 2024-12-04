@@ -42,8 +42,6 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
       "pool": "pump"
     })
   });
-
-  
   if (response.status === 200) {
     const data = await response.arrayBuffer();
     const tx = VersionedTransaction.deserialize(new Uint8Array(data));
@@ -54,6 +52,7 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
     console.log(signature)
     return signature
   }
+  
 }
 module.exports = { Swap }
 
