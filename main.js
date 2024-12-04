@@ -645,7 +645,7 @@ const SOLANA_RPC_ENDPOINTS = [ //TODO make it so that this is a universal variab
   //"https://solana-mainnet.core.chainstack.com/155d8d316c41d2ab16e07ee9190e409c",
   //"https://solana-rpc.publicnode.com/",
   //"https://solana-mainnet.api.syndica.io/api-key/4MPquh8r1sBddBwSk6bN3pEHWF241B15QjPVGM5NJCTaetdXSKWyKiGrbw2XtM6YLa6EnYUExb6c5Hras1ocYuUks3YvmtMKDNj",
-  //"https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec",
+  "https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec",
   "https://public.ligmanode.com",
 ];
 
