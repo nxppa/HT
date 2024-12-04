@@ -1272,6 +1272,7 @@ async function handleMessage(messageObj) {
     case ActionTexts["getconditions"]:
       const data = fs.readFileSync(BaseFilePath + "Values.json", "utf8");
       let MsgStr = "\`\`\`json\n" + data + "\`\`\`"
+      sendMessage(chatId, MsgStr)
     case ActionTexts["getpriofee"]:
       const FeeMsg = "Priority fee: " + SetParameters.PriorityFee
       return sendMessage(chatId, FeeMsg);
@@ -1291,6 +1292,7 @@ async function handleMessage(messageObj) {
         { text: ActionTexts["getmaxpropspending"] },
         { text: ActionTexts["getminspending"] },
         { text: ActionTexts["getmaxpermc"] },
+        { text: ActionTexts["getconditions"] },
         { text: ActionTexts["back"] },
       ]
       const InfoKB = GetKeyBoard(InfoOptions, true, false)
