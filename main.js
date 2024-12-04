@@ -82,8 +82,6 @@ async function updateValue() {
 }
 function startConstantUpdate() {
   setInterval(async () => {
-    console.log(`Memory Usage: ${os.freemem()} / ${os.totalmem()}`);
-    //!here
     await updateValue()
   }, 10000)
 }
@@ -493,7 +491,7 @@ async function enqueueSwap(SwapData) {
       //TODO Add timeframe
     }
   }
-
+  
   const PassedChecksMessage = `✅ Passed all checks for ${GetMintEmbed("mint", SwapData.mintAddress)}`
   DetectionMessage += "\n" + PassedChecksMessage
   if (Simulating) {
@@ -543,7 +541,7 @@ async function enqueueSwap(SwapData) {
     SendToAll(DetectionMessage, "Markdown")
     return
   }
-
+  SendToAll(DetectionMessage, "Markdown")
   let Data = {}
 
   Data.Amount = NumTokens
@@ -949,6 +947,7 @@ async function handleMessage(messageObj) {
     "clearwallets": "❌ Clear Wallets",
     "confirmation": "✔️ Yes",
     "walletgen": "🗝️ Generate Wallet",
+    "getconditions": "📝 Get Conditions"
   }
 
   if (!IDToName[chatId]) {
@@ -1270,6 +1269,9 @@ async function handleMessage(messageObj) {
       }
       await showbal();
       return
+    case ActionTexts["getconditions"]:
+      const data = fs.readFileSync(BaseFilePath + "Values.json", "utf8");
+      let MsgStr = "\`\`\`json\n" + data + "\`\`\`"
     case ActionTexts["getpriofee"]:
       const FeeMsg = "Priority fee: " + SetParameters.PriorityFee
       return sendMessage(chatId, FeeMsg);
