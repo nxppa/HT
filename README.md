@@ -1,2 +1,3 @@
-# Double-Bay-Gooner
-I am the one who goons
+# dbg
+
+Node JS copytrading bot

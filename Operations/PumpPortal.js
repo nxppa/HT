@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const bs58 = require("bs58").default
-const { PublicKey, VersionedTransaction, Connection, Keypair } = require('@solana/web3.js')
+const { PublicKey, VersionedTransaction, Connection, Keypair } = require('@solana/web3.js');
 
 const REPLICATING_WALLET_PRIVATE_KEY = process.env.PrivateKey //* private wallet key
 
@@ -16,12 +16,13 @@ function PrivToPub(PrivateKey) {
   }
 }
 
-//TODO Make a universal variable for these
-
 const MyWallet = PrivToPub(REPLICATING_WALLET_PRIVATE_KEY) //* public wallet address
 
 const MyWalletPubKey = new PublicKey(MyWallet)
-
+const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f"
+const connection = new Connection(SOLANA_RPC_ENDPOINT, {
+  commitment: 'confirmed',
+});
 async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
   const response = await fetch(`https://pumpportal.fun/api/trade-local`, {
     method: "POST",
@@ -47,37 +48,11 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
     const data = await response.arrayBuffer();
     const tx = VersionedTransaction.deserialize(new Uint8Array(data));
     console.log(tx)
-    
-    tx.sign([Keypair.fromSecretKey(bs58.decode(process.env.PrivateKey))])
-    const EncodedAndSigned = bs58.encode(tx.serialize())
-    const sigs = VersionedTransaction.deserialize(new Uint8Array(bs58.decode(EncodedAndSigned)));
-    const ProperSig = sigs.signatures[0]
-    const SigString = bs58.encode(ProperSig)
-
-    try {
-      const jitoResponse = await fetch(`https://ny.mainnet.block-engine.jito.wtf/api/v1/transactions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "sendTransaction",
-          "params": [
-            EncodedAndSigned
-          ]
-        })
-      });
-      console.log(jitoResponse, SigString)
-      return SigString
-    } catch (e) {
-      console.log(e.message);
-      return false
-    }
-  } else {
-    console.log("request failed");
-    return false
+    const signerKeyPair = Keypair.fromSecretKey(bs58.decode(process.env.PrivateKey));
+    tx.sign([signerKeyPair])
+    const signature = await connection.sendTransaction(tx)
+    console.log(signature)
+    return signature
   }
 }
 module.exports = { Swap }

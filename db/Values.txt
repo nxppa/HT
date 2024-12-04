@@ -1,5 +1,0 @@
-[PriorityFee] = 0.0001;
-[MaxProportionSpending] = 0.05;
-[MinimumSpending] = 0.1;
-[MaxMarketCap] = 0.02;
-[Halted] = 0;

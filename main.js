@@ -57,13 +57,11 @@ const IDToName = {
 for (const ID in IDToName) {
   TransactionDetectionIDToMessageIDForEach[ID] = {}
 }
+const BaseFilePath = './db/'
 
 let CompletedCopies = []
 let SetParameters = {}
-SetParameters.PriorityFee = null
-SetParameters.MaxProportionSpending = null
-SetParameters.MinimumSpending = null
-SetParameters.Halted = null
+
 
 
 let myWalletBalanceInSol = null
@@ -720,20 +718,8 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-const StringWalletFilePath = './db/TargetWallets.txt' //TODO make these json files instead of text files
-const StringValuesFilePath = './db/Values.txt'
-
 async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
-  if (!InitialFetch) {
-    fs.appendFile(StringWalletFilePath, '\n' + Wallet, (err) => {
-      if (err) {
-        console.error('Error appending to file:', err);
-        return;
-      }
-      console.log('String was appended to file!');
-    });
-  }
-
+  EditValue("TargetWallets", GetData("TargetWallets").length, Wallet)
   const WalletSize = await getWalletBalance(Wallet)
   const CurrentWalletFactor = Math.min(await myWalletBalanceInSol / WalletSize, 1)
   const TheirLastTokens = await GetTokens(Wallet);
@@ -776,20 +762,11 @@ async function main() {
   console.log(MyTrades)
   MyTokens = await GetTokens(MyWalletPubKey)
   UpdateMyWallet()
-  var ValuesText = fs.readFileSync(StringValuesFilePath, 'utf8')
-  const lines = ValuesText.trim().split('\n').filter(line => line.trim() !== '');
-  console.log("Presets: ", lines)
-  lines.forEach(line => {
-    const match = line.match(/\[(.+?)\]\s*=\s*(.+?);/);
-    if (match) {
-      const key = match[1].trim();
-      const value = match[2].trim();
-      const numericValue = Number(value);
-      SetParameters[key] = isNaN(numericValue) ? value : numericValue;
-    }
-  });
-  var WalletText = fs.readFileSync(StringWalletFilePath, 'utf8')
-  const Arr = WalletText.split('\n');
+  const data = fs.readFileSync(BaseFilePath + "Values.json");
+  Info = JSON.parse(data);
+  SetParameters = Info
+  const walletdata = fs.readFileSync(BaseFilePath + "TargetWallets.json");
+  const Arr = JSON.parse(walletdata)
   const Msg = `Starting bot. Adding ${Arr.length - 1} wallets`
   SendToAll(Msg, "Markdown", "sendMessage")
   for (const i in Arr) {
@@ -895,77 +872,32 @@ function GetKeyBoard(Options, Resize, OTK) {
   return KB
 
 }
-
-
-async function updateValueInFile(key, value) {
-  try {
-    var fileContent = fs.readFileSync(StringValuesFilePath, 'utf8')
-
-    const lines = fileContent.split('\n');
-
-    let keyFound = false;
-
-    const updatedLines = lines.map(line => {
-      const match = line.match(/\[(.+?)\]\s*=\s*(.+?);/);
-      if (match) {
-        const currentKey = match[1].trim();
-        if (currentKey === key) {
-          keyFound = true;
-          // Replace the line with the updated value
-          return `[${key}] = ${value};`;
-        }
-      }
-      return line;
-    });
-
-    if (!keyFound) {
-      console.warn(`Key [${key}] not found in the file. Adding it.`);
-      updatedLines.push(`[${key}] = ${value};`);
-    }
-
-    const updatedContent = updatedLines.join('\n');
-
-    fs.writeFile(StringValuesFilePath, updatedContent, 'utf8', (err) => {
-      if (err) {
-        console.error('Error writing to the file:', err);
-        return;
-      }
-    });
-
-
-    console.log('File has been updated successfully.');
-
-  } catch (err) {
-    console.error('Error:', err);
-  }
+function GetData(Database) {
+  const path = BaseFilePath + Database + ".json"
+  const data = fs.readFileSync(path);
+  Info = JSON.parse(data);
+  return Info
+}
+function ClearJsonArray(Database){
+  const path = BaseFilePath + Database + ".json"
+  fs.writeFileSync(path, JSON.stringify([], null, 2));
+}
+function RemoveValue(Database, Value){//! must be array
+  const path = BaseFilePath + Database + ".json"
+  const data = fs.readFileSync(path);
+  Info = JSON.parse(data);
+  const index = Info.indexOf(Value);
+  Info.splice(index, 1)
+  fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+}
+function EditValue(Database, Key, Value) {
+  const path = BaseFilePath + Database + ".json"
+  const data = fs.readFileSync(path);
+  Info = JSON.parse(data);
+  Info[Key] = Value
+  fs.writeFileSync(path, JSON.stringify(Info, null, 2));
 }
 
-
-
-function RemoveLineFromWallets(Line) {
-  fs.readFile(StringWalletFilePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading the file:', err);
-      return;
-    }
-    const lines = data.split('\n');
-    console.log(Line, lines.length)
-    if (Line <= lines.length) {
-      lines.splice(Line, 1); // Adjust for zero-based index
-    } else {
-      console.error('Line number out of range');
-      return;
-    }
-    const modifiedData = lines.join('\n');
-    fs.writeFile(StringWalletFilePath, modifiedData, 'utf8', (err) => {
-      if (err) {
-        console.error('Error writing to the file:', err);
-        return;
-      }
-      console.log(`Line ${Line} has been removed from the file.`);
-    });
-  });
-}
 
 async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method = "sendMessage") { //TODO make it so that it retries if sending message failed
   try {
@@ -1040,7 +972,7 @@ async function handleMessage(messageObj) {
       } else {
         SetParameters.PriorityFee = newFee
         userStates[chatId].waitingForFee = false;
-        updateValueInFile("PriorityFee", newFee)
+        EditValue("Values", "PriorityFee", newFee)
         SendToAll(`Priority fee changed to ${newFee}.`)
       }
       ReturnToMenu()
@@ -1084,17 +1016,7 @@ async function handleMessage(messageObj) {
         userStates[chatId].waitingForWalletAddressToRemove = false
       } else {
         delete targetWallets[removing]
-        var text = fs.readFileSync(StringWalletFilePath, 'utf8')
-        const Arr = text.split('\n');
-
-        for (const i in Arr) {
-          const CurrentWallet = Arr[i]
-          if (removing == CurrentWallet) {
-            RemoveLineFromWallets(i)
-          } else {
-            console.log(CurrentWallet)
-          }
-        }
+        RemoveValue("TargetWallets", removing)
         userStates[chatId].waitingForWalletAddressToRemove = false;
         SendToAll(`Removed wallet: ${removing}.`)
       }
@@ -1170,7 +1092,8 @@ async function handleMessage(messageObj) {
       } else {
         SetParameters.MaxProportionSpending = NewMax
         userStates[chatId].waitingForProportion = false;
-        updateValueInFile("MaxProportionSpending", NewMax)
+        EditValue("Values", "MaxProportionSpending", NewMax)
+
         SendToAll(`Max proportion changed to ${NewMax * 100}%.`)
       }
       ReturnToMenu()
@@ -1187,7 +1110,8 @@ async function handleMessage(messageObj) {
       } else {
         SetParameters.MinimumSpending = NewMin
         userStates[chatId].waitingForMinimum = false;
-        updateValueInFile("MinimumSpending", NewMin)
+        EditValue("Values", "MinimumSpending", NewMin)
+
         SendToAll(`Minimum spent changed to ${NewMin} USD.`)
       }
       ReturnToMenu()
@@ -1198,12 +1122,7 @@ async function handleMessage(messageObj) {
         return ReturnToMenu()
       } else if (messageText == ActionTexts["confirmation"]) {
         userStates[chatId].waitingToClearAll = false;
-        fs.writeFile(StringWalletFilePath, "", 'utf8', (err) => {
-          if (err) {
-            console.error('Error writing to the file:', err);
-            return;
-          }
-        });
+        ClearJsonArray("TargetWallets")
         targetWallets = {}
         SendToAll("Cleared all wallets.")
         ReturnToMenu()
@@ -1228,7 +1147,8 @@ async function handleMessage(messageObj) {
       } else {
         SetParameters.MaxMarketCap = NewMax
         userStates[chatId].waitingForMCPerc = false;
-        updateValueInFile("MaxMarketCap", NewMax)
+        EditValue("Values", "MaxMarketCap", NewMax)
+
         SendToAll(`Max Market Cap threshold changed to ${NewMax * 100}%.`)
       }
       ReturnToMenu()
@@ -1258,7 +1178,8 @@ async function handleMessage(messageObj) {
     case ActionTexts["back"]:
       return ReturnToMenu()
     case ActionTexts["halt"]:
-      updateValueInFile("Halted", 1)
+      EditValue("Values", "Halted", true)
+
       SendToAll("Halted trading. Logs will still come through");
       const HaltOptions = GetSettingsOptions(true)
       const HaltKB = GetKeyBoard(HaltOptions, true, false)
@@ -1266,7 +1187,8 @@ async function handleMessage(messageObj) {
       return sendMessage(chatId, "Settings: ", null, HaltKB)
 
     case ActionTexts["resume"]:
-      updateValueInFile("Halted", 0)
+      EditValue("Values", "Halted", false)
+
       SendToAll("Resumed trading");
       const ResumeOptions = GetSettingsOptions(false)
       const ResumeKB = GetKeyBoard(ResumeOptions, true, false)
