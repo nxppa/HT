@@ -640,9 +640,7 @@ async function handleSwap(Mint, InpAmount, transactionType) {
 const SOLANA_RPC_ENDPOINTS = [ //TODO make it so that this is a universal variable
   //"https://api.mainnet-beta.solana.com",
   //"https://rpc-mainnet.solanatracker.io/?api_key=81b71925-ca06-487c-ac6c-155d8a9e3cda",
-  //"https://solana-rpc.publicnode.com/",
-  
-  
+  "https://solana-rpc.publicnode.com/",
   "https://solana-mainnet.core.chainstack.com/155d8d316c41d2ab16e07ee9190e409c",
   "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
   "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7",
@@ -970,7 +968,7 @@ function RemoveLineFromWallets(Line) {
   });
 }
 
-async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method = "sendMessage") {
+async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method = "sendMessage") { //TODO make it so that it retries if sending message failed
   try {
 
     return getAxiosInstance().get(Method, {
