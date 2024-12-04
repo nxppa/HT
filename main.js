@@ -638,7 +638,7 @@ async function handleSwap(Mint, InpAmount, transactionType) {
 }
 
 const SOLANA_RPC_ENDPOINTS = [ //TODO make it so that this is a universal variable
-  //"https://api.mainnet-beta.solana.com",
+  "https://api.mainnet-beta.solana.com",
   "https://rpc-mainnet.solanatracker.io/?api_key=81b71925-ca06-487c-ac6c-155d8a9e3cda",
   "https://solana-rpc.publicnode.com/",
   "https://solana-mainnet.core.chainstack.com/155d8d316c41d2ab16e07ee9190e409c",
