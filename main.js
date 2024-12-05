@@ -1314,7 +1314,7 @@ async function handleMessage(messageObj) {
       ]
       const WalletsKB = GetKeyBoard(WalletsOptions, true, false)
 
-      let WalletString = `Wallets: (${Object.keys(targetWallets).length})\n`
+      let WalletString = `Wallets: ⟨${Object.keys(targetWallets).length}⟩\n`
       Object.keys(targetWallets).forEach(key => {
         const Alias = targetWallets[key][4]
         const PrePend = Alias ? Alias + ": " : "Account: "
