@@ -20,6 +20,8 @@ const express = require('express');
 const bs58 = require("bs58").default
 const fs = require('fs');
 const os = require("os")
+const Events = require("events")
+
 
 const MyWallet = PrivToPub(process.env.PrivateKey)
 const MyWalletPubKey = new PublicKey(MyWallet)
@@ -157,6 +159,7 @@ const connection = new Connection(SOLANA_RPC_ENDPOINT, {
 connection.onLogs(MyWalletPubKey, async (logs, ctx) => {
   if (!MyWalletAnalysis[logs.signature]) {
     MyWalletAnalysis[logs.signature] = logs
+    Events.emit("AnalysisLogsAdded", logs.signature)
     UpdateMyWallet()
   }
 }, 'confirmed')
@@ -487,7 +490,7 @@ async function enqueueSwap(SwapData) {
     }
     if (ConsecutiveSells[SwapData.mintAddress] >= ConsecutiveSellsThreshold) {
       NumTokens = MyTokens[SwapData.mintAddress];
-      //TODO Add timeframe
+      //TODO Add timeframe if actually implementing
     }
   }
   
@@ -505,7 +508,6 @@ async function enqueueSwap(SwapData) {
           if (SwapData.transactionType == "buy") {
             return
           } else {
-            //TODO make it try again here
           }
         }
         let Data = {}
@@ -564,13 +566,19 @@ async function enqueueSwap(SwapData) {
     Data.Signature = Signature
     Data.MyLogs = logs
     console.log("swapped. Status: ", Successful)
-    if (!Successful) {
+    if (!Successful) { //! failed to buy
       if (SwapData.transactionType == "sell") {
         console.log(`failed to sell. retrying`)
       } else {
         // buy
         console.log("key stuff", logs)
-        //console.log(Object.keys(logs.err)[0])
+        try {
+          console.log(Object.keys(logs.err)[0])
+
+        } catch (e) {
+          console.log("couldnt log error: ", e)
+
+        }
         MyTokens[SwapData.mintAddress] -= NumTokens //! removing imaginary tokens
         const err = "unknown error"
         const Message = `🚫 Failed to execute buy at ${GetTime(true)} ${Emoji}\n ${GetWalletEmbed("Wallet", Wallet)} ${GetMintEmbed("Mint", SwapData.mintAddress)} ${GetSignatureEmbed("Solscan", Signature)}\n Error: ${Object.keys(err)}` //TODO make it log error
@@ -579,7 +587,7 @@ async function enqueueSwap(SwapData) {
         AddData("OurOrders.json", Data)
         return
       }
-    } else {
+    } else { //Successfull buy
       console.log("did operation successfully")
       if (SwapData.transactionType == "buy") {
         ConsecutiveSells[SwapData.mintAddress] = 0
@@ -590,7 +598,6 @@ async function enqueueSwap(SwapData) {
           ConsecutiveSells[SwapData.mintAddress] += 1
         }
         MyTokens[SwapData.mintAddress] -= NumTokens
-        //TODO make it so that it minuses the correct amount of tokens
       }
       break
     }
@@ -618,9 +625,12 @@ async function handleSwap(Mint, InpAmount, transactionType) {
   if (!Signature) {
     return { Signature, Successful, logs }
   }
-  while (!MyWalletAnalysis[Signature]) {
-    await new Promise(resolve => setTimeout(resolve, 5)); //TODO implement events instead
-  }
+  await new Promise((resolve) => {
+    Events.once('AnalysisLogsAdded', (key) => {
+      if (key === Signature) resolve();
+    });
+  });
+
   const MyAnalysis = MyWalletAnalysis[Signature]
   logs = MyAnalysis.logs
   if (findMatchingStrings(logs, ["Error", "panicked"], true) || MyAnalysis.err) {
@@ -1348,3 +1358,4 @@ async function handleMessage(messageObj) {
       return sendMessage(chatId, "That is not a command");
   }
 }
+
