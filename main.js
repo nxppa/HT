@@ -71,7 +71,6 @@ let myWalletBalanceInSol = null
 function isEthereumOrSolanaAddress(address) {
   return /^0x[a-fA-F0-9]{40}$/.test(address) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
 }
-
 let MyTokens = {}
 let SolVal = FetchSolVal() //TODO in future make it so no trades are enqueued until solvalue is procured 
 async function updateValue() {
@@ -952,7 +951,7 @@ async function handleMessage(messageObj) {
   }
 
   if (!IDToName[chatId]) {
-    return sendMessage(chatId, "Your telegram ID isn't whitelisted; call Nappa demure so that he will whitelist you")
+    return sendMessage(chatId, "Your telegram ID isn't whitelisted; tell @Nappa2 that he is demure so that he will whitelist you")
   }
   const StartOptions = [
     { text: ActionTexts["info"] },
@@ -960,8 +959,6 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["actions"] },
     { text: ActionTexts["managewallets"] },
   ]
-
-
 
   const messageText = messageObj.text || "";
   if (userStates[chatId]) { //TODO make this better managed
@@ -1314,7 +1311,7 @@ async function handleMessage(messageObj) {
       ]
 
       const ActionKB = GetKeyBoard(ActionOptions, true, false)
-      return await sendMessage(chatId, "Info: ", null, ActionKB)
+      return await sendMessage(chatId, "Actions: ", null, ActionKB)
 
     case ActionTexts["managewallets"]:
       const WalletsOptions = [
