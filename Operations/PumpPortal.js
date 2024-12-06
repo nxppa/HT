@@ -33,9 +33,7 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
       "publicKey": MyWalletPubKey.toString(),
       "action": Type,
       "mint": Mint,
-
       "denominatedInSol": "false",
-
       "amount": Amount,
       "slippage": Slippage,
       "priorityFee": PrioFee,
@@ -51,6 +49,8 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
     const signature = await connection.sendTransaction(tx)
     console.log(signature)
     return signature
+  } else {
+    console.log(response)
   }
   
 }
