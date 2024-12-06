@@ -947,7 +947,8 @@ async function handleMessage(messageObj) {
     "clearwallets": "❌ Clear Wallets",
     "confirmation": "✔️ Yes",
     "walletgen": "🗝️ Generate Wallet",
-    "getconditions": "📝 Get Conditions"
+    "getconditions": "📝 Get Conditions",
+    "changeconditions": "🛠️ Change Conditions",
   }
 
   if (!IDToName[chatId]) {
@@ -959,6 +960,9 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["actions"] },
     { text: ActionTexts["managewallets"] },
   ]
+
+
+
   const messageText = messageObj.text || "";
   if (userStates[chatId]) { //TODO make this better managed
     if (userStates[chatId].waitingForFee) {
@@ -1217,6 +1221,7 @@ async function handleMessage(messageObj) {
       sendMessage(chatId, "Please enter the maximum percent of the market cap someone may own for you to ender the trade as a percentage (eg. 10%)", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForMCPerc: true };
       return
+      
     case ActionTexts["addwallet"]:
       sendMessage(chatId, "Please enter the wallet address:", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForWalletAddress: true };
@@ -1286,6 +1291,17 @@ async function handleMessage(messageObj) {
     case ActionTexts["getmaxpermc"]:
       const MCMsg = `Maximum percent of market cap: ${SetParameters.MaxMarketCap * 100}%`
       return sendMessage(chatId, MCMsg);
+    case ActionTexts["changeconditions"]:
+      const ConditionsOptions = [
+        { text: ActionTexts["changemaxpermc"] },
+        { text: ActionTexts["changemaxpropspending"] },
+        { text: ActionTexts["changeminimumspending"] },
+        { text: ActionTexts["changepriofee"]},
+        { text: ActionTexts["back"]},
+      ]
+      const CondtionsKB = GetKeyBoard(ConditionsOptions, true, false)
+      return await sendMessage(chatId, "Conditions: ", null, CondtionsKB)
+
     case ActionTexts["info"]:
       const InfoOptions = [
         { text: ActionTexts["mybal"] },
@@ -1326,10 +1342,7 @@ async function handleMessage(messageObj) {
 
     case ActionTexts["settings"]:
       const SettingsOptions = [
-        { text: ActionTexts["changepriofee"] },
-        { text: ActionTexts["changemaxpropspending"] },
-        { text: ActionTexts["changeminimumspending"] },
-        { text: ActionTexts["changemaxpermc"] },
+        { text: ActionTexts["changeconditions"] }, 
         { text: ActionTexts[SetParameters.Halted ? "resume" : "halt"] },
         { text: ActionTexts["back"] },
       ]
