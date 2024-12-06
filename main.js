@@ -1170,10 +1170,7 @@ async function handleMessage(messageObj) {
   }
   function GetSettingsOptions(Halted) {
     let SettingsOptions = [
-      { text: ActionTexts["changepriofee"] },
-      { text: ActionTexts["changemaxpropspending"] },
-      { text: ActionTexts["changeminimumspending"] },
-      { text: ActionTexts["changemaxpermc"] },
+      { text: ActionTexts["changeconditions"] }, 
       { text: ActionTexts[Halted ? "resume" : "halt"] },
       { text: ActionTexts["back"] },
     ]
