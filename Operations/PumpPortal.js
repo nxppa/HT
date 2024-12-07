@@ -3,7 +3,6 @@ require('dotenv').config();
 const bs58 = require("bs58").default
 const { PublicKey, VersionedTransaction, Connection, Keypair } = require('@solana/web3.js');
 
-const REPLICATING_WALLET_PRIVATE_KEY = process.env.PrivateKey //* private wallet key
 
 function PrivToPub(PrivateKey) {
   try {
@@ -16,7 +15,7 @@ function PrivToPub(PrivateKey) {
   }
 }
 
-const MyWallet = PrivToPub(REPLICATING_WALLET_PRIVATE_KEY) //* public wallet address
+const MyWallet = PrivToPub(process.env.PrivateKey) //* public wallet address
 
 const MyWalletPubKey = new PublicKey(MyWallet)
 const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f"

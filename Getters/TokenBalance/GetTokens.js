@@ -47,9 +47,7 @@ async function fetchTokensFromEndpoint(rpc, address, programId) {
         const mint = parsedInfo.mint;
         const tokenAmountInfo = parsedInfo.tokenAmount;
         const tokenAmount = parseFloat(tokenAmountInfo.uiAmountString);
-        if (tokenAmount) {
-            tokens[mint] = tokenAmount;
-        }
+        tokens[mint] = tokenAmount;
     });
 
     return tokens;
