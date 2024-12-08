@@ -978,7 +978,6 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["settings"] },
     { text: ActionTexts["actions"] },
     { text: ActionTexts["managewallets"] },
-    { text: ActionTexts["tools"] },
   ]
 
   const messageText = messageObj.text || "";
