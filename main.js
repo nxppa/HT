@@ -966,8 +966,7 @@ async function handleMessage(messageObj) {
     "getconditions": "📝 Get Conditions",
     "changeconditions": "🔨 Change Conditions",
     "tools": "🛠️ Tools",
-    "tokenanalysis": "🪙 Token Analysis",
-    "walletanalysis": "💳 Wallet Analysis",
+    "scanner": "🔍 Scanner",
   }
 
   if (!IDToName[chatId]) {
@@ -1331,8 +1330,7 @@ async function handleMessage(messageObj) {
       return await sendMessage(chatId, "Info: ", null, InfoKB)
     case ActionTexts["tools"]:
           const ToolOptions = [
-        { text: ActionTexts["walletanalysis"] },
-        { text: ActionTexts["tokenanalysis"] },
+        { text: ActionTexts["scanner"] },
         { text: ActionTexts["back"] },
       ]
       const ToolKB = GetKeyBoard(ToolOptions, true, false)
