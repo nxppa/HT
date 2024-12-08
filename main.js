@@ -966,7 +966,7 @@ async function handleMessage(messageObj) {
     "getconditions": "📝 Get Conditions",
     "changeconditions": "🔨 Change Conditions",
     "tools": "🛠️ Tools",
-    "mintanalysis": "🪙 Token Analysis",
+    "tokenanalysis": "🪙 Token Analysis",
     "walletanalysis": "💳 Wallet Analysis",
   }
 
