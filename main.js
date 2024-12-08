@@ -978,8 +978,9 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["settings"] },
     { text: ActionTexts["actions"] },
     { text: ActionTexts["managewallets"] },
+    { text: ActionTexts["tools"] },
   ]
-
+  console.log(ActionTexts["tools"])
   const messageText = messageObj.text || "";
   if (userStates[chatId]) { //TODO make this better managed
     if (userStates[chatId].waitingForFee) {
