@@ -978,7 +978,7 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["settings"] },
     { text: ActionTexts["actions"] },
     { text: ActionTexts["managewallets"] },
-    { text: ActionTexts["Tools"] },
+    { text: ActionTexts["tools"] },
   ]
 
   const messageText = messageObj.text || "";
@@ -1329,7 +1329,6 @@ async function handleMessage(messageObj) {
       const InfoKB = GetKeyBoard(InfoOptions, true, false)
       return await sendMessage(chatId, "Info: ", null, InfoKB)
     case ActionTexts["tools"]:
-
           const ToolOptions = [
         { text: ActionTexts["walletanalysis"] },
         { text: ActionTexts["tokenanalysis"] },
