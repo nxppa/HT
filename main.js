@@ -74,7 +74,7 @@ function isEthereumOrSolanaAddress(address) {
   return /^0x[a-fA-F0-9]{40}$/.test(address) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
 }
 let MyTokens = {}
-let SolVal = FetchSolVal() //TODO in future make it so no trades are enqueued until solvalue is procured 
+let SolVal = FetchSolVal()
 async function updateValue() {
   const Fetched = await FetchSolVal()
   if (Fetched) {
@@ -124,9 +124,9 @@ function GetTime(raw) {
 
   return time;
 }
-async function getWalletBalance(Wallet){
+async function getWalletBalance(Wallet) {
 
-  return await connection.getBalance(new PublicKey(Wallet))/Bil //TODO make it so it uses multiple endpoints
+  return await connection.getBalance(new PublicKey(Wallet)) / Bil //TODO make it so it uses multiple endpoints
 
 }
 function ToDecimalString(num) {
@@ -414,7 +414,7 @@ async function enqueueSwap(SwapData) {
     0.75: "two thirds of their position of the mint",
     1: "all of their mint position of the mint",
   }
-  const InfoSelling = InfoMapping[FactorSold] ? InfoMapping[FactorSold] : FactorSold * 100 + "% of their mint" //TODO do something with this 
+  const InfoSelling = InfoMapping[FactorSold] ? InfoMapping[FactorSold] : FactorSold * 100 + "% of their mint"
 
   const RoundedAmount = roundToDigits(FactorSold, 5)
   const RoundedTheyreBuying = Math.floor(SwapData.AmountTheyreBuying + 0.5)
@@ -433,7 +433,7 @@ async function enqueueSwap(SwapData) {
     "Maximum Spending Check"
   ]
   let NumChecks = DescriptionMapping.length
-  function GetStatus(FailedAt) { //TODO also do something with this 
+  function GetStatus(FailedAt) {
     let str = ""
     for (let i = 0; i < NumChecks; i++) {
 
@@ -493,7 +493,7 @@ async function enqueueSwap(SwapData) {
       //TODO Add timeframe if actually implementing
     }
   }
-  
+
   const PassedChecksMessage = `✅ Passed all checks for ${GetMintEmbed("mint", SwapData.mintAddress)}`
   DetectionMessage += "\n" + PassedChecksMessage
   if (Simulating) {
@@ -676,6 +676,10 @@ function subscribeToWalletTransactions(WalletAdd) {
         connection.removeOnLogsListener(subscriptions[WalletAdd][index]);
         return;
       }
+      if (!SolVal) {
+        //! no solvalue; wil break
+        return
+      }
       if (!StartedLogging) {
         targetWallets[WalletAdd][2] = await GetTokens(WalletAdd);
         return;
@@ -726,7 +730,7 @@ process.on('SIGINT', async () => {
 });
 
 async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
-  if (!InitialFetch){
+  if (!InitialFetch) {
     EditValue("TargetWallets", GetData("TargetWallets").length, Wallet)
   }
 
@@ -817,7 +821,7 @@ const server = app.listen(PORT, process.env.WebIP, function (err) {
 
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
-function getAxiosInstance() { 
+function getAxiosInstance() {
   return {
     get(method, params) {
       return axios.get(`/${method}`, {
@@ -888,11 +892,11 @@ function GetData(Database) {
   Info = JSON.parse(data);
   return Info
 }
-function ClearJsonArray(Database){
+function ClearJsonArray(Database) {
   const path = BaseFilePath + Database + ".json"
   fs.writeFileSync(path, JSON.stringify([], null, 2));
 }
-function RemoveValue(Database, Value){//! must be array
+function RemoveValue(Database, Value) {//! must be array
   const path = BaseFilePath + Database + ".json"
   const data = fs.readFileSync(path);
   Info = JSON.parse(data);
@@ -910,20 +914,23 @@ function EditValue(Database, Key, Value) {
 
 
 async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method = "sendMessage") { //TODO make it so that it retries if sending message failed
-  try {
+  async function ReturnAxios(deep) {
+    try {
+      return getAxiosInstance().get(Method, {
+        chat_id: ID,
+        text: messageText,
+        parse_mode: Mode,
+        reply_markup: JSON.stringify(Keyboard),
+        disable_web_page_preview: true,
+      });
+    } catch {
+      deep += 1
+      return ReturnAxios(deep)
+    }
 
-    return getAxiosInstance().get(Method, {
-      chat_id: ID,
-      text: messageText,
-      parse_mode: Mode,
-      reply_markup: JSON.stringify(Keyboard),
-      disable_web_page_preview: true,
-    });
-
-  } catch {
-    console.log("Error sending message to individual", ID)
   }
 
+    return ReturnAxios()
 
 }
 
@@ -1048,9 +1055,7 @@ async function handleMessage(messageObj) {
         userStates[chatId].waitingForWalletToView = false;
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
         const TheirBal = await getWalletBalance(Viewing)
-
         sendMessage(chatId, TheirBal)
-
         //TODO give details for wallet (pnl, most recent trade etc.)
       }
       ReturnToMenu()
@@ -1177,7 +1182,7 @@ async function handleMessage(messageObj) {
   }
   function GetSettingsOptions(Halted) {
     let SettingsOptions = [
-      { text: ActionTexts["changeconditions"] }, 
+      { text: ActionTexts["changeconditions"] },
       { text: ActionTexts[Halted ? "resume" : "halt"] },
       { text: ActionTexts["back"] },
     ]
@@ -1225,7 +1230,7 @@ async function handleMessage(messageObj) {
       sendMessage(chatId, "Please enter the maximum percent of the market cap someone may own for you to ender the trade as a percentage (eg. 10%)", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForMCPerc: true };
       return
-      
+
     case ActionTexts["addwallet"]:
       sendMessage(chatId, "Please enter the wallet address:", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForWalletAddress: true };
@@ -1281,7 +1286,7 @@ async function handleMessage(messageObj) {
     case ActionTexts["getconditions"]:
       const data = fs.readFileSync(BaseFilePath + "Values.json", "utf8");
       let MsgStr = "\`\`\`json\n" + data + "\`\`\`"
-      
+
       return sendMessage(chatId, MsgStr)
     case ActionTexts["getpriofee"]:
       const FeeMsg = "Priority fee: " + SetParameters.PriorityFee
@@ -1300,8 +1305,8 @@ async function handleMessage(messageObj) {
         { text: ActionTexts["changemaxpermc"] },
         { text: ActionTexts["changemaxpropspending"] },
         { text: ActionTexts["changeminimumspending"] },
-        { text: ActionTexts["changepriofee"]},
-        { text: ActionTexts["back"]},
+        { text: ActionTexts["changepriofee"] },
+        { text: ActionTexts["back"] },
       ]
       const CondtionsKB = GetKeyBoard(ConditionsOptions, true, false)
       return await sendMessage(chatId, "Conditions: ", null, CondtionsKB)
@@ -1346,7 +1351,7 @@ async function handleMessage(messageObj) {
 
     case ActionTexts["settings"]:
       const SettingsOptions = [
-        { text: ActionTexts["changeconditions"] }, 
+        { text: ActionTexts["changeconditions"] },
         { text: ActionTexts[SetParameters.Halted ? "resume" : "halt"] },
         { text: ActionTexts["back"] },
       ]
