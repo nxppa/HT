@@ -704,7 +704,7 @@ function subscribeToWalletTransactions(WalletAdd) {
         console.log(WalletAdd, "good data: ", logs);
         handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs);
       } else {
-        console.log("Useless data: ", logs);
+        console.log("Useless data: ", logs.signature);
       }
     }, 'confirmed');
     if (!subscriptions[WalletAdd]) {
@@ -1319,7 +1319,8 @@ async function handleMessage(messageObj) {
       const CondtionsKB = GetKeyBoard(ConditionsOptions, true, false)
       return await sendMessage(chatId, "Conditions: ", null, CondtionsKB)
     case ActionTexts["walletanalysis"]:
-
+      
+    return
     case ActionTexts["info"]:
       const InfoOptions = [
         { text: ActionTexts["mybal"] },
@@ -1332,6 +1333,7 @@ async function handleMessage(messageObj) {
           const ToolOptions = [
         { text: ActionTexts["walletanalysis"] },
         { text: ActionTexts["tokenanalysis"] },
+        { text: ActionTexts["back"] },
       ]
       const ToolKB = GetKeyBoard(ToolOptions, true, false)
       return await sendMessage(chatId, "Info: ", null, ToolKB)
