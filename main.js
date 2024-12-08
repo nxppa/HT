@@ -964,7 +964,10 @@ async function handleMessage(messageObj) {
     "confirmation": "✔️ Yes",
     "walletgen": "🗝️ Generate Wallet",
     "getconditions": "📝 Get Conditions",
-    "changeconditions": "🛠️ Change Conditions",
+    "changeconditions": "🔨 Change Conditions",
+    "tools": "🛠️ Tools",
+    "mintanalysis": "🪙 Token Analysis",
+    "walletanalysis": "💳 Wallet Analysis",
   }
 
   if (!IDToName[chatId]) {
@@ -975,6 +978,7 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["settings"] },
     { text: ActionTexts["actions"] },
     { text: ActionTexts["managewallets"] },
+    { text: ActionTexts["Tools"] },
   ]
 
   const messageText = messageObj.text || "";
@@ -1055,8 +1059,12 @@ async function handleMessage(messageObj) {
         userStates[chatId].waitingForWalletToView = false;
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
         const TheirBal = await getWalletBalance(Viewing)
+        let FormattedResponseStr = "```" //! include pnl, latest trade, balance, and give it a rating to copytrade
+        FormattedResponseStr += `Balance: $${TheirBal*SolVal}`
+
+
+
         sendMessage(chatId, TheirBal)
-        //TODO give details for wallet (pnl, most recent trade etc.)
       }
       ReturnToMenu()
       return
@@ -1310,6 +1318,7 @@ async function handleMessage(messageObj) {
       ]
       const CondtionsKB = GetKeyBoard(ConditionsOptions, true, false)
       return await sendMessage(chatId, "Conditions: ", null, CondtionsKB)
+    case ActionTexts["walletanalysis"]:
 
     case ActionTexts["info"]:
       const InfoOptions = [
@@ -1319,6 +1328,15 @@ async function handleMessage(messageObj) {
       ]
       const InfoKB = GetKeyBoard(InfoOptions, true, false)
       return await sendMessage(chatId, "Info: ", null, InfoKB)
+    case ActionTexts["tools"]:
+
+          const ToolOptions = [
+        { text: ActionTexts["walletanalysis"] },
+        { text: ActionTexts["tokenanalysis"] },
+      ]
+      const ToolKB = GetKeyBoard(ToolOptions, true, false)
+      return await sendMessage(chatId, "Info: ", null, ToolKB)
+
     case ActionTexts["actions"]:
       const ActionOptions = [
         { text: ActionTexts["walletgen"] },
