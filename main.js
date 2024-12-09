@@ -332,7 +332,7 @@ async function AnalyseAccount(Account) {
       if (Mint.endsWith("pump")){
         PreMoji = "💊"
       }
-      ResponseString += `${PreMoji} s${Mint}: ${Amount}\n`
+      ResponseString += `${PreMoji} ${Mint}: ${Amount}\n`
     }
   }
   ResponseString += "=======================\n"
