@@ -1342,7 +1342,7 @@ async function handleMessage(messageObj) {
 
       sendMessage(chatId, "Please enter a wallet, mint, signature, SPL account etc", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForScanner: true };
-
+      return
     case ActionTexts["walletdetails"]:
       let WalletsToSelectFrom = []
       Object.keys(targetWallets).forEach(key => {
@@ -1421,7 +1421,7 @@ async function handleMessage(messageObj) {
         { text: ActionTexts["back"] },
       ]
       const ToolKB = GetKeyBoard(ToolOptions, true, false)
-      return await sendMessage(chatId, "Info: ", null, ToolKB)
+      return await sendMessage(chatId, "Tools: ", null, ToolKB)
 
     case ActionTexts["actions"]:
       const ActionOptions = [
