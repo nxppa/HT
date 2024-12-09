@@ -28,7 +28,7 @@ const { getAssociatedTokenAddressSync } = require("@solana/spl-token")
 const MyWallet = PrivToPub(process.env.PrivateKey)
 const MyWalletPubKey = new PublicKey(MyWallet)
 const TelegramKey = process.env.TelegramKey;
-const TPID = process.env.TPID
+const TPID = process.env.ProgramID
 const Simulating = false
 const ConsecutiveSellsThreshold = 1000
 const MAX_SIGNATURES = 100
@@ -274,7 +274,12 @@ async function AnalyseAccount(Account) {
       ResponseString += "```"
     return ResponseString;
   }
-  const publicKey = typeof(Account) == "string" ? new PublicKey(Account) : Account
+  let publicKey = ""
+  try {
+    publicKey = typeof(Account) == "string" ? new PublicKey(Account) : Account
+  } catch {
+    return "invalid input"
+  }
   const accountInfo = await connection.getParsedAccountInfo(publicKey)
 
   const data = accountInfo.value.data;
@@ -332,7 +337,7 @@ async function AnalyseAccount(Account) {
       if (Mint.endsWith("pump")){
         PreMoji = "💊"
       }
-      ResponseString += `${PreMoji} ${Mint}: ${Amount}\n`
+      ResponseString += `${PreMoji} ${Mint}: ${Amount}\n` //TODO make it split into pages
     }
   }
   ResponseString += "=======================\n"
