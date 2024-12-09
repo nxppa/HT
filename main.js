@@ -322,12 +322,17 @@ async function AnalyseAccount(Account) {
   ResponseString += "Account\n"
   ResponseString += `Address: ${Account}\n`
   ResponseString += `Balance: ${TheirBal}\n`
-  ResponseString += "====Open Positions====\n"
+  ResponseString += "\n====Open Positions 📊====\n"
   const OpenPositons = await GetTokens(Account)
   for (let Mint in OpenPositons){
     const Amount = OpenPositons[Mint]
     if (Amount){
-      ResponseString += `${Mint}: ${Amount}\n`
+
+      let PreMoji = "💊"
+      if (Mint.endsWith("pump")){
+        PreMoji = "🪙"
+      }
+      ResponseString += `${PreMoji} s${Mint}: ${Amount}\n`
     }
   }
   ResponseString += "=======================\n"
