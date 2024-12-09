@@ -9,7 +9,7 @@ const connection = new Connection(SOLANA_RPC_ENDPOINT, {
 async function SPLToOwner(Account){
     const Key = typeof(Account) == "string" ? new PublicKey(Account) : Account
     const response = await connection.getParsedAccountInfo(Key)
-    return response
+    return response.value.data.parsed.info.owner
 }
 
 module.exports = {SPLToOwner}

@@ -4,7 +4,8 @@ const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
-const MAX_SIGNATURES = 100
+const {SPLToOwner} = require("./Getters/SPLToOwner.js")
+
 
 
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
@@ -21,14 +22,16 @@ const bs58 = require("bs58").default
 const fs = require('fs');
 const os = require("os")
 const Events = require("events")
+const { getAssociatedTokenAddressSync } = require("@solana/spl-token")
 
 
 const MyWallet = PrivToPub(process.env.PrivateKey)
 const MyWalletPubKey = new PublicKey(MyWallet)
 const TelegramKey = process.env.TelegramKey;
-
+const TPID = process.env.TPID
 const Simulating = false
 const ConsecutiveSellsThreshold = 1000
+const MAX_SIGNATURES = 100
 const Unfilled = "□"
 const Filled = "■"
 const BarSize = 10
@@ -214,6 +217,79 @@ function PrivToPub(PrivateKey) {
     console.log(error)
     throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
   }
+}
+async function isValidEdwardsPoint(R) {
+  try {
+      const point = await ed25519.Point.fromHex(R); // Convert R to an Edwards point
+      return !point.hasSmallOrder();
+  } catch {
+      return false; // If the conversion fails, R is not a valid point
+  }
+}
+function SignatureSyntaxMatch(sig){
+  try {
+      const Signature = bs58.decode(sig)
+      if (Signature.length !== 64) {
+          Signature.length
+          return false
+      }
+      const R = Signature.slice(0, 32); // First 32 bytes
+      const S = Signature.slice(32);   // Last 32 bytes
+      if (!isValidEdwardsPoint(R)) {
+          return false;
+      }
+      return true;
+  } catch (err) {
+      return false
+  }
+}
+
+async function AnalyseAccount(Account) {
+  const Matches = SignatureSyntaxMatch(Account)
+  let ResponseString = "```"
+  if (Matches) {
+      ResponseString += "Signature\n"
+      const Interaction =  await connection.getParsedTransaction(Account, {"maxSupportedTransactionVersion": 0})
+    return ResponseString;
+  }
+  const publicKey = typeof(Account) == "string" ? new PublicKey(Account) : Account
+  const accountInfo = await connection.getParsedAccountInfo(publicKey)
+
+  const data = accountInfo.value.data;
+  if (!data || data === 'none') {
+      const TheirBal = await connection.getBalance(publicKey) / Bil
+      ResponseString += "Account\n"
+      ResponseString += "Balance: " + TheirBal
+      ResponseString += "```"
+      return ResponseString;
+  }
+  const parsed = data.parsed;
+  const program = data.program;
+  if (program === 'spl-token') {
+    if (parsed && parsed.type === 'mint') {
+      return 'mint';
+    }
+    if (parsed && parsed.type === 'account') {
+      const info = parsed.info;
+      const mint = new PublicKey(info.mint);
+      const owner = new PublicKey(info.owner);
+
+      // Derive the expected ATA for this owner & mint
+      const ata = getAssociatedTokenAddressSync(mint, owner, true, TPID);
+      if (ata.equals(publicKey)) {
+          ResponseString += "associated token account\n"
+          ResponseString +=  "Authority: " + await SPLToOwner(publicKey)
+          ResponseString += "```"
+        return ResponseString
+      }
+      return 'token account';
+    }
+  }
+  const TheirBal = await connection.getBalance(publicKey) / Bil
+  ResponseString += "Account\n"
+  ResponseString += "Balance: " + TheirBal
+  ResponseString += "```"
+  return ResponseString;
 }
 
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
@@ -1178,6 +1254,10 @@ async function handleMessage(messageObj) {
       }
       ReturnToMenu()
       return;
+    } else if (userStates[chatId].waitingForScanner) {
+      const Input = messageText
+      const Analysis = AnalyseAccount(Inpt)
+      sendMessage(chatId, Analysis)
     }
   }
 
@@ -1258,6 +1338,11 @@ async function handleMessage(messageObj) {
       WalletsToRemoveOptions.push(ActionTexts["back"])
       userStates[chatId] = { waitingForWalletAddressToRemove: true };
       return sendMessage(chatId, "Please enter the wallet address to remove: ", null, GetKeyBoard(WalletsToRemoveOptions, true, false));
+    case ActionTexts["scanner"]:
+
+      sendMessage(chatId, "Please enter a wallet, mint, signature, SPL account etc", null, GetKeyBoard([ActionTexts["back"]], true, false));
+      userStates[chatId] = { waitingForScanner: true };
+
     case ActionTexts["walletdetails"]:
       let WalletsToSelectFrom = []
       Object.keys(targetWallets).forEach(key => {
@@ -1318,8 +1403,10 @@ async function handleMessage(messageObj) {
       const CondtionsKB = GetKeyBoard(ConditionsOptions, true, false)
       return await sendMessage(chatId, "Conditions: ", null, CondtionsKB)
     case ActionTexts["walletanalysis"]:
-      
+    
+
     return
+
     case ActionTexts["info"]:
       const InfoOptions = [
         { text: ActionTexts["mybal"] },
