@@ -295,7 +295,9 @@ async function AnalyseAccount(Account) {
       ResponseString += `Address: ${Account}\n`
       for (let k in MintInfo){
         const Info = MintInfo[k]
-        ResponseString += `${k}: ${Info}\n`
+        if (Info){
+          ResponseString += `${k}: ${Info}\n`
+        }
       }
       ResponseString += `USD: $${Price}\n`
       ResponseString += `MC: $${Price * Bil}\n`
@@ -890,7 +892,7 @@ async function main() {
   const walletdata = fs.readFileSync(BaseFilePath + "TargetWallets.json");
   const Arr = JSON.parse(walletdata)
   const Msg = `Starting bot. Adding ${Arr.length} wallets`
-  SendToAll(Msg, "Markdown", "sendMessage")
+  SendToAll(Msg, "Markdown", "sendMessage") //TODO make it so that it sends keyboard 
   for (const i in Arr) {
     const newWallet = Arr[i]
     if (isEthereumOrSolanaAddress(newWallet)) {
