@@ -289,14 +289,17 @@ async function AnalyseAccount(Account) {
   const program = data.program;
   if (program === 'spl-token') {
     if (parsed && parsed.type === 'mint') {
-      ResponseString += "Mint address\n"
+      ResponseString += "Mint\n"
       const MintInfo = await getAsset(Account)
+      const Price = await GetPrice(Account)
       console.log("mint info: ", MintInfo)
 
       for (let k in MintInfo){
         const Info = MintInfo[k]
         ResponseString += `${k}: ${Info}\n`
       }
+      ResponseString += `USD: $${Price}`
+      ResponseString += `MC: ${Price * Bil}`
       ResponseString += "```"
       return ResponseString
     }
