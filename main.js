@@ -328,22 +328,40 @@ async function AnalyseAccount(Account) {
   ResponseString += `🏠 Address: ${Account}\n`
   ResponseString += `💲 Balance: $${TheirBal*SolVal}\n`
   ResponseString += "\n====📊 Open Positions====\n"
-  const OpenPositons = await GetTokens(Account)
-  for (let Mint in OpenPositons){
-    const Amount = OpenPositons[Mint]
-    if (Amount){
-      const SpecialToken = SpecialTokens[Mint]
-      let PreMoji = "🪙"
-      if (SpecialToken){
-        Mint = SpecialToken
-        PreMoji = "✨"
+  const OpenPositions = await GetTokens(Account);
+  const pumpTokens = [];
+  const regularTokens = [];
+  
+  for (let Mint in OpenPositions) {
+    const Amount = OpenPositions[Mint];
+    if (Amount) {
+      const SpecialToken = SpecialTokens[Mint];
+      let PreMoji = "🪙";
+      if (SpecialToken) {
+        Mint = SpecialToken;
+        PreMoji = "✨";
       }
-      if (IsPumpCoin(Mint)){
-        PreMoji = "💊"
+      if (IsPumpCoin(Mint)) {
+        PreMoji = "💊";
+        pumpTokens.push({ Mint, Amount, PreMoji });
+      } else {
+        regularTokens.push({ Mint, Amount, PreMoji });
       }
-      ResponseString += `${PreMoji} ${Mint}: ${Amount}\n` //TODO make it split into pages
     }
   }
+  
+  // Sort tokens alphabetically
+  pumpTokens.sort((a, b) => a.Mint.localeCompare(b.Mint));
+  regularTokens.sort((a, b) => a.Mint.localeCompare(b.Mint));
+  
+  // Combine tokens and format the response string
+  regularTokens.forEach(({ PreMoji, Mint, Amount }) => {
+    ResponseString += `${PreMoji} ${Mint}: ${Amount}\n`;
+  });
+  pumpTokens.forEach(({ PreMoji, Mint, Amount }) => {
+    ResponseString += `${PreMoji} ${Mint}: ${Amount}\n`;
+  });
+  
   ResponseString += "=======================\n"
   ResponseString += "```"
   return ResponseString;
