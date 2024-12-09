@@ -295,7 +295,7 @@ async function AnalyseAccount(Account) {
 
       for (let k in MintInfo){
         const Info = MintInfo[k]
-        ResponseString += `${k}: ${Info}`
+        ResponseString += `${k}: ${Info}\n`
       }
       ResponseString += "```"
       return ResponseString
