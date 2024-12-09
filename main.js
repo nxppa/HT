@@ -243,8 +243,18 @@ function SignatureSyntaxMatch(sig){
       return false
   }
 }
-
+function containsNonBase58Character(str) {
+  try {
+      bs58.decode(str);
+      return false
+  } catch (e) {
+      return true
+  }
+}
 async function AnalyseAccount(Account) {
+  if (containsNonBase58Character(Account)){
+    return "Contains non base 58 character"
+  }
   const Matches = SignatureSyntaxMatch(Account)
   let ResponseString = "```"
   if (Matches) {
@@ -1255,6 +1265,10 @@ async function handleMessage(messageObj) {
       ReturnToMenu()
       return;
     } else if (userStates[chatId].waitingForScanner) {
+      if (messageText == ActionTexts["back"]) {
+        userStates[chatId].waitingForScanner = false;
+        return ReturnToMenu()
+      }
       userStates[chatId].waitingForScanner = false
       const Input = messageText
       const Analysis = await AnalyseAccount(Input)
