@@ -267,6 +267,9 @@ async function AnalyseAccount(Account) {
       if (Interaction){
         const Time = unixToRegularTime(Interaction.blockTime) //TODO make it so that it localised to telegram users location
         const BlockAndTimestampMsg = `🕒 Block & Timestamp: ${Time} (${Interaction.slot})`
+        ResponseString += BlockAndTimestampMsg
+      } else {
+        ResponseString += "couldnt get parsed transaction for signature"
       }
       ResponseString += "```"
     return ResponseString;
