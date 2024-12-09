@@ -329,6 +329,9 @@ async function AnalyseAccount(Account) {
   ResponseString += `💲 Balance: $${TheirBal*SolVal}\n`
   ResponseString += "\n====📊 Open Positions====\n"
   const OpenPositions = await GetTokens(Account);
+
+  // Group tokens
+  const specialTokens = [];
   const pumpTokens = [];
   const regularTokens = [];
   
@@ -336,31 +339,32 @@ async function AnalyseAccount(Account) {
     const Amount = OpenPositions[Mint];
     if (Amount) {
       const SpecialToken = SpecialTokens[Mint];
-      let PreMoji = "🪙";
       if (SpecialToken) {
-        Mint = SpecialToken;
-        PreMoji = "✨";
-      }
-      if (IsPumpCoin(Mint)) {
-        PreMoji = "💊";
-        pumpTokens.push({ Mint, Amount, PreMoji });
+        // Special tokens group
+        specialTokens.push({ Mint: SpecialToken, Amount });
+      } else if (IsPumpCoin(Mint)) {
+        // Pump tokens group
+        pumpTokens.push({ Mint, Amount });
       } else {
-        regularTokens.push({ Mint, Amount, PreMoji });
+        // Regular tokens group
+        regularTokens.push({ Mint, Amount });
       }
     }
   }
-  
-  // Sort tokens alphabetically
+  specialTokens.sort((a, b) => a.Mint.localeCompare(b.Mint));
   pumpTokens.sort((a, b) => a.Mint.localeCompare(b.Mint));
   regularTokens.sort((a, b) => a.Mint.localeCompare(b.Mint));
+  for (const token of specialTokens) {
+    ResponseString += `✨ ${token.Mint}: ${token.Amount}\n`;
+  }
+  for (const token of regularTokens) {
+    ResponseString += `🪙 ${token.Mint}: ${token.Amount}\n`;
+  }
+  for (const token of pumpTokens) {
+    ResponseString += `💊 ${token.Mint}: ${token.Amount}\n`;
+  }
   
-  // Combine tokens and format the response string
-  regularTokens.forEach(({ PreMoji, Mint, Amount }) => {
-    ResponseString += `${PreMoji} ${Mint}: ${Amount}\n`;
-  });
-  pumpTokens.forEach(({ PreMoji, Mint, Amount }) => {
-    ResponseString += `${PreMoji} ${Mint}: ${Amount}\n`;
-  });
+  // TODO: Add logic for splitting into pages if needed
   
   ResponseString += "=======================\n"
   ResponseString += "```"
