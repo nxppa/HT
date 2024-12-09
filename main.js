@@ -259,6 +259,7 @@ async function AnalyseAccount(Account) {
   let ResponseString = "```"
   if (Matches) {
       ResponseString += "Signature\n"
+      ResponseString += "this is a signature"
       ResponseString += "```"
       const Interaction =  await connection.getParsedTransaction(Account, {"maxSupportedTransactionVersion": 0})
     return ResponseString;
@@ -1272,7 +1273,7 @@ async function handleMessage(messageObj) {
       userStates[chatId].waitingForScanner = false
       const Input = messageText
       const Analysis = await AnalyseAccount(Input)
-      console.log(Analysis)
+      console.log("analysis: ",Analysis)
       sendMessage(chatId, Analysis)
       ReturnToMenu()
       return 
