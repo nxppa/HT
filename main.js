@@ -259,9 +259,12 @@ async function AnalyseAccount(Account) {
   let ResponseString = "```"
   if (Matches) {
       ResponseString += "Signature\n"
-      ResponseString += "this is a signature"
-      ResponseString += "```"
       const Interaction =  await connection.getParsedTransaction(Account, {"maxSupportedTransactionVersion": 0})
+      if (Interaction){
+        const Time = unixToRegularTime(Interaction.blockTime) //TODO make it so that it localised to telegram users location
+        const BlockAndTimestampMsg = `🕒 Block & Timestamp: ${Time} (${Interaction.slot})`
+      }
+      ResponseString += "```"
     return ResponseString;
   }
   const publicKey = typeof(Account) == "string" ? new PublicKey(Account) : Account
