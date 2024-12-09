@@ -320,9 +320,9 @@ async function AnalyseAccount(Account) {
   }
   const TheirBal = await connection.getBalance(publicKey) / Bil
   ResponseString += "Account\n"
-  ResponseString += `Address: ${Account}\n`
-  ResponseString += `Balance: ${TheirBal}\n`
-  ResponseString += "\n====Open Positions 📊====\n"
+  ResponseString += `🏠 Address: ${Account}\n`
+  ResponseString += `💲Balance: $${TheirBal*SolVal}\n`
+  ResponseString += "\n====📊 Open Positions====\n"
   const OpenPositons = await GetTokens(Account)
   for (let Mint in OpenPositons){
     const Amount = OpenPositons[Mint]
