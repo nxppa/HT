@@ -308,8 +308,6 @@ async function AnalyseAccount(Account) {
       const info = parsed.info;
       const mint = new PublicKey(info.mint);
       const owner = new PublicKey(info.owner);
-
-      // Derive the expected ATA for this owner & mint
       const ata = getAssociatedTokenAddressSync(mint, owner, true, TPID);
       if (ata.equals(publicKey)) {
           ResponseString += "Associated Token Account\n"
@@ -323,6 +321,15 @@ async function AnalyseAccount(Account) {
   const TheirBal = await connection.getBalance(publicKey) / Bil
   ResponseString += "Account\n"
   ResponseString += "Balance: " + TheirBal
+
+  const OpenPositons = await GetTokens(Account)
+  for (let Mint in OpenPositons){
+    const Amount = OpenPositons[Mint]
+    if (Amount){
+      ResponseString += `${Mint}: ${Amount}\n`
+    }
+  }
+
   ResponseString += "```"
   return ResponseString;
 }
@@ -1089,7 +1096,6 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["managewallets"] },
     { text: ActionTexts["tools"] },
   ]
-  console.log(ActionTexts["tools"])
   const messageText = messageObj.text || "";
   if (userStates[chatId]) { //TODO make this better managed
     if (userStates[chatId].waitingForFee) {
@@ -1509,4 +1515,3 @@ async function handleMessage(messageObj) {
       return sendMessage(chatId, "That is not a command");
   }
 }
-
