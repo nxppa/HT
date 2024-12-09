@@ -251,6 +251,10 @@ function containsNonBase58Character(str) {
       return true
   }
 }
+function unixToRegularTime(unixTimestamp) {
+  const date = new Date(unixTimestamp * 1000);
+  return date.toLocaleString();
+}
 async function AnalyseAccount(Account) {
   if (containsNonBase58Character(Account)){
     return "Contains non base 58 character. Could not parse"
