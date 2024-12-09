@@ -298,8 +298,8 @@ async function AnalyseAccount(Account) {
         const Info = MintInfo[k]
         ResponseString += `${k}: ${Info}\n`
       }
-      ResponseString += `USD: $${Price}`
-      ResponseString += `MC: ${Price * Bil}`
+      ResponseString += `USD: $${Price}\n`
+      ResponseString += `MC: $${Price * Bil}\n`
       ResponseString += "```"
       return ResponseString
     }
