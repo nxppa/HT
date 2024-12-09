@@ -332,8 +332,12 @@ async function AnalyseAccount(Account) {
   for (let Mint in OpenPositons){
     const Amount = OpenPositons[Mint]
     if (Amount){
-      Mint = !SpecialTokens[Mint] ? Mint : SpecialTokens[Mint]
+      const SpecialToken = SpecialTokens[Mint]
       let PreMoji = "🪙"
+      if (SpecialToken){
+        Mint = SpecialToken
+        PreMoji = "✨"
+      }
       if (IsPumpCoin(Mint)){
         PreMoji = "💊"
       }
