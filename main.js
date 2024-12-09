@@ -332,9 +332,9 @@ async function AnalyseAccount(Account) {
   for (let Mint in OpenPositons){
     const Amount = OpenPositons[Mint]
     if (Amount){
-
+      Mint = !SpecialTokens[Mint] ? Mint : SpecialTokens[Mint]
       let PreMoji = "🪙"
-      if (Mint.endsWith("pump")){
+      if (IsPumpCoin(Mint)){
         PreMoji = "💊"
       }
       ResponseString += `${PreMoji} ${Mint}: ${Amount}\n` //TODO make it split into pages
