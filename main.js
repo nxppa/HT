@@ -1256,8 +1256,10 @@ async function handleMessage(messageObj) {
       return;
     } else if (userStates[chatId].waitingForScanner) {
       const Input = messageText
-      const Analysis = AnalyseAccount(Input)
+      const Analysis = await AnalyseAccount(Input)
       sendMessage(chatId, Analysis)
+      ReturnToMenu()
+      return 
     }
   }
 
