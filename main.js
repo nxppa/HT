@@ -292,8 +292,7 @@ async function AnalyseAccount(Account) {
       ResponseString += "Mint\n"
       const MintInfo = await getAsset(Account)
       const Price = await GetPrice(Account)
-      console.log("mint info: ", MintInfo)
-
+      ResponseString += `Address: ${Account}\n`
       for (let k in MintInfo){
         const Info = MintInfo[k]
         ResponseString += `${k}: ${Info}\n`
