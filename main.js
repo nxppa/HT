@@ -330,41 +330,38 @@ async function AnalyseAccount(Account) {
   ResponseString += "\n====📊 Open Positions====\n"
   const OpenPositions = await GetTokens(Account);
 
-  // Group tokens
-  const specialTokens = [];
-  const pumpTokens = [];
-  const regularTokens = [];
+  let specialTokens = [];
+  let regularTokens = [];
+  let pumpTokens = [];
   
   for (let Mint in OpenPositions) {
     const Amount = OpenPositions[Mint];
     if (Amount) {
       const SpecialToken = SpecialTokens[Mint];
+      let PreMoji = "🪙";
       if (SpecialToken) {
-        // Special tokens group
-        specialTokens.push({ Mint: SpecialToken, Amount });
-      } else if (IsPumpCoin(Mint)) {
-        // Pump tokens group
-        pumpTokens.push({ Mint, Amount });
-      } else {
-        // Regular tokens group
-        regularTokens.push({ Mint, Amount });
+        Mint = SpecialToken;
+        PreMoji = "✨";
+        specialTokens.push({ PreMoji, Mint, Amount });
+        continue;
       }
+      if (IsPumpCoin(Mint)) {
+        PreMoji = "💊";
+        pumpTokens.push({ PreMoji, Mint, Amount });
+        continue;
+      }
+      regularTokens.push({ PreMoji, Mint, Amount });
     }
   }
-  specialTokens.sort((a, b) => a.Mint.localeCompare(b.Mint));
-  pumpTokens.sort((a, b) => a.Mint.localeCompare(b.Mint));
-  regularTokens.sort((a, b) => a.Mint.localeCompare(b.Mint));
-  for (const token of specialTokens) {
-    ResponseString += `✨ ${token.Mint}: ${token.Amount}\n`;
-  }
-  for (const token of regularTokens) {
-    ResponseString += `🪙 ${token.Mint}: ${token.Amount}\n`;
-  }
-  for (const token of pumpTokens) {
-    ResponseString += `💊 ${token.Mint}: ${token.Amount}\n`;
+  specialTokens.sort((a, b) => b.Amount - a.Amount);
+  regularTokens.sort((a, b) => b.Amount - a.Amount);
+  pumpTokens.sort((a, b) => b.Amount - a.Amount);
+  const allTokens = [...specialTokens, ...regularTokens, ...pumpTokens];
+  for (const token of allTokens) {
+    ResponseString += `${token.PreMoji} ${token.Mint}: ${token.Amount}\n`;
   }
   
-  // TODO: Add logic for splitting into pages if needed
+  // TODO: Split ResponseString into pages if needed
   
   ResponseString += "=======================\n"
   ResponseString += "```"
