@@ -291,9 +291,8 @@ async function AnalyseAccount(Account) {
     if (parsed && parsed.type === 'mint') {
       ResponseString += "Mint address\n"
       const MintInfo = await getAsset(Account)
-      const Name = MintInfo.Name
-      const Description = MintInfo.Description
-      const Symbol = MintInfo.Symbol
+      console.log(MintInfo)
+
       for (let k of MintInfo){
         const Info = MintInfo[k]
         ResponseString += `${k}: ${Info}`
