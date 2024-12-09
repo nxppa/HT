@@ -5,7 +5,7 @@ const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const {SPLToOwner} = require("./Getters/SPLToOwner.js")
-
+const {getAsset} = require("./Getters/AssetInfo/Helius.js")
 
 
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
@@ -289,7 +289,17 @@ async function AnalyseAccount(Account) {
   const program = data.program;
   if (program === 'spl-token') {
     if (parsed && parsed.type === 'mint') {
-      return 'mint';
+      ResponseString += "Mint address\n"
+      const MintInfo = await getAsset(Account)
+      const Name = MintInfo.Name
+      const Description = MintInfo.Description
+      const Symbol = MintInfo.Symbol
+      for (let k of MintInfo){
+        const Info = MintInfo[k]
+        ResponseString += `${k}: ${Info}`
+      }
+      ResponseString += "```"
+      return ResponseString
     }
     if (parsed && parsed.type === 'account') {
       const info = parsed.info;
@@ -299,7 +309,7 @@ async function AnalyseAccount(Account) {
       // Derive the expected ATA for this owner & mint
       const ata = getAssociatedTokenAddressSync(mint, owner, true, TPID);
       if (ata.equals(publicKey)) {
-          ResponseString += "associated token account\n"
+          ResponseString += "Associated Token Account\n"
           ResponseString +=  "Authority: " + await SPLToOwner(publicKey)
           ResponseString += "```"
         return ResponseString
