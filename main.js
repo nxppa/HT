@@ -253,7 +253,7 @@ function containsNonBase58Character(str) {
 }
 async function AnalyseAccount(Account) {
   if (containsNonBase58Character(Account)){
-    return "Contains non base 58 character"
+    return "Contains non base 58 character. Could not parse"
   }
   const Matches = SignatureSyntaxMatch(Account)
   let ResponseString = "```"
@@ -301,7 +301,6 @@ async function AnalyseAccount(Account) {
   ResponseString += "```"
   return ResponseString;
 }
-
 async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
   let Diagnosed = false
   if (deep >= 8) {
@@ -1272,6 +1271,7 @@ async function handleMessage(messageObj) {
       userStates[chatId].waitingForScanner = false
       const Input = messageText
       const Analysis = await AnalyseAccount(Input)
+      console.log(Analysis)
       sendMessage(chatId, Analysis)
       ReturnToMenu()
       return 
