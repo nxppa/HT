@@ -478,7 +478,7 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
     targetWallets[Addy][2] = TheirCurrentTokens
   } catch (error) {
     if (error.response && error.response.status === 429) {
-      console.warn('Encountered 429 Too Many Requests. Please slow down.');
+      console.warn('Encountered 429 Too Many Requests. slow down.');
     } else {
       console.error('Unexpected error during token balance check:', error);
     }
@@ -1198,7 +1198,7 @@ async function handleMessage(messageObj) {
       }
       const removing = messageText
       if (!targetWallets[removing]) {
-        sendMessage(chatId, "Please enter a valid wallet address to remove.");
+        sendMessage(chatId, "Enter a valid wallet address to remove.");
         userStates[chatId].waitingForWalletAddressToRemove = false
       } else {
         delete targetWallets[removing]
@@ -1215,7 +1215,7 @@ async function handleMessage(messageObj) {
       }
       const Viewing = messageText
       if (!targetWallets[Viewing]) {
-        sendMessage(chatId, "Please enter a valid wallet address to appraise.");
+        sendMessage(chatId, "Enter a valid wallet address to appraise.");
         userStates[chatId].waitingForWalletToView = false
       } else {
         userStates[chatId].waitingForWalletToView = false;
@@ -1393,7 +1393,7 @@ async function handleMessage(messageObj) {
       return sendMessage(chatId, "Settings: ", null, ResumeKB)
 
     case ActionTexts["changepriofee"]:
-      sendMessage(chatId, "Please enter the new priority fee:", null, GetKeyBoard([ActionTexts["back"]], true, false));
+      sendMessage(chatId, "Enter the new priority fee:", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForFee: true };
       return;
     case ActionTexts["message"]:
@@ -1401,24 +1401,24 @@ async function handleMessage(messageObj) {
       userStates[chatId] = { waitingForGCMessage: true };
       return
     case ActionTexts["changemaxpropspending"]:
-      sendMessage(chatId, "Please enter the new proportion you would be willing to spend on each transaction as a percentage. (eg. 10%)", null, GetKeyBoard([ActionTexts["back"]], true, false));
+      sendMessage(chatId, "Enter the new proportion you would be willing to spend on each transaction as a percentage. (eg. 10%)", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForProportion: true };
       return
     case ActionTexts["changeminimumspending"]:
-      sendMessage(chatId, "Please enter the smallest amount you will be willing to take for a transaction (USD)", null, GetKeyBoard([ActionTexts["back"]], true, false));
+      sendMessage(chatId, "Enter the smallest amount you will be willing to take for a transaction (USD)", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForMinimum: true };
       return
     case ActionTexts["changemaxpermc"]:
-      sendMessage(chatId, "Please enter the maximum percent of the market cap someone may own for you to ender the trade as a percentage (eg. 10%)", null, GetKeyBoard([ActionTexts["back"]], true, false));
+      sendMessage(chatId, "Enter the maximum percent of the market cap someone may own for you to ender the trade as a percentage (eg. 10%)", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForMCPerc: true };
       return
 
     case ActionTexts["addwallet"]:
-      sendMessage(chatId, "Please enter the wallet address:", null, GetKeyBoard([ActionTexts["back"]], true, false));
+      sendMessage(chatId, "Enter the wallet address:", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForWalletAddress: true };
       return;
     case ActionTexts["importwallets"]:
-      sendMessage(chatId, "Please enter the wallet addresses:", null, GetKeyBoard([ActionTexts["back"]], true, false));
+      sendMessage(chatId, "Enter the wallet addresses:", null, GetKeyBoard([ActionTexts["back"]], true, false)); //TODO make it say format and fix aliases
       userStates[chatId] = { waitingForWalletAddresses: true };
       return;
     case ActionTexts["clearwallets"]:
@@ -1432,10 +1432,10 @@ async function handleMessage(messageObj) {
       });
       WalletsToRemoveOptions.push(ActionTexts["back"])
       userStates[chatId] = { waitingForWalletAddressToRemove: true };
-      return sendMessage(chatId, "Please enter the wallet address to remove: ", null, GetKeyBoard(WalletsToRemoveOptions, true, false));
+      return sendMessage(chatId, "Enter the wallet address to remove: ", null, GetKeyBoard(WalletsToRemoveOptions, true, false));
     case ActionTexts["scanner"]:
 
-      sendMessage(chatId, "Please enter a wallet, mint, signature, SPL account etc", null, GetKeyBoard([ActionTexts["back"]], true, false));
+      sendMessage(chatId, "Enter a wallet, mint, signature, SPL account etc", null, GetKeyBoard([ActionTexts["back"]], true, false));
       userStates[chatId] = { waitingForScanner: true };
       return
     case ActionTexts["walletdetails"]:
