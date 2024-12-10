@@ -327,9 +327,9 @@ async function AnalyseAccount(Account) {
   ResponseString += "Account\n"
   ResponseString += `🏠 Address: ${Account}\n`
   ResponseString += `💲 Balance: $${TheirBal*SolVal} | ◎ Sol: ${TheirBal}}\n`
-  ResponseString += "\n====📊 Open Positions====\n"
   const OpenPositions = await GetTokens(Account);
-
+  
+  ResponseString += "\n====📊 Open Positions====\n"
   let specialTokens = [];
   let regularTokens = [];
   let pumpTokens = [];
@@ -1077,11 +1077,11 @@ async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method 
         },
       });
     } catch (error) {
-      console.error(`Retry attempt ${deep + 1}:`, error.message)
+      console.error(`Retry attempt ${deep + 1}:`, error)
       if (deep < 3) {
         return await ReturnAxios(deep + 1);
       } else {
-        throw new Error("Failed to send message after multiple retries.")
+        console.log("couldnt send message after 3 retries")
       }
     }
   }
