@@ -1065,6 +1065,7 @@ function EditValue(Database, Key, Value) {
 
 
 async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method = "sendMessage") {
+  console.log("message: ", messageText)
   async function ReturnAxios(deep = 0) {
     try {
       return await getAxiosInstance().get(Method, {
