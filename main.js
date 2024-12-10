@@ -1088,6 +1088,11 @@ async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method 
 const userStates = {}; // Store states for each user
 async function handleMessage(messageObj) {
   const chatId = messageObj.chat.id;
+  const ActionAliases = {
+    "🔍 Scan again": "scanner",
+
+  }
+
   const ActionTexts = {
     "back": "🔙 Back",
     "info": "ℹ️ Info",
@@ -1131,6 +1136,14 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["tools"] },
   ]
   const messageText = messageObj.text || "";
+  if (!ActionTexts[messageText]){
+    const UsedAlias = ActionAliases[messageText]
+    if (UsedAlias){
+      messageText = UsedAlias 
+    }
+  }
+  
+
   if (userStates[chatId]) { //TODO make this better managed
     if (userStates[chatId].waitingForFee) {
       if (messageText == ActionTexts["back"]) {
