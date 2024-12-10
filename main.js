@@ -1064,26 +1064,31 @@ function EditValue(Database, Key, Value) {
 }
 
 
-async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method = "sendMessage") { //TODO make it so that it retries if sending message failed
-  async function ReturnAxios(deep) {
+async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method = "sendMessage") {
+  async function ReturnAxios(deep = 0) {
     try {
-      return getAxiosInstance().get(Method, {
-        chat_id: ID,
-        text: messageText,
-        parse_mode: Mode,
-        reply_markup: JSON.stringify(Keyboard),
-        disable_web_page_preview: true,
+      return await getAxiosInstance().get(Method, {
+        params: {
+          chat_id: ID,
+          text: messageText,
+          parse_mode: Mode,
+          reply_markup: JSON.stringify(Keyboard),
+          disable_web_page_preview: true,
+        },
       });
-    } catch {
-      deep += 1
-      return ReturnAxios(deep)
+    } catch (error) {
+      console.error(`Retry attempt ${deep + 1}:`, error.message)
+      if (deep < 3) {
+        return await ReturnAxios(deep + 1);
+      } else {
+        throw new Error("Failed to send message after multiple retries.")
+      }
     }
-
   }
 
-    return ReturnAxios()
-
+  return ReturnAxios();
 }
+
 
 const userStates = {}; // Store states for each user
 async function handleMessage(messageObj) {
