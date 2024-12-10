@@ -313,8 +313,8 @@ async function AnalyseAccount(Account) {
       const owner = new PublicKey(info.owner);
       const ata = getAssociatedTokenAddressSync(mint, owner, true, TPID);
       if (ata.equals(publicKey)) {
-          ResponseString += "Associated Token Account\n"
-          ResponseString +=  "Authority: " + await SPLToOwner(publicKey)
+          ResponseString += "SPL\n"
+          ResponseString +=  "Authority: " + owner //TODO get balance for this
           ResponseString += "```"
         return ResponseString
       }
