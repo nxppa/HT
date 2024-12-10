@@ -28,7 +28,7 @@ const { getAssociatedTokenAddressSync } = require("@solana/spl-token")
 const MyWallet = PrivToPub(process.env.PrivateKey)
 const MyWalletPubKey = new PublicKey(MyWallet)
 const TelegramKey = process.env.TelegramKey;
-const TPID = process.env.ProgramID
+const TPID = new PublicKey(process.env.ProgramID)
 const Simulating = false
 const ConsecutiveSellsThreshold = 1000
 const MAX_SIGNATURES = 100
@@ -39,7 +39,9 @@ const Bil = 1000000000
 const MaxRetries = 20
 const SpecialTokens = {
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: "USDC",
-  So11111111111111111111111111111111111111112: "WSOL"
+  So11111111111111111111111111111111111111112: "WSOL",
+  Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: "USDT",
+  HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr: "EURC",
 }
 
 let StartedLogging = false
@@ -284,11 +286,7 @@ async function AnalyseAccount(Account) {
 
   const data = accountInfo.value.data;
   if (!data || data === 'none') {
-      const TheirBal = await connection.getBalance(publicKey) / Bil
-      ResponseString += "Account\n"
-      ResponseString += "Balance: " + TheirBal
-      ResponseString += "```"
-      return ResponseString;
+      return "acc not parsed";
   }
   const parsed = data.parsed;
   const program = data.program;
@@ -326,7 +324,7 @@ async function AnalyseAccount(Account) {
   const TheirBal = await connection.getBalance(publicKey) / Bil
   ResponseString += "Account\n"
   ResponseString += `🏠 Address: ${Account}\n`
-  ResponseString += `💲 Balance: $${TheirBal*SolVal}\n`
+  ResponseString += `💲 Balance: $${TheirBal*SolVal} | ◎ Sol: ${TheirBal}}\n`
   ResponseString += "\n====📊 Open Positions====\n"
   const OpenPositions = await GetTokens(Account);
 
