@@ -1079,7 +1079,7 @@ async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method 
         return 
       }
       deep += 1
-      return ReturnAxios(deep)
+      return await ReturnAxios(deep)
     }
   }
     return ReturnAxios(0)
