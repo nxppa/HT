@@ -283,7 +283,9 @@ async function AnalyseAccount(Account) {
     return "invalid input"
   }
   const accountInfo = await connection.getParsedAccountInfo(publicKey)
-
+  if (!accountInfo.value){
+    return "could not find data on account"
+  }
   const data = accountInfo.value.data;
   if (!data || data === 'none') {
       return "acc not parsed";
