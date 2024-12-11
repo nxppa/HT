@@ -95,6 +95,7 @@ async function ParseSignature(Signature) {
                     BaseMessage += BaseInteractMsg
                     continue
                 case "initializeAccount":
+                    //TODO fill this out
                     continue
                 case "create":
                     BaseInteractMsg += `📥 Create ${ParsedInfo.account} with a deposit from ${ParsedInfo.source}\n\n` //TODO make it list amount of tokens created

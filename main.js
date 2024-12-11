@@ -948,28 +948,34 @@ main()
 
 
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3000;
+const WebIP = process.env.WebIP
 const app = express();
 app.use(express.json());
-app.post("*", async (req, res) => {
+app.post('*', async (req, res) => {
   let Body = req.body;
   if (Body.message) {
     let ID = Body.message.from.id;
     let Text = Body.message.text;
-    console.log(Text, ID);
+    console.log(`Received message: "${Text}" from ID: ${ID}`);
     handleMessage(Body.message);
     res.send("Hello post");
   }
 });
-app.get("*", async (req, res) => {
+app.get('*', async (req, res) => {
   res.send("t.me/nappa2");
 });
-const server = app.listen(PORT, process.env.WebIP, function (err) {
-  if (err) console.log(err);
-  console.log("Server listening on PORT", PORT);
+const server = http.createServer(app);
+server.listen(PORT, WebIP, function (err) {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(`Server listening on PORT ${PORT}`);
+  }
 });
-server.keepAliveTimeout = 24 * 60 * 60 * 1000 * 1
-server.headersTimeout = 24 * 60 * 60 * 1000 + 1000; // 24 hours + 1 second
+server.keepAliveTimeout = 24 * 60 * 60 * 1000; // 24 hours
+server.headersTimeout = 24 * 60 * 60 * 1000 + 1000; // Slightly higher than keepAliveTimeout
+
 
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
