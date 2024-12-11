@@ -6,7 +6,7 @@ const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const {SPLToOwner} = require("./Getters/SPLToOwner.js")
 const {getAsset} = require("./Getters/AssetInfo/Helius.js")
-
+const {ParseSignature} = require("./Getters/ParsedSignature/ParseSig.js")
 
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
@@ -266,12 +266,9 @@ async function AnalyseAccount(Account) {
   let ResponseString = "```"
   if (Matches) {
       ResponseString += "Signature\n"
-      const parsed =  await ParseSignature("5wJieEVCESCqkj4CAS5rEKQ9iUzfNbS7jPM7zJV5otek8mnK9oopkn3Z9yJMMAvHFfXLCTPXgJX9UAWU4qXa57dV")
-
-
+      const parsed = await ParseSignature("5wJieEVCESCqkj4CAS5rEKQ9iUzfNbS7jPM7zJV5otek8mnK9oopkn3Z9yJMMAvHFfXLCTPXgJX9UAWU4qXa57dV")
       if (parsed){
         ResponseString+= parsed
-        
       } else {
         return "couldnt get parsed transaction for signature"
       }
