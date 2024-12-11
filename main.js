@@ -1232,7 +1232,7 @@ async function handleMessage(messageObj) {
         const TheirBal = await getWalletBalance(Viewing)
         
         let MsgStr = "```Account\n"
-        const Analysis = AnalyseAccount(Viewing)
+        const Analysis = await AnalyseAccount(Viewing)
         MsgStr += Analysis
         MsgStr += "```"
         sendMessage(chatId, MsgStr)
