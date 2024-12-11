@@ -266,7 +266,7 @@ async function AnalyseAccount(Account) {
   let ResponseString = "```"
   if (Matches) {
       ResponseString += "Signature\n"
-      const parsed = await ParseSignature("5wJieEVCESCqkj4CAS5rEKQ9iUzfNbS7jPM7zJV5otek8mnK9oopkn3Z9yJMMAvHFfXLCTPXgJX9UAWU4qXa57dV")
+      const parsed = await ParseSignature(Account)
       if (parsed){
         ResponseString+= parsed
       } else {
