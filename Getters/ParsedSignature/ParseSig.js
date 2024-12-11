@@ -57,15 +57,15 @@ async function ParseSignature(Signature) {
                         case "transfer":
                             const FromAcc = ParsedInfo.authority || ParsedInfo.source
                             const ToAcc = ParsedInfo.destination
-                            const Amount = ParsedInfo.lamports / Bil || parseFloat(ParsedInfo.amount) / Bil
-                            BaseInteractMsg += `transfer from account: ${FromAcc} to SPL account: ${ToAcc} for: ${Amount} Tokens\n`
+                            const Amount = ParsedInfo.lamports / Bil || parseFloat(ParsedInfo.amount) / Bil //TODO fix amount
+                            BaseInteractMsg += `📁 transfer from account: ${FromAcc} to SPL account: ${ToAcc} for: ${Amount} Tokens\n` 
                             continue
                         case "1":
                         }
                         console.error("missed case type")
                 }
             }
-            BaseMessage += BaseInteractMsg
+            BaseMessage += BaseInteractMsg + "\n"
 
         }
 
@@ -84,21 +84,20 @@ async function ParseSignature(Signature) {
                     const FromAcc = ParsedInfo.authority || ParsedInfo.source
                     const ToAcc = ParsedInfo.destination
                     const Amount = ParsedInfo.lamports|| parseFloat(ParsedInfo.amount)
-                    BaseInteractMsg += `transfer from account: ${FromAcc} to account: ${ToAcc} for: ${Amount} Lamports\n`//TODO make it say which token
-                    BaseMessage += BaseInteractMsg + "\n"
+                    BaseInteractMsg += `📁 transfer from account: ${FromAcc} to SPL account: ${ToAcc} for: ${Amount/Bil} Tokens\n\n`//TODO make it say which token
+                    BaseMessage += BaseInteractMsg 
                     continue
                 case "createAccountWithSeed":
-                    BaseInteractMsg += `Create ${ParsedInfo.newAccount} with a deposit of ${ParsedInfo.lamports / Bil} SOL from ${ParsedInfo.source} \n`
-                    BaseMessage += BaseInteractMsg + "\n"
-
+                    BaseInteractMsg += `📥 Create ${ParsedInfo.newAccount} with a deposit of ${ParsedInfo.lamports / Bil} SOL from ${ParsedInfo.source} \n\n`
+                    BaseMessage += BaseInteractMsg 
                     continue
                 case "closeAccount":
-                    BaseInteractMsg += `Close Token Account ${ParsedInfo.acocunt} \n` //TODO find out information where it says how much was liquidated
+                    BaseInteractMsg += `⛔ Close Token Account ${ParsedInfo.acocunt} \n` //TODO find out information where it says how much was liquidated
                     continue
                 case "initializeAccount":
                     continue
                 case "create":
-                    BaseInteractMsg += `Create ${ParsedInfo.account} with a deposit from ${ParsedInfo.source} \n` //TODO make it list amount of tokens created
+                    BaseInteractMsg += `📥 Create ${ParsedInfo.account} with a deposit from ${ParsedInfo.source} \n` //TODO make it list amount of tokens created
                     BaseMessage += BaseInteractMsg + "\n"
 
                     continue

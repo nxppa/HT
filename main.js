@@ -266,6 +266,7 @@ async function AnalyseAccount(Account) {
   let ResponseString = "```"
   if (Matches) {
       ResponseString += "Signature\n"
+      ResponseString += "✍️ Signature: " + Account
       const parsed = await ParseSignature(Account)
       if (parsed){
         ResponseString+= parsed
@@ -325,7 +326,7 @@ async function AnalyseAccount(Account) {
   const TheirBal = await connection.getBalance(publicKey) / Bil
   ResponseString += "Account\n"
   ResponseString += `🏠 Address: ${Account}\n`
-  ResponseString += `💲 Balance: $${TheirBal*SolVal} | ◎ Sol: ${TheirBal}}\n`
+  ResponseString += `💲 Balance: $${TheirBal*SolVal} | ◎ Sol: ${TheirBal}\n`
   const OpenPositions = await GetTokens(Account);
   
   ResponseString += "\n====📊 Open Positions====\n"
