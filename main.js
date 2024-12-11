@@ -968,7 +968,7 @@ const server = app.listen(PORT, process.env.WebIP, function (err) {
   if (err) console.log(err);
   console.log("Server listening on PORT", PORT);
 });
-//server.keepAliveTimeout = 61*1000
+server.keepAliveTimeout = 24 * 60 * 60 * 1000 * 1
 
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
