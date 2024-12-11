@@ -955,6 +955,7 @@ const app = express();
 app.use(express.json());
 app.post('*', async (req, res) => {
   let Body = req.body;
+  console.log("rcvd")
   if (Body.message) {
     let ID = Body.message.from.id;
     let Text = Body.message.text;
