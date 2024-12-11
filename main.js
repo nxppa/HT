@@ -984,9 +984,9 @@ server.listen(PORT, WebIP, function (err) {
 server.keepAliveTimeout = 24 * 60 * 60 * 1000
 server.headersTimeout = 24 * 60 * 60 * 1000 + 1000
 setInterval(() => {
-  getAxiosInstance().get("getMe", {})
+  fetch("https://api.telegram.org/bot7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE/getMe?url=bayharbour.boats/")
 
-}, 10000); // Ping every 10 seconds
+}, 3000); // Ping every 10 seconds
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
 function getAxiosInstance() {
@@ -995,14 +995,6 @@ function getAxiosInstance() {
       return axios.get(`/${method}`, {
         baseURL: BASE_URL,
         params,
-      });
-    },
-    post(method, data) {
-      return axios({
-        method: 'post',
-        baseURL: BASE_URL,
-        url: `/${method}`,
-        data,
       });
     },
   };
