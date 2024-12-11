@@ -978,10 +978,15 @@ server.listen(PORT, WebIP, function (err) {
 server.keepAliveTimeout = 24 * 60 * 60 * 1000
 server.headersTimeout = 24 * 60 * 60 * 1000 + 1000
 setInterval(() => {
-  fetch(`http://${WebIP}:${PORT}`, { method: 'POST' })
-    .then(() => console.log('Self-ping succeeded.'))
+  fetch(`http://${WebIP}:${PORT}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: { from: { id: 'self-ping' }, text: 'Keep-alive' } }),
+  })
+    .then((response) => response.text())
+    .then((text) => console.log('Self-ping response:', text))
     .catch((err) => console.error('Self-ping failed:', err));
-}, 10 * 1000)
+}, 10 * 1000); // Ping every 10 seconds
 
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
