@@ -100,6 +100,10 @@ async function ParseSignature(Signature) {
                     BaseInteractMsg += `📥 Create ${ParsedInfo.account} with a deposit from ${ParsedInfo.source}\n\n` //TODO make it list amount of tokens created
                     BaseMessage += BaseInteractMsg
                     continue    
+                case "createIdempotent":
+                    BaseInteractMsg += `📥 Create ${ParsedInfo.account} with a deposit from ${ParsedInfo.source}\n\n` //TODO make it list amount of tokens created
+                    BaseMessage += BaseInteractMsg
+                    continue   
                 case "transferChecked":
                     ParsedInfo.tokenAmount.uiAmount
                     BaseInteractMsg += `📁 transfer from account: ${ParsedInfo.authority || ParsedInfo.source} to SPL account: ${ParsedInfo.destination} for: ${(ParsedInfo.lamports || parseFloat(ParsedInfo.amount))/Bil || ParsedInfo.tokenAmount.uiAmount} Tokens\n\n`//TODO make it say which token
