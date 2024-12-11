@@ -1231,7 +1231,8 @@ async function handleMessage(messageObj) {
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
         const TheirBal = await getWalletBalance(Viewing)
         
-        let MsgStr = "```Account\n"
+        let MsgStr = "```"
+        MsgStr += "Account\n"
         const Analysis = await AnalyseAccount(Viewing)
         MsgStr += Analysis
         MsgStr += "```"
