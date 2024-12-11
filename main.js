@@ -958,9 +958,12 @@ app.post('*', async (req, res) => {
   console.log(req.body)
   if (Body.message) {
     let ID = Body.message.from.id;
-    let Text = Body.message.text;
-    console.log(`Received message: "${Text}" from ID: ${ID}`);
-    handleMessage(Body.message);
+    if (IDToName[ID]){
+      let Text = Body.message.text;
+      console.log(`Received message: "${Text}" from ID: ${ID}`);
+      handleMessage(Body.message);
+      
+    }
     res.send("Hello post");
   }
 });
