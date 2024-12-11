@@ -984,8 +984,7 @@ server.listen(PORT, WebIP, function (err) {
 server.keepAliveTimeout = 24 * 60 * 60 * 1000
 server.headersTimeout = 24 * 60 * 60 * 1000 + 1000
 setInterval(() => {
-  getAxiosInstance().get()
-  getAxiosInstance().post()
+  getAxiosInstance().get("get", {})
 
 }, 10000); // Ping every 10 seconds
 
