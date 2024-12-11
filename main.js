@@ -839,7 +839,11 @@ function subscribeToWalletTransactions(WalletAdd) {
         return;
       }
       if (LoggedSignature.length > MAX_SIGNATURES) {
+        targetWallets[WalletAdd][2] = await GetTokens(WalletAdd);
         LoggedSignature.shift()
+      }
+      if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])){
+        return
       }
       const ToSearchFor = [
         `Program log: Instruction: PumpSell`,

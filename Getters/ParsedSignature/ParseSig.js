@@ -20,7 +20,7 @@ async function ParseSignature(Signature) {
         return null
     }
     const jsonString = JSON.stringify(Interaction, null, 2)
-
+    //4tSp9X87ffp225ycesAfx3RiNJd2dnVGjPZsa51XTQsfFEqwvhJPThEqSgi9aifu44Uh74dqeBnsTZk17vYG2Miv
     const Time = unixToRegularTime(Interaction.blockTime) //TODO make it so that it localised to telegram users location
     const message = Interaction.transaction.message
     const Instructions = message.instructions
@@ -106,7 +106,6 @@ async function ParseSignature(Signature) {
                     BaseMessage += BaseInteractMsg
                     continue   
                 case "transferChecked":
-                    ParsedInfo.tokenAmount.uiAmount
                     BaseInteractMsg += `📁 transfer from account: ${ParsedInfo.authority || ParsedInfo.source} to SPL account: ${ParsedInfo.destination} for: ${(ParsedInfo.lamports || parseFloat(ParsedInfo.amount))/Bil || ParsedInfo.tokenAmount.uiAmount} Tokens\n\n`//TODO make it say which token
                     BaseMessage += BaseInteractMsg
                     continue
@@ -116,6 +115,13 @@ async function ParseSignature(Signature) {
             //console.log("empty", Instruction)
         }
     }
+
+    loggedMessages = Interaction.meta.logMessages
+    BaseMessage += "====Log Messages====\n"
+    for (const msg of loggedMessages){
+        BaseMessage += msg + "\n"
+    }
+    BaseMessage += "===================="
     return BaseMessage
 }
 
