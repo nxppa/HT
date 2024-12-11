@@ -967,7 +967,7 @@ app.post('*', async (req, res) => {
       console.log(`Received message: "${Text}" from ID: ${ID}`);
       handleMessage(Body.message);
     }
-    res.send("Hello post");
+    //res.send("Hello post");
   }
 });
 app.get('*', async (req, res) => {
