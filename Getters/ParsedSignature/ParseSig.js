@@ -58,7 +58,7 @@ async function ParseSignature(Signature) {
                             const FromAcc = ParsedInfo.authority || ParsedInfo.source
                             const ToAcc = ParsedInfo.destination
                             const Amount = ParsedInfo.lamports / Bil || parseFloat(ParsedInfo.amount) / Bil
-                            BaseInteractMsg += `transfer from account: ${FromAcc} to account: ${ToAcc} for: ${Amount} SOL\n`
+                            BaseInteractMsg += `transfer from account: ${FromAcc} to SPL account: ${ToAcc} for: ${Amount} Tokens\n`
                             continue
                         case "1":
                         }
