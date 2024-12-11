@@ -78,28 +78,30 @@ async function ParseSignature(Signature) {
             if (!Program){
                 BaseMessage += ListedProgram + "\n"
             }
+            console.log(Type)
             BaseInteractMsg = `📋 Interact with instruction ${Type} on ${Program}\n`
             switch (Type) {
                 case "transfer":
-                    const FromAcc = ParsedInfo.authority || ParsedInfo.source
-                    const ToAcc = ParsedInfo.destination
-                    const Amount = ParsedInfo.lamports|| parseFloat(ParsedInfo.amount)
-                    BaseInteractMsg += `📁 transfer from account: ${FromAcc} to SPL account: ${ToAcc} for: ${Amount/Bil} Tokens\n\n`//TODO make it say which token
+                    BaseInteractMsg += `📁 transfer from account: ${ParsedInfo.authority || ParsedInfo.source} to SPL account: ${ParsedInfo.destination} for: ${(ParsedInfo.lamports|| parseFloat(ParsedInfo.amount))/Bil} Tokens\n\n`//TODO make it say which token
                     BaseMessage += BaseInteractMsg 
                     continue
                 case "createAccountWithSeed":
-                    BaseInteractMsg += `📥 Create ${ParsedInfo.newAccount} with a deposit of ${ParsedInfo.lamports / Bil} SOL from ${ParsedInfo.source} \n\n`
+                    BaseInteractMsg += `📥 Create ${ParsedInfo.newAccount} with a deposit of ${ParsedInfo.lamports / Bil} SOL from ${ParsedInfo.source}\n\n`
                     BaseMessage += BaseInteractMsg 
                     continue
                 case "closeAccount":
-                    BaseInteractMsg += `⛔ Close Token Account ${ParsedInfo.acocunt} \n` //TODO find out information where it says how much was liquidated
+                    BaseInteractMsg += `⛔ Close Token Account ${ParsedInfo.acocunt} \n\n` //TODO find out information where it says how much was liquidated
+                    BaseMessage += BaseInteractMsg
                     continue
                 case "initializeAccount":
                     continue
                 case "create":
-                    BaseInteractMsg += `📥 Create ${ParsedInfo.account} with a deposit from ${ParsedInfo.source} \n` //TODO make it list amount of tokens created
-                    BaseMessage += BaseInteractMsg + "\n"
-
+                    BaseInteractMsg += `📥 Create ${ParsedInfo.account} with a deposit from ${ParsedInfo.source}\n\n` //TODO make it list amount of tokens created
+                    BaseMessage += BaseInteractMsg
+                    continue    
+                case "transferChecked":
+                    BaseInteractMsg += `📁 transfer from account: ${ParsedInfo.authority || ParsedInfo.source} to SPL account: ${ParsedInfo.destination} for: ${(ParsedInfo.lamports|| parseFloat(ParsedInfo.amount))/Bil} Tokens\n\n`//TODO make it say which token
+                    BaseMessage += BaseInteractMsg
                     continue
             }
             console.log("missing type: ", Type)
