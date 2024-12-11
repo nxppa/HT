@@ -974,13 +974,13 @@ server.listen(PORT, WebIP, function (err) {
     console.log(`Server listening on PORT ${PORT}`);
   }
 });
-server.keepAliveTimeout = 24 * 60 * 60 * 1000; // 24 hours
-server.headersTimeout = 24 * 60 * 60 * 1000 + 1000; // Slightly higher than keepAliveTimeout
+server.keepAliveTimeout = 24 * 60 * 60 * 1000
+server.headersTimeout = 24 * 60 * 60 * 1000 + 1000
 setInterval(() => {
-  fetch(`http://${WebIP}:${PORT}`, { method: 'GET' })
+  fetch(`http://${WebIP}:${PORT}`, { method: 'POST' })
     .then(() => console.log('Self-ping succeeded.'))
     .catch((err) => console.error('Self-ping failed:', err));
-}, 10 * 1000); // Ping every 10 seconds
+}, 10 * 1000)
 
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
