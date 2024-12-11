@@ -19,6 +19,8 @@ async function ParseSignature(Signature) {
     if (!Interaction){
         return null
     }
+    const jsonString = JSON.stringify(Interaction, null, 2)
+
     const Time = unixToRegularTime(Interaction.blockTime) //TODO make it so that it localised to telegram users location
     const message = Interaction.transaction.message
     const Instructions = message.instructions
@@ -73,12 +75,11 @@ async function ParseSignature(Signature) {
             const Parsed = Instruction.parsed
             const Type = Parsed.type
             const ParsedInfo = Parsed.info
-            const ListedProgram = ParsedInfo.tokenProgram || Instruction.programId.toBase58()
+            const ListedProgram = Instruction.programId.toBase58() || ParsedInfo.tokenProgram
             const Program = ProgramMapping[ListedProgram]
             if (!Program){
                 BaseMessage += ListedProgram + "\n"
             }
-            console.log(Type)
             BaseInteractMsg = `📋 Interact with instruction ${Type} on ${Program}\n`
             switch (Type) {
                 case "transfer":
