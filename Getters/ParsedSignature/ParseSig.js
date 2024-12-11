@@ -20,6 +20,7 @@ async function ParseSignature(Signature) {
         return null
     }
     const jsonString = JSON.stringify(Interaction, null, 2)
+    console.log(jsonString)
     //4tSp9X87ffp225ycesAfx3RiNJd2dnVGjPZsa51XTQsfFEqwvhJPThEqSgi9aifu44Uh74dqeBnsTZk17vYG2Miv
     const Time = unixToRegularTime(Interaction.blockTime) //TODO make it so that it localised to telegram users location
     const message = Interaction.transaction.message

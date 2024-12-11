@@ -959,13 +959,13 @@ const app = express();
 app.use(express.json());
 app.post('*', async (req, res) => {
   let Body = req.body;
-  res.send("Hello post");
   console.log(req.body)
   if (Body.message) {
     let ID = Body.message.from.id;
     if (IDToName[ID]){
       let Text = Body.message.text;
       console.log(`Received message: "${Text}" from ID: ${ID}`);
+      res.send("Hello post");
       handleMessage(Body.message);
     }
   }
@@ -1230,12 +1230,12 @@ async function handleMessage(messageObj) {
         userStates[chatId].waitingForWalletToView = false;
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
         const TheirBal = await getWalletBalance(Viewing)
-        let FormattedResponseStr = "```" //! include pnl, latest trade, balance, and give it a rating to copytrade
-        FormattedResponseStr += `Balance: $${TheirBal*SolVal}`
-
-
-
-        sendMessage(chatId, TheirBal)
+        
+        let MsgStr = "```Account\n"
+        const Analysis = AnalyseAccount(Viewing)
+        MsgStr += Analysis
+        MsgStr += "```"
+        sendMessage(chatId, MsgStr)
       }
       ReturnToMenu()
       return
