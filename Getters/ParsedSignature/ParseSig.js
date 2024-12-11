@@ -1,6 +1,6 @@
 const Bil = 10 ** 9
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message, Transaction } = require('@solana/web3.js');
-const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f" //TODO MAYBE make it use multiple endpoints 
+const SOLANA_RPC_ENDPOINT = "https://public.ligmanode.com" //TODO MAYBE make it use multiple endpoints 
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
     commitment: 'confirmed',
 });

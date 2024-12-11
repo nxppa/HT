@@ -157,7 +157,7 @@ function GetShorthandVersion(str, NumChar) {
 
 //-------My Wallet Logs ------\\
 let MyWalletAnalysis = {}
-const SOLANA_RPC_ENDPOINT = "https://public.ligmanode.com" //TODO make it so that it uses multiple endpoints
+const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f" //TODO make it so that it uses multiple endpoints
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
   commitment: 'confirmed',
 });
