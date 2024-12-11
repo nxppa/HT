@@ -46,7 +46,7 @@ async function ParseSignature(Signature) {
         }
         let BaseInteractMsg = ``
         if (IntWProg) {
-            BaseInteractMsg = `Interact with program ${IntWProg}\n`
+            BaseInteractMsg = `💻 Interact with program ${IntWProg}\n`
             const CurrentAdded = AddedInstructionsLookUp[index]
             for (const Individual of CurrentAdded) {
                 const Parsed = Individual.parsed
@@ -78,7 +78,7 @@ async function ParseSignature(Signature) {
             if (!Program){
                 BaseMessage += ListedProgram + "\n"
             }
-            BaseInteractMsg = `Interact with instruction ${Type} on ${Program}\n`
+            BaseInteractMsg = `📋 Interact with instruction ${Type} on ${Program}\n`
             switch (Type) {
                 case "transfer":
                     const FromAcc = ParsedInfo.authority || ParsedInfo.source
