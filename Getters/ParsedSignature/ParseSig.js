@@ -16,6 +16,9 @@ const ProgramMapping = {
 }
 async function ParseSignature(Signature) {
     const Interaction = await connection.getParsedTransaction(Signature, { "maxSupportedTransactionVersion": 0 })
+    if (!Interaction){
+        return null
+    }
     const Time = unixToRegularTime(Interaction.blockTime) //TODO make it so that it localised to telegram users location
     const message = Interaction.transaction.message
     const Instructions = message.instructions
