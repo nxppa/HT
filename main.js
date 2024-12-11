@@ -984,13 +984,34 @@ setInterval(() => {
   fetch(`http://${WebIP}:${PORT}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: { from: { id: 'self-ping' }, text: 'Keep-alive' } }),
+    body: JSON.stringify({
+      update_id: 100000000, // Example update ID
+      message: {
+        message_id: 1,
+        from: {
+          id: 123456789, // Self-ping user ID
+          is_bot: false,
+          first_name: "Self",
+          last_name: "Ping",
+          username: "selfping",
+          language_code: "en"
+        },
+        chat: {
+          id: 123456789,
+          first_name: "Self",
+          last_name: "Ping",
+          username: "selfping",
+          type: "private"
+        },
+        date: Math.floor(Date.now() / 1000), // Unix timestamp
+        text: "Keep-alive message"
+      }
+    }),
   })
     .then((response) => response.text())
     .then((text) => console.log('Self-ping response:', text))
     .catch((err) => console.error('Self-ping failed:', err));
 }, 10 * 1000); // Ping every 10 seconds
-
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
 function getAxiosInstance() {
