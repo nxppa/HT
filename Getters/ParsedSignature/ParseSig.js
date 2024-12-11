@@ -101,7 +101,8 @@ async function ParseSignature(Signature) {
                     BaseMessage += BaseInteractMsg
                     continue    
                 case "transferChecked":
-                    BaseInteractMsg += `📁 transfer from account: ${ParsedInfo.authority || ParsedInfo.source} to SPL account: ${ParsedInfo.destination} for: ${(ParsedInfo.lamports|| parseFloat(ParsedInfo.amount))/Bil} Tokens\n\n`//TODO make it say which token
+                    ParsedInfo.tokenAmount.uiAmount
+                    BaseInteractMsg += `📁 transfer from account: ${ParsedInfo.authority || ParsedInfo.source} to SPL account: ${ParsedInfo.destination} for: ${(ParsedInfo.lamports || parseFloat(ParsedInfo.amount))/Bil || ParsedInfo.tokenAmount.uiAmount} Tokens\n\n`//TODO make it say which token
                     BaseMessage += BaseInteractMsg
                     continue
             }
