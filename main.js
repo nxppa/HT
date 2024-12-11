@@ -266,7 +266,7 @@ async function AnalyseAccount(Account) {
   let ResponseString = "```"
   if (Matches) {
       ResponseString += "Signature\n"
-      ResponseString += "✍️ Signature: " + Account
+      ResponseString += `✍️ Signature: ${Account}\n` 
       const parsed = await ParseSignature(Account)
       if (parsed){
         ResponseString+= parsed
