@@ -115,13 +115,14 @@ async function ParseSignature(Signature) {
             //console.log("empty", Instruction)
         }
     }
-
+    /*
     loggedMessages = Interaction.meta.logMessages
     BaseMessage += "====Log Messages====\n"
     for (const msg of loggedMessages){
         BaseMessage += msg + "\n"
     }
     BaseMessage += "===================="
+    */
     return BaseMessage
 }
 
