@@ -959,6 +959,7 @@ const app = express();
 app.use(express.json());
 app.post('*', async (req, res) => {
   let Body = req.body;
+  res.send("Hello post");
   console.log(req.body)
   if (Body.message) {
     let ID = Body.message.from.id;
@@ -967,7 +968,6 @@ app.post('*', async (req, res) => {
       console.log(`Received message: "${Text}" from ID: ${ID}`);
       handleMessage(Body.message);
     }
-    //res.send("Hello post");
   }
 });
 app.get('*', async (req, res) => {
