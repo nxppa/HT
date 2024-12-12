@@ -4,9 +4,9 @@ const { AUDTOUSD } = require("./Getters/Conversion/USD-AUD/RBA.js")
 const { GetPrice } = require('./Getters/Price/Combination.js');
 const { Swap } = require('./Operations/PumpPortal.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
-const {SPLToOwner} = require("./Getters/SPLToOwner.js")
-const {getAsset} = require("./Getters/AssetInfo/Helius.js")
-const {ParseSignature} = require("./Getters/ParsedSignature/ParseSig.js")
+const { SPLToOwner } = require("./Getters/SPLToOwner.js")
+const { getAsset } = require("./Getters/AssetInfo/Helius.js")
+const { ParseSignature } = require("./Getters/ParsedSignature/ParseSig.js")
 
 const WalletCheckBaseAddress = "https://gmgn.ai/sol/address/"
 const MintCheckBaseAddress = "https://gmgn.ai/sol/token/"
@@ -222,35 +222,35 @@ function PrivToPub(PrivateKey) {
 }
 async function isValidEdwardsPoint(R) {
   try {
-      const point = await ed25519.Point.fromHex(R); // Convert R to an Edwards point
-      return !point.hasSmallOrder();
+    const point = await ed25519.Point.fromHex(R); // Convert R to an Edwards point
+    return !point.hasSmallOrder();
   } catch {
-      return false; // If the conversion fails, R is not a valid point
+    return false; // If the conversion fails, R is not a valid point
   }
 }
-function SignatureSyntaxMatch(sig){
+function SignatureSyntaxMatch(sig) {
   try {
-      const Signature = bs58.decode(sig)
-      if (Signature.length !== 64) {
-          Signature.length
-          return false
-      }
-      const R = Signature.slice(0, 32); // First 32 bytes
-      const S = Signature.slice(32);   // Last 32 bytes
-      if (!isValidEdwardsPoint(R)) {
-          return false;
-      }
-      return true;
-  } catch (err) {
+    const Signature = bs58.decode(sig)
+    if (Signature.length !== 64) {
+      Signature.length
       return false
+    }
+    const R = Signature.slice(0, 32); // First 32 bytes
+    const S = Signature.slice(32);   // Last 32 bytes
+    if (!isValidEdwardsPoint(R)) {
+      return false;
+    }
+    return true;
+  } catch (err) {
+    return false
   }
 }
 function containsNonBase58Character(str) {
   try {
-      bs58.decode(str);
-      return false
+    bs58.decode(str);
+    return false
   } catch (e) {
-      return true
+    return true
   }
 }
 
@@ -259,36 +259,36 @@ function unixToRegularTime(unixTimestamp) {
   return date.toLocaleString();
 }
 async function AnalyseAccount(Account) {
-  if (containsNonBase58Character(Account)){
+  if (containsNonBase58Character(Account)) {
     return "Contains non base 58 character. Could not parse"
   }
   const Matches = SignatureSyntaxMatch(Account)
   let ResponseString = "```"
   if (Matches) {
-      ResponseString += "Signature\n"
-      ResponseString += `✍️ Signature: ${Account}\n` 
-      const parsed = await ParseSignature(Account)
-      if (parsed){
-        ResponseString+= parsed
-      } else {
-        return "couldnt get parsed transaction for signature"
-      }
-      ResponseString += "```"
+    ResponseString += "Signature\n"
+    ResponseString += `✍️ Signature: ${Account}\n`
+    const parsed = await ParseSignature(Account)
+    if (parsed) {
+      ResponseString += parsed
+    } else {
+      return "couldnt get parsed transaction for signature"
+    }
+    ResponseString += "```"
     return ResponseString;
   }
   let publicKey = ""
   try {
-    publicKey = typeof(Account) == "string" ? new PublicKey(Account) : Account
+    publicKey = typeof (Account) == "string" ? new PublicKey(Account) : Account
   } catch {
     return "invalid input"
   }
   const accountInfo = await connection.getParsedAccountInfo(publicKey)
-  if (!accountInfo.value){
+  if (!accountInfo.value) {
     return "could not find data on account"
   }
   const data = accountInfo.value.data;
   if (!data || data === 'none') {
-      return "acc not parsed";
+    return "acc not parsed";
   }
   const parsed = data.parsed;
   const program = data.program;
@@ -298,9 +298,9 @@ async function AnalyseAccount(Account) {
       const MintInfo = await getAsset(Account)
       const Price = await GetPrice(Account)
       ResponseString += `Address: ${Account}\n`
-      for (let k in MintInfo){
+      for (let k in MintInfo) {
         const Info = MintInfo[k]
-        if (Info){
+        if (Info) {
           ResponseString += `${k}: ${Info}\n`
         }
       }
@@ -315,9 +315,9 @@ async function AnalyseAccount(Account) {
       const owner = new PublicKey(info.owner);
       const ata = getAssociatedTokenAddressSync(mint, owner, true, TPID);
       if (ata.equals(publicKey)) {
-          ResponseString += "SPL\n"
-          ResponseString +=  "Authority: " + owner //TODO get balance for this
-          ResponseString += "```"
+        ResponseString += "SPL\n"
+        ResponseString += "Authority: " + owner //TODO get balance for this
+        ResponseString += "```"
         return ResponseString
       }
       return 'token account';
@@ -326,14 +326,14 @@ async function AnalyseAccount(Account) {
   const TheirBal = await connection.getBalance(publicKey) / Bil
   ResponseString += "Wallet\n"
   ResponseString += `🏠 Address: ${Account}\n`
-  ResponseString += `💲 Balance: $${TheirBal*SolVal} | ◎ Sol: ${TheirBal}\n`
+  ResponseString += `💲 Balance: $${TheirBal * SolVal} | ◎ Sol: ${TheirBal}\n`
   const OpenPositions = await GetTokens(Account);
-  
+
   ResponseString += "\n====📊 Open Positions====\n"
   let specialTokens = [];
   let regularTokens = [];
   let pumpTokens = [];
-  
+
   for (let Mint in OpenPositions) {
     const Amount = OpenPositions[Mint];
     if (Amount) {
@@ -360,9 +360,9 @@ async function AnalyseAccount(Account) {
   for (const token of allTokens) {
     ResponseString += `${token.PreMoji} ${token.Mint}: ${token.Amount}\n`;
   }
-  
+
   // TODO: Split ResponseString into pages if needed
-  
+
   ResponseString += "=======================\n"
   ResponseString += "```"
   return ResponseString;
@@ -842,7 +842,7 @@ function subscribeToWalletTransactions(WalletAdd) {
         targetWallets[WalletAdd][2] = await GetTokens(WalletAdd);
         LoggedSignature.shift()
       }
-      if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])){
+      if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])) {
         return
       }
       const ToSearchFor = [
@@ -962,7 +962,7 @@ app.post('*', async (req, res) => {
   console.log(Body)
   if (Body.message) {
     let ID = Body.message.from.id;
-    if (IDToName[ID] || ID == "self-ping"){
+    if (IDToName[ID] || ID == "self-ping") {
       let Text = Body.message.text;
       console.log(`Received message: "${Text}" from ID: ${ID}`);
       res.send("Hello post");
@@ -991,10 +991,27 @@ setInterval(() => {
   fetch(`http://${WebIP}:${PORT}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: { from: { id: 'self-ping' }, text: 'Keep-alive' } }),
+    body: JSON.stringify(
+      {
+        update_id: 574153825,
+        message: {
+          message_id: -1,
+          from: {
+            id: 574153825,
+            is_bot: false,
+            username: 'Server',
+          },
+          chat: {
+            id: 574153825,
+            username: 'Server',
+            type: 'private'
+          },
+          date: Math.floor(Date.now() / 1000),
+          text: 'Self Ping'
+        }
+      })
   })
-}, 3000); // Ping every 10 seconds
-
+}, 3000) // Ping every 10 seconds
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
 function getAxiosInstance() {
   return {
@@ -1090,15 +1107,15 @@ async function sendMessage(ID, messageText, Mode = "Markdown", Keyboard, Method 
         disable_web_page_preview: true,
       });
     } catch {
-      if (deep >= 4){
+      if (deep >= 4) {
         console.error("couldnt send message :(")
-        return 
+        return
       }
       deep += 1
       return await ReturnAxios(deep)
     }
   }
-    return ReturnAxios(0)
+  return ReturnAxios(0)
 }
 
 const userStates = {}; // Store states for each user
@@ -1152,13 +1169,13 @@ async function handleMessage(messageObj) {
     { text: ActionTexts["tools"] },
   ]
   const messageText = messageObj.text || "";
-  if (!ActionTexts[messageText]){
+  if (!ActionTexts[messageText]) {
     const UsedAlias = ActionAliases[messageText]
-    if (UsedAlias){
-      messageText = UsedAlias 
+    if (UsedAlias) {
+      messageText = UsedAlias
     }
   }
-  
+
 
   if (userStates[chatId]) { //TODO make this better managed
     if (userStates[chatId].waitingForFee) {
@@ -1236,7 +1253,7 @@ async function handleMessage(messageObj) {
       } else {
         userStates[chatId].waitingForWalletToView = false;
         sendMessage(chatId, `Getting details for wallet: ${GetWalletEmbed(Viewing, Viewing)}`);
-        
+
         const Analysis = await AnalyseAccount(Viewing)
         sendMessage(chatId, Analysis)
       }
@@ -1361,10 +1378,10 @@ async function handleMessage(messageObj) {
       userStates[chatId].waitingForScanner = false
       const Input = messageText
       const Analysis = await AnalyseAccount(Input)
-      console.log("analysis: ",Analysis)
+      console.log("analysis: ", Analysis)
       sendMessage(chatId, Analysis)
       ReturnToMenu()
-      return 
+      return
     }
   }
 
@@ -1510,9 +1527,9 @@ async function handleMessage(messageObj) {
       const CondtionsKB = GetKeyBoard(ConditionsOptions, true, false)
       return await sendMessage(chatId, "Conditions: ", null, CondtionsKB)
     case ActionTexts["walletanalysis"]:
-    
 
-    return
+
+      return
 
     case ActionTexts["info"]:
       const InfoOptions = [
@@ -1523,7 +1540,7 @@ async function handleMessage(messageObj) {
       const InfoKB = GetKeyBoard(InfoOptions, true, false)
       return await sendMessage(chatId, "Info: ", null, InfoKB)
     case ActionTexts["tools"]:
-          const ToolOptions = [
+      const ToolOptions = [
         { text: ActionTexts["scanner"] },
         { text: ActionTexts["back"] },
       ]
