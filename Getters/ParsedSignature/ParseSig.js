@@ -20,7 +20,7 @@ async function ParseSignature(Signature) {
         return null
     }
     const jsonString = JSON.stringify(Interaction, null, 2)
-    console.log(jsonString)
+    //console.log(jsonString)
     //4tSp9X87ffp225ycesAfx3RiNJd2dnVGjPZsa51XTQsfFEqwvhJPThEqSgi9aifu44Uh74dqeBnsTZk17vYG2Miv
     const Time = unixToRegularTime(Interaction.blockTime) //TODO make it so that it localised to telegram users location
     const message = Interaction.transaction.message
@@ -63,7 +63,9 @@ async function ParseSignature(Signature) {
                             const Amount = ParsedInfo.lamports / Bil || parseFloat(ParsedInfo.amount) / Bil //TODO fix amount
                             BaseInteractMsg += `📁 transfer from account: ${FromAcc} to SPL account: ${ToAcc} for: ${Amount} Tokens\n` 
                             continue
-                        case "1":
+                        case "closeAccount":
+                            BaseInteractMsg += `⛔ Close Token Account ${ParsedInfo.acocunt} \n\n` //TODO find out information where it says how much was liquidated
+                            continue
                         }
                         console.error("missed case type")
                 }

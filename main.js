@@ -324,7 +324,7 @@ async function AnalyseAccount(Account) {
     }
   }
   const TheirBal = await connection.getBalance(publicKey) / Bil
-  ResponseString += "Account\n"
+  ResponseString += "Wallet\n"
   ResponseString += `🏠 Address: ${Account}\n`
   ResponseString += `💲 Balance: $${TheirBal*SolVal} | ◎ Sol: ${TheirBal}\n`
   const OpenPositions = await GetTokens(Account);
@@ -984,8 +984,11 @@ server.listen(PORT, WebIP, function (err) {
 server.keepAliveTimeout = 24 * 60 * 60 * 1000
 server.headersTimeout = 24 * 60 * 60 * 1000 + 1000
 setInterval(() => {
-  fetch("https://api.telegram.org/bot7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE/getMe?url=bayharbour.boats/")
-
+  fetch(`http://${WebIP}:${PORT}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: { from: { id: 'self-ping' }, text: 'Keep-alive' } }),
+  })
 }, 3000); // Ping every 10 seconds
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited

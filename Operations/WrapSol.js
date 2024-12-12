@@ -2,7 +2,6 @@ require('dotenv').config();
 const { Connection, Keypair,  SystemProgram, Transaction, VersionedTransaction, clusterApiUrl } = require("@solana/web3.js")
 const { NATIVE_MINT, createSyncNativeInstruction, ASSOCIATED_TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount } = require("@solana/spl-token")
 const bs58 = require("bs58").default
-
 const privateKey = process.env.PrivateKey
 const wallet = Keypair.fromSecretKey(bs58.decode(privateKey));
 const Bil = 1000000000;
@@ -20,7 +19,6 @@ async function WrapSol(amount) {
       NATIVE_MINT,
       wallet.publicKey
     )
-    
     let transaction = new Transaction().add(
         SystemProgram.transfer({
             fromPubkey: wallet.publicKey,
@@ -29,7 +27,6 @@ async function WrapSol(amount) {
         }),
         createSyncNativeInstruction(associatedTokenAccount.address)
     );
-    
     transaction.recentBlockhash = latestBlockhash.blockhash
     transaction.feePayer = wallet.publicKey
     const serializedTransaction = transaction.serialize({ requireAllSignatures: false, verifySignatures: true });
@@ -42,10 +39,8 @@ async function WrapSol(amount) {
     recoveredTransaction.partialSign(wallet);
   }
   const txnSignature = await connection.sendRawTransaction(recoveredTransaction.serialize());
-
   console.log(`Wrapped SOL successfully: Signature: ${txnSignature}`);
 }
-
 function getRawTransaction(encodedTransaction) {
     let recoveredTransaction;
     try {
