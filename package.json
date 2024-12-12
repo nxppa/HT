@@ -22,7 +22,6 @@
     "@solana/spl-token": "^0.4.9",
     "@solana/spl-token-swap": "^0.4.4",
     "@solana/web3.js": "^1.95.3",
-    "@solxtence/solana-swap": "^1.0.12",
     "alchemy-sdk": "^3.4.7",
     "axios": "^1.7.7",
     "axios-retry": "^4.5.0",
