@@ -59,7 +59,7 @@ const IDToName = {
   6050162852: "Naps",
   1788282135: "Revvin Dev",
   679687518: "Sasha the basher",
-  574153825: "Server"
+  574153825: "Server" //TODO make an account for server
 }
 
 for (const ID in IDToName) {
@@ -998,12 +998,12 @@ setInterval(() => {
         message: {
           message_id: -1,
           from: {
-            id: 574153825,
+            id: 6050162852,
             is_bot: false,
             username: 'Server',
           },
           chat: {
-            id: 574153825,
+            id: 6050162852,
             username: 'Server',
             type: 'private'
           },
