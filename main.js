@@ -959,14 +959,16 @@ const app = express();
 app.use(express.json());
 app.post('*', async (req, res) => {
   let Body = req.body;
-  console.log(req.body)
+  console.log(Body)
   if (Body.message) {
     let ID = Body.message.from.id;
-    if (IDToName[ID] || ID == ""){
+    if (IDToName[ID] || ID == "self-ping"){
       let Text = Body.message.text;
-      console.log(`Received message: "${Text || ID}" from ID: ${ID}`);
+      console.log(`Received message: "${Text}" from ID: ${ID}`);
       res.send("Hello post");
       handleMessage(Body.message);
+    } else {
+      console.log("invalid person: ", ID)
     }
   }
 });
