@@ -59,7 +59,6 @@ const IDToName = {
   6050162852: "Naps",
   1788282135: "Revvin Dev",
   679687518: "Sasha the basher",
-  574153825: "Server" //TODO make an account for server
 }
 
 for (const ID in IDToName) {
