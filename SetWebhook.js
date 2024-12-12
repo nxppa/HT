@@ -2,10 +2,9 @@
 require('dotenv').config();
 const TelegramKey = process.env.TelegramKey;
 const Domain = process.env.Domain
-//https://api.telegram.org/bot7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE/sendMessage?url=bayharbour.boats/
 
 function SetWebhook() {
-    const WebhookUrl = `https://api.telegram.org/bot7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE/setWebhook?url=bayharbour.boats/`
+    const WebhookUrl = `https://api.telegram.org/bot7847350269:AAGru9IsC15r893fP2wbmvXt54bPAtn9TxE/setWebhook?url=bayharbour.boats/` //TODO hide this
 
     fetch(WebhookUrl, {
         method: 'GET',
