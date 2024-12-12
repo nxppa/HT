@@ -970,6 +970,8 @@ app.post('*', async (req, res) => {
     } else {
       console.log("invalid person: ", ID)
     }
+  } else {
+    console.log("invalid message: ", Body)
   }
 });
 app.get('*', async (req, res) => {
