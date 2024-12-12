@@ -953,7 +953,7 @@ main()
 
 const http = require('http');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT
 const WebIP = process.env.WebIP
 const app = express();
 app.use(express.json());
@@ -987,7 +987,8 @@ server.listen(PORT, WebIP, function (err) {
 });
 server.keepAliveTimeout = 24 * 60 * 60 * 1000
 server.headersTimeout = 24 * 60 * 60 * 1000 + 1000
-/*
+
+
 setInterval(() => {
   fetch(`http://${WebIP}:${PORT}`, {
     method: 'POST',
@@ -1013,7 +1014,6 @@ setInterval(() => {
       })
   })
 }, 3000) // Ping every 10 seconds
-*/
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
 function getAxiosInstance() {
   return {
