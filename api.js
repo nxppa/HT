@@ -103,7 +103,7 @@ app.get("/authenticate", async (req, res) => {
     if (!KeyCheck(res, key, req.query.session_token, true)) return;
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
     const token = generateSessionToken(ValidKeys[key]);
-    console.log("generating new token")
+    console.log("generating new token: ", token)
     res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: 480000 }); //TODO (8 minutes) Make it so that there is a universal variable for this 
     return res.status(200).send({ success: true, message: 'Authentication successful!', token: token });
 });
