@@ -9,7 +9,7 @@ const app = express();
 const MaxWallets = 100
 const port = 3000; //TODO make env files
 const BackupIp = "142.93.123.245";
-const SECRET_KEY = 'your-very-secure-secret'; // Use an environment variable
+const SECRET_KEY = 'oeruahgbaoieurgboiWGEOYUFGPiweh9f'; // Use an environment variable
 
 function generateSessionToken(userId) {
     const issuedAt = Math.floor(Date.now() / 1000); // Current Unix timestamp
@@ -52,6 +52,8 @@ function KeyCheck(res, key, token, Authentication) {
             res.status(401).send('Unauthorized');
             return false
         }
+    } else {
+
     }
 
     console.log(key)
@@ -113,9 +115,20 @@ app.get("/authenticate", async (req, res) => {
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
     const token = generateSessionToken(ValidKeys[key]);
     res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: 480000 }); //TODO (8 minutes) Make it so that there is a universal variable for this 
-    return res.status(200).send({ success: true, message: 'Authentication successful!' });
+    return res.status(200).send({ success: true, message: 'Authentication successful!', token: token });
 
 });
+app.get("/validate", async (req, res) => {
+    const token = req.query.token
+
+    try {
+        const payload = jwt.verify(token, SECRET_KEY); 
+        res.json({ message: 'Token is valid', userId: payload.userId });
+    } catch (error) {
+        res.status(401).json({ message: 'Token is invalid or expired' });
+    }
+});
+
 
 
 
