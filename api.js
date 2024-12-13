@@ -47,11 +47,15 @@ app.use(cors({
 
 
 
-function KeyCheck(res, key, token) {
-    if (!token || !validateSessionToken(token)) {
-        res.status(401).send('Unauthorized token');
-        return false
+function KeyCheck(res, key, token, Authentication) {
+    if (!Authentication){
+
+        if (!token || !validateSessionToken(token)) {
+            res.status(401).send('Unauthorized');
+            return false
+        }
     }
+
     console.log(key)
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
     if (!key) {
@@ -106,7 +110,8 @@ app.get("/api/tools/getBalance", async (req, res) => {
 
 
 app.get("/authenticate", async (req, res) => {
-    if (!KeyCheck(res, req.query.key, req.query.session_token)) return;
+
+    if (!KeyCheck(res, req.query.key, req.query.session_token, true)) return;
     const token = generateSessionToken(username);
     res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: 480000 }); //TODO (8 minutes) Make it so that there is a universal variable for this 
     return res.status(200).send({ success: true, message: 'Authentication successful!' });
