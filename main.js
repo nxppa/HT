@@ -952,14 +952,18 @@ main()
 
 
 const http = require('http');
-
+let LastUpdate = 1
+let LastMessageID = 1
 const PORT = process.env.PORT
 const WebIP = process.env.WebIP
 const app = express();
 app.use(express.json());
 app.post('*', async (req, res) => {
   let Body = req.body;
+  LastUpdate = Body.update_id
   console.log(Body)
+  console.log(Body.update_id)
+  LastMessageID = Body.message_id
   if (Body.message) {
     let ID = Body.message.from.id;
     if (IDToName[ID] || ID == "self-ping") {
@@ -988,24 +992,27 @@ server.listen(PORT, WebIP, function (err) {
 server.keepAliveTimeout = 24 * 60 * 60 * 1000
 server.headersTimeout = 24 * 60 * 60 * 1000 + 1000
 
-/*
 setInterval(() => {
   fetch(`http://${WebIP}:${PORT}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(
       {
-        update_id: 574153825,
+        update_id: LastUpdate + 1,
         message: {
-          message_id: -1,
+          message_id: LastMessageID + 1,
           from: {
             id: 6050162852,
             is_bot: false,
-            username: 'Server',
+            first_name: "Nappa",
+            username: "Nappa2",
+            language_code: "en",
+            is_premium: true
           },
           chat: {
             id: 6050162852,
-            username: 'Server',
+            first_name: "Nappa",
+            username: "Nappa2",
             type: 'private'
           },
           date: Math.floor(Date.now() / 1000),
@@ -1014,7 +1021,6 @@ setInterval(() => {
       })
   })
 }, 3000) // Ping every 10 seconds
-*/
 
 
 const BASE_URL = `https://api.telegram.org/bot${TelegramKey}/`; //TODO make it so that sending messages is rate limited
