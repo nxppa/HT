@@ -963,7 +963,7 @@ app.post('*', async (req, res) => {
   LastUpdate = Body.update_id
   console.log(Body)
   console.log(Body.update_id)
-  LastMessageID = Body.message_id
+  LastMessageID = Body.message.message_id
   if (Body.message) {
     let ID = Body.message.from.id;
     if (IDToName[ID] || ID == "self-ping") {
