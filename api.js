@@ -111,18 +111,7 @@ app.get("/authenticate", async (req, res) => {
 
 app.get("/validate", async (req, res) => {
     const token = req.query.token
-
-    try {
-        const payload = jwt.verify(token, SECRET_KEY);
-        if (Date.now()<payload.expiresAt ){
-            res.json({ message: 'Token is valid', userId: payload.userId });
-        } else {
-            console.log("Expired ", payload.expiresAt)
-            res.status(401).json({ message: 'Token is expired' });
-        }
-    } catch (error) {
-        res.status(401).json({ message: 'Token is invalid' });
-    }
+    return validateSessionToken(token)
 });
 
 
