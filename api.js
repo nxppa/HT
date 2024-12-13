@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const cors = require('cors');
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
 const { publicKey } = require('@raydium-io/raydium-sdk');
