@@ -1,6 +1,6 @@
 const express = require('express');
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
-const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message, PublicKey } = require('@solana/web3.js');
+const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
 const { publicKey } = require('@raydium-io/raydium-sdk');
 const app = express();
 const MaxWallets = 100
@@ -62,9 +62,8 @@ app.get("/api/tools/getBalance", async (req, res) => {
     if (!Account) {
         return res.status(400).send({ error: "Account parameter is required" });
     }
-    const PublicKey = new PublicKey(Account)
-    const Balance = connection.getBalance(publicKey) / Bil
-
+    const Pub = new PublicKey(Account)
+    const Balance = connection.getBalance(Pub) / Bil
     let Response = {}
     Response.Balance = Balance
     res.status(200).send(Response);
