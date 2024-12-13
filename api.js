@@ -15,10 +15,10 @@ app.listen(port, BackupIp, function (err) {
 app.use(express.json());
 
 function KeyCheck(res, key){
-    const KeyOwner = ValidKeys[key]
-    if (!ApiKey){
+    if (!key){
         return  res.status(400).send({ error: "API key needed" });
     }
+    const KeyOwner = ValidKeys[key]
     if (!KeyOwner){
         return  res.status(401).send({ error: "Invalid API key" });
     }
