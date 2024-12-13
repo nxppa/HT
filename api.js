@@ -25,13 +25,12 @@ app.use(cors({
 
 
 function KeyCheck(res, key){
+    console.log(key)
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
-
     if (!key){
         res.status(400).send({ error: "API key needed" });
         return  false
     }
-    console.log(ValidKeys)
     const KeyOwner = ValidKeys[key]
 
     if (!KeyOwner){
