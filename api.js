@@ -82,7 +82,7 @@ app.get("/authenticate", async (req, res) => {
         console.log("works C:")
         res.status(200).send({ success: true, message: 'Authentication successful!' });
     } else {
-        res.status(401).send({ success: false, message: 'Invalid password' });
+        return res.status(404).send({ success: false, message: "nope" });
     }
 
 
