@@ -105,13 +105,15 @@ app.get("/authenticate", async (req, res) => {
     const token = generateSessionToken(ValidKeys[key]);
     res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: 480000 }); //TODO (8 minutes) Make it so that there is a universal variable for this 
     return res.status(200).send({ success: true, message: 'Authentication successful!', token: token });
-
 });
+
+
 app.get("/validate", async (req, res) => {
     const token = req.query.token
 
     try {
         const payload = jwt.verify(token, SECRET_KEY);
+        console.log(payload)
         res.json({ message: 'Token is valid', userId: payload.userId });
     } catch (error) {
         res.status(401).json({ message: 'Token is invalid or expired' });
