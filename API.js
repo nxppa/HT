@@ -21,7 +21,7 @@ app.get("/api/tools/scanner", async (req, res) => {
     if (typeof(Response) == "string") {
         return res.status(404).send({ error: Response });
     }
-    res.status(200).send(tokenBalance);
+    res.status(200).send(Response);
 });
 
 //TODO make sanity check; only allow requests from whitelisted ips
