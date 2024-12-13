@@ -9,6 +9,7 @@ const BackupIp = "142.93.123.245";
 const ValidKeys = {
     "qwerty123": "Nappa"
 }
+const SOLANA_RPC_ENDPOINT = "https://public.ligmanode.com" //TODO MAYBE make it use multiple endpoints 
 const connection = new Connection(SOLANA_RPC_ENDPOINT, {
     commitment: 'confirmed',
   });
