@@ -1,6 +1,7 @@
 const express = require('express');
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
 const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
+const { publicKey } = require('@raydium-io/raydium-sdk');
 const app = express();
 const port = 8080; //TODO make env files
 const BackupIp = "142.93.123.245";
@@ -47,6 +48,28 @@ app.get("/api/tools/generateWallet", async (req, res) => {
     const keypair = Keypair.generate();
     const PubKey = keypair.publicKey.toBase58()
     const PrivKey = Buffer.from(keypair.secretKey).toString("hex")
+    let Response = {}
+    Response.publicKey = PubKey
+    Response.privateKey = PrivKey
+    res.status(200).send(Response);
+});
+
+app.get("/api/tools/generateWallets", async (req, res) => { 
+    if (!KeyCheck(res, req.query.key)) return;
+    NumWallets = req.query.amount 
+    if (!NumWallets){
+        return res.status(400).send({ error: "Amount parameter is required" });
+    }
+    Response.wallets = []
+    for (let x = 1; x <NumWallets; x++){
+        const keypair = Keypair.generate();
+        const PubKey = keypair.publicKey.toBase58()
+        const PrivKey = Buffer.from(keypair.secretKey).toString("hex")
+        Response.wallets.push({
+         publicKey: PubKey,
+         privateKey: PrivKey   
+        })
+    }
     let Response = {}
     Response.publicKey = PubKey
     Response.privateKey = PrivKey
