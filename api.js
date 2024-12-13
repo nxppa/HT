@@ -116,10 +116,11 @@ app.get("/validate", async (req, res) => {
         if (Date.now()<payload.expiresAt ){
             res.json({ message: 'Token is valid', userId: payload.userId });
         } else {
+            console.log("Expired")
             res.status(401).json({ message: 'Token is expired' });
         }
     } catch (error) {
-        res.status(401).json({ message: 'Token is invalid or expired' });
+        res.status(401).json({ message: 'Token is invalid' });
     }
 });
 
