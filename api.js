@@ -28,8 +28,9 @@ function KeyCheck(res, key){
         res.status(400).send({ error: "API key needed" });
         return  false
     }
-    console.log(key)
+    console.log(ValidKeys)
     const KeyOwner = ValidKeys[key]
+
     if (!KeyOwner){
         res.status(401).send({ error: "Invalid API key" });
         return  false
