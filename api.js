@@ -14,15 +14,20 @@ app.listen(port, BackupIp, function (err) {
 });
 app.use(express.json());
 
-app.get("/api/tools/scanner", async (req, res) => {
-    const ApiKey = req.query.key
-    const KeyOwner = ValidKeys[ApiKey]
+function KeyCheck(res){
     if (!ApiKey){
         return  res.status(400).send({ error: "API key needed" });
     }
     if (!KeyOwner){
         return  res.status(401).send({ error: "Invalid API key" });
     }
+
+}
+
+app.get("/api/tools/scanner", async (req, res) => {
+    const ApiKey = req.query.key
+    const KeyOwner = ValidKeys[ApiKey]
+    KeyCheck(res)
     const AccountToScan = req.query.account
 
     if (!AccountToScan) {
