@@ -27,14 +27,12 @@ async function getAsset(assetId) {
         }
 
         const data = await response.json();
-        console.log("fiiles: ", data.result.files)
         const Output = {
-            "Name": data.result.content.metadata.name,
-            "Description": data.result.content.metadata.description,
-            "Symbol": data.result.content.metadata.symbol,
+            "name": data.result.content.metadata.name,
+            "description": data.result.content.metadata.description,
+            "symbol": data.result.content.metadata.symbol,
             //"Image": data.result.content.files.uri
         }
-        console.log("output: ", Output)
         return Output;
     } catch (error) {
         console.error('Error fetching asset data:', error);

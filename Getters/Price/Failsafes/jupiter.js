@@ -18,7 +18,7 @@ async function JupiterPrice(Mint) {
         }
     } catch (error) {
         console.error('Error fetching token price:', error.message);
-        return null;
+        return undefined;
     }
 }
 
