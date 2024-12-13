@@ -1,6 +1,6 @@
 const express = require('express');
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
-const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
+const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message, PublicKey } = require('@solana/web3.js');
 const { publicKey } = require('@raydium-io/raydium-sdk');
 const app = express();
 const MaxWallets = 100
@@ -8,8 +8,10 @@ const port = 8080; //TODO make env files
 const BackupIp = "142.93.123.245";
 const ValidKeys = {
     "qwerty123": "Nappa"
-
 }
+const connection = new Connection(SOLANA_RPC_ENDPOINT, {
+    commitment: 'confirmed',
+  });
 
 app.listen(port, BackupIp, function (err) {
     if (err) console.log(err);
@@ -54,10 +56,23 @@ app.get("/api/tools/generateWallet", async (req, res) => {
     Response.privateKey = PrivKey
     res.status(200).send(Response);
 });
+app.get("/api/tools/getBalance", async (req, res) => { 
+    if (!KeyCheck(res, req.query.key)) return;
+    const Account = req.query.account
+    if (!Account) {
+        return res.status(400).send({ error: "Account parameter is required" });
+    }
+    const PublicKey = new PublicKey(Account)
+    const Balance = connection.getBalance(publicKey) / Bil
+
+    let Response = {}
+    Response.Balance = Balance
+    res.status(200).send(Response);
+});
 
 app.get("/api/tools/generateWallets", async (req, res) => { 
     if (!KeyCheck(res, req.query.key)) return;
-    NumWallets = req.query.amount 
+    const NumWallets = req.query.amount 
     if (!NumWallets){
         return res.status(400).send({ error: "Amount parameter is required" });
     }
