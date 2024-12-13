@@ -24,5 +24,4 @@ app.get("/api/tools/scanner", async (req, res) => {
     res.status(200).send(tokenBalance);
 });
 
-
 //TODO make sanity check; only allow requests from whitelisted ips
