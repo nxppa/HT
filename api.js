@@ -17,7 +17,7 @@ app.get("/api/tools/scanner", async (req, res) => {
     if (!AccountToScan) {
         return res.status(400).send({ error: "Account parameter is required" });
     }
-    const Response = AnalyseAccount(AccountToScan)
+    const Response = await AnalyseAccount(AccountToScan)
     if (typeof(Response) == "string") {
         return res.status(404).send({ error: Response });
     }
