@@ -27,9 +27,8 @@ function KeyCheck(res, key){
     return true
 }
 
-app.get("/api/tools/scanner", async (req, res) => {
-    const ApiKey = req.query.key
-   if (!KeyCheck(res, ApiKey)) return;
+app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for all methods
+   if (!KeyCheck(res, req.query.key)) return;
 
     const AccountToScan = req.query.account
 
@@ -42,15 +41,14 @@ app.get("/api/tools/scanner", async (req, res) => {
     }
     res.status(200).send(Response);
 });
-app.get("/api/tools/generateWallet", async (req, res) => {
-
-    if (!AccountToScan) {
-        return res.status(400).send({ error: "Account parameter is required" });
-    }
-    const Response = await AnalyseAccount(AccountToScan)
-    if (typeof(Response) == "string") {
-        return res.status(404).send({ error: Response });
-    }
+app.get("/api/tools/generateWallet", async (req, res) => { 
+    if (!KeyCheck(res, req.query.key)) return;
+    const keypair = Keypair.generate();
+    const PubKey = keypair.publicKey.toBase58()
+    const PrivKey = Buffer.from(keypair.secretKey).toString("hex")
+    let Response = {}
+    Response.publicKey = PubKey
+    Response.privateKey = PrivKey
     res.status(200).send(Response);
 });
 
