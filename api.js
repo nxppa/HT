@@ -111,7 +111,8 @@ app.get("/authenticate", async (req, res) => {
 
 app.get("/validate", async (req, res) => {
     const token = req.query.token
-    return validateSessionToken(token)
+    const IsValid = validateSessionToken(token)
+    return IsValid
 });
 
 
