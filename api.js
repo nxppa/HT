@@ -80,7 +80,5 @@ app.get("/api/tools/generateWallets", async (req, res) => {
          privateKey: PrivKey   
         })
     }
-    Response.publicKey = PubKey
-    Response.privateKey = PrivKey
     res.status(200).send(Response);
 });
