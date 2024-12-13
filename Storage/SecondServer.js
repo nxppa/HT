@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
-
-const port = 8080;
+const GetTokens = require("../Getters/TokenBalance/GetTokens")
+const port = 80;
 const BackupIp = "142.93.123.245";
 
 
