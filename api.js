@@ -64,7 +64,7 @@ app.get("/api/tools/getBalance", async (req, res) => {
         return res.status(400).send({ error: "Account parameter is required" });
     }
     const Pub = new PublicKey(Account)
-    const Balance = connection.getBalance(Pub) / Bil
+    const Balance = await connection.getBalance(Pub) / Bil
     let Response = {}
     Response.Balance = Balance
     res.status(200).send(Response);
