@@ -14,7 +14,6 @@ const SECRET_KEY = 'your-very-secure-secret'; // Use an environment variable
 function generateSessionToken(userId) {
     const issuedAt = Math.floor(Date.now() / 1000); // Current Unix timestamp
     const expiresAt = issuedAt + 8 * 60; // 8 minutes in seconds
-
     return jwt.sign({ userId, issuedAt, expiresAt }, SECRET_KEY);
 }
 function validateSessionToken(token) {
@@ -49,7 +48,6 @@ app.use(cors({
 
 function KeyCheck(res, key, token, Authentication) {
     if (!Authentication){
-
         if (!token || !validateSessionToken(token)) {
             res.status(401).send('Unauthorized');
             return false
@@ -110,9 +108,10 @@ app.get("/api/tools/getBalance", async (req, res) => {
 
 
 app.get("/authenticate", async (req, res) => {
-
-    if (!KeyCheck(res, req.query.key, req.query.session_token, true)) return;
-    const token = generateSessionToken(username);
+    const key = req.query.key
+    if (!KeyCheck(res, key, req.query.session_token, true)) return;
+    const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
+    const token = generateSessionToken(ValidKeys[key]);
     res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: 480000 }); //TODO (8 minutes) Make it so that there is a universal variable for this 
     return res.status(200).send({ success: true, message: 'Authentication successful!' });
 
