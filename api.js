@@ -17,7 +17,9 @@ app.listen(port, BackupIp, function (err) {
     if (err) console.log(err);
     console.log("Server listening on PORT", port);
 });
-app.use(express.json());
+app.use(cors({
+    origin: 'chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll', // Allow your extension origin
+}));
 
 
 
