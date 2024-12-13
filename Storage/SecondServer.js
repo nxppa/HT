@@ -1,8 +1,8 @@
 const express = require('express');
-const GetTokens = require("./Getters/TokenBalance/GetTokens")
 const app = express();
-const port = 80;
-const BackupIp = "146.190.214.255";
+
+const port = 8080;
+const BackupIp = "142.93.123.245";
 
 
 app.listen(port, BackupIp, function (err) {
@@ -11,16 +11,20 @@ app.listen(port, BackupIp, function (err) {
 });
 app.use(express.json());
 
+
 app.get("/TokenBal", async (req, res) => {
-    const wallet = req.query.wallet; // Retrieve 'wallet' query parameter
+    const wallet = req.query.wallet
     console.log(`Requested Token Balance for Wallet: ${wallet}`);
     if (!wallet) {
         return res.status(400).send({ error: "Wallet parameter is required" });
     }
+
     const tokenBalance = await GetTokens(wallet)
     if (!tokenBalance) {
         return res.status(404).send({ error: "Wallet not found" });
     }
+
+
     res.status(200).send(tokenBalance);
 });
 
