@@ -77,14 +77,9 @@ app.get("/api/tools/getBalance", async (req, res) => {
 
 
 app.get("/authenticate", async (req, res) => { 
-    const Validation = KeyCheck(res, req.query.key)
-    if (Validation){
-        console.log("works C:")
-        return res.status(200).send({ success: true, message: 'Authentication successful!' });
-    } else {
-        return res.status(404).send({ error: "Authentication unsuccessfull" });
-    }
+    if (!KeyCheck(res, req.query.key)) return;
 
+    return res.status(200).send({ success: true, message: 'Authentication successful!' });
 
 });
 
