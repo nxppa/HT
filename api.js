@@ -44,25 +44,23 @@ app.use(cors({
     origin: 'chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll', // Allow your extension origin
 }));
 
-
+function ValidateKey(key){
+    const KeyOwner = ValidKeys[key]
+    return KeyOwner
+}
 
 function KeyCheck(res, key, token, Authentication) {
-    if (!Authentication){
-        if (!token || !validateSessionToken(token)) {
-            res.status(401).send('Unauthorized');
-            return false
-        }
-    } else {
 
+    if ((!token || !validateSessionToken(token)) && (!key || !ValidateKey(key)) ) {
+        res.status(401).send('Unauthorized');
+        return false
     }
 
-    console.log(key)
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
     if (!key) {
         res.status(400).send({ error: "API key needed" });
         return false
     }
-    const KeyOwner = ValidKeys[key]
 
     if (!KeyOwner) {
         res.status(401).send({ error: "Invalid API key" });
@@ -122,7 +120,7 @@ app.get("/validate", async (req, res) => {
     const token = req.query.token
 
     try {
-        const payload = jwt.verify(token, SECRET_KEY); 
+        const payload = jwt.verify(token, SECRET_KEY);
         res.json({ message: 'Token is valid', userId: payload.userId });
     } catch (error) {
         res.status(401).json({ message: 'Token is invalid or expired' });
