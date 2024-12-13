@@ -16,17 +16,20 @@ app.use(express.json());
 
 function KeyCheck(res, key){
     if (!key){
-        return  res.status(400).send({ error: "API key needed" });
+        res.status(400).send({ error: "API key needed" });
+        return  false
     }
     const KeyOwner = ValidKeys[key]
     if (!KeyOwner){
-        return  res.status(401).send({ error: "Invalid API key" });
+        res.status(401).send({ error: "Invalid API key" });
+        return  false
     }
+    return true
 }
 
 app.get("/api/tools/scanner", async (req, res) => {
     const ApiKey = req.query.key
-    KeyCheck(res, ApiKey)
+   if (!KeyCheck(res, ApiKey)) return;
 
     const AccountToScan = req.query.account
 
