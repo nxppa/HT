@@ -22,7 +22,7 @@ app.use(express.json());
 
 
 function KeyCheck(res, key){
-    const ValidKeys = fs.readFileSync("./db/Passes.json");
+    const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
 
     if (!key){
         res.status(400).send({ error: "API key needed" });
