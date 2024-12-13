@@ -45,6 +45,7 @@ app.use(cors({
 }));
 
 function ValidateKey(key){
+    const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
     const KeyOwner = ValidKeys[key]
     return KeyOwner
 }
@@ -56,7 +57,6 @@ function KeyCheck(res, key, token, Authentication) {
         return false
     }
 
-    const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
     if (!key) {
         res.status(400).send({ error: "API key needed" });
         return false
