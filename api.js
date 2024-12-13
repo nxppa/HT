@@ -1,7 +1,8 @@
 const express = require('express');
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
+const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
 const app = express();
-const port = 8080;
+const port = 8080; //TODO make env files
 const BackupIp = "142.93.123.245";
 const ValidKeys = {
     "qwerty123": "Nappa"
@@ -51,6 +52,3 @@ app.get("/api/tools/generateWallet", async (req, res) => {
     Response.privateKey = PrivKey
     res.status(200).send(Response);
 });
-
-
-//TODO make sanity check; only allow requests from whitelisted ips
