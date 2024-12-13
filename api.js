@@ -53,19 +53,10 @@ function ValidateKey(key){
 function KeyCheck(res, key, token, Authentication) {
 
     if ((!token || !validateSessionToken(token)) && (!key || !ValidateKey(key)) ) {
-        res.status(401).send('Unauthorized');
+        res.status(401).send({ error: "API key needed" });
         return false
     }
 
-    if (!key) {
-        res.status(400).send({ error: "API key needed" });
-        return false
-    }
-
-    if (!KeyOwner) {
-        res.status(401).send({ error: "Invalid API key" });
-        return false
-    }
     return true
 }
 
