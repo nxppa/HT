@@ -5,7 +5,7 @@ const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Mes
 const { publicKey } = require('@raydium-io/raydium-sdk');
 const app = express();
 const MaxWallets = 100
-const port = 8080; //TODO make env files
+const port = 3000; //TODO make env files
 const BackupIp = "142.93.123.245";
 
 const SOLANA_RPC_ENDPOINT = "https://public.ligmanode.com" //TODO MAYBE make it use multiple endpoints 
