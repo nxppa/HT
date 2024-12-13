@@ -79,9 +79,10 @@ app.get("/api/tools/getBalance", async (req, res) => {
 app.get("/authenticate", async (req, res) => { 
     const Validation = KeyCheck(res, req.query.key)
     if (Validation){
-        res.json({ success: true, message: 'Authentication successful!' });
+        console.log("works C:")
+        res.status(200).send({ success: true, message: 'Authentication successful!' });
     } else {
-        res.status(401).json({ success: false, message: 'Invalid password' });
+        res.status(401).send({ success: false, message: 'Invalid password' });
     }
 
 
