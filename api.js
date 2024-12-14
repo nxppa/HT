@@ -3,17 +3,26 @@ const fs = require('fs');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
-const { Connection, PublicKey, clusterApiUrl, Keypair, VersionedTransaction, Message } = require('@solana/web3.js');
-const { publicKey } = require('@raydium-io/raydium-sdk');
+const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const app = express();
 const MaxWallets = 100
 const port = 3000; //TODO make env files
 const BackupIp = "142.93.123.245";
-const SECRET_KEY = 'oeruahgbaoieurgboiWGEOYUFGPiweh9f'; // Use an environment variable
+const SECRET_KEY = 'oeruahgbaoieurgboiWGEOYUFGPiweh9f'; // TODO Use an environment variable
+const AuthTimeMins = 8
+blacklist = {}
+
+function invalidateToken(token) {
+    const decoded = jwt.decode(token);
+    blacklist[decoded.jti] = true
+    setTimeout(() => {
+        delete blacklist[decoded.jti]
+    }, decoded.exp * 1000 - Date.now());
+  }
 
 function generateSessionToken(userId) {
-    const issuedAt = Math.floor(Date.now() / 1000); // Current Unix timestamp
-    const expiresAt = issuedAt + 8 * 60; // 8 minutes in seconds
+    const issuedAt = Math.floor(Date.now() / 1000)
+    const expiresAt = issuedAt + AuthTimeMins * 60
     return jwt.sign({ userId, issuedAt, expiresAt }, SECRET_KEY);
 }
 function validateSessionToken(token) {
@@ -25,9 +34,9 @@ function validateSessionToken(token) {
             throw new Error('Token expired');
         }
 
-        return payload.userId; // Valid user
+        return payload.userId
     } catch (err) {
-        return null; // Invalid or expired token
+        return null
     }
 }
 
@@ -41,7 +50,7 @@ app.listen(port, BackupIp, function (err) {
     console.log("Server listening on PORT", port);
 });
 app.use(cors({
-    origin: 'chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll', // Allow your extension origin
+    origin: 'chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll', 
 }));
 
 function ValidateKey(key){
@@ -104,7 +113,9 @@ app.get("/authenticate", async (req, res) => {
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
     const token = generateSessionToken(ValidKeys[key]);
     console.log("generating new token: ", token)
-    res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: 480000 }); //TODO (8 minutes) Make it so that there is a universal variable for this 
+    const Seconds = AuthTimeMins*60
+    const Miliseconds = Seconds*1000
+    res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: Miliseconds }); //TODO (8 minutes) Make it so that there is a universal variable for this 
     return res.status(200).send({ success: true, message: 'Authentication successful!', token: token });
 });
 
@@ -123,10 +134,6 @@ app.get("/validate", async (req, res) => {
     }
     return IsValid
 });
-
-
-
-
 
 app.get("/api/tools/generateWallets", async (req, res) => {
     if (!KeyCheck(res, req.query.key)) return;

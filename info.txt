@@ -9,11 +9,14 @@ HT bot
 
 sudo lsof -i :80
 
-kill -9 1647
+kill -9 1528
 
 
 tmux attach
 tmux ls
 
+git config --global credential.helper "cache --timeout=360000"
+
+sudo systemctl start nginx
 
 https://flashy-radial-needle.SOLANA_MAINNET.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7
