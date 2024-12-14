@@ -112,8 +112,8 @@ app.get("/authenticate", async (req, res) => {
 app.get("/validate", async (req, res) => {
     const token = req.query.token
     const IsValid = validateSessionToken(token)
-    console.log(IsValid)
     if (IsValid){
+        console.log("creating new token")
         const payload = jwt.decode(token)
         const newToken = generateSessionToken(payload.userId)
         res.status(200).send({ success: true, message: 'TokenValid', token: newToken });
