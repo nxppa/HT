@@ -114,13 +114,13 @@ app.get("/validate", async (req, res) => {
     const IsValid = validateSessionToken(token)
     console.log(IsValid)
     if (IsValid){
-        res.status(200).send({ success: true, message: 'TokenValid', token: token });
-        
+        //Renew
+        const newToken = generateSessionToken(payload.userId)
+        res.status(200).send({ success: true, message: 'TokenValid', token: newToken });
     } else {
         res.status(403).send({ success: false, message: 'Token invalid', token: token });
 
     }
-
     return IsValid
 });
 
