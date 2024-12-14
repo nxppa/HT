@@ -49,9 +49,27 @@ app.listen(port, BackupIp, function (err) {
     if (err) console.log(err);
     console.log("Server listening on PORT", port);
 });
-app.use(cors({
-    origin: 'chrome-extension://lkdhledpbhaplhlkpidfelelcmiinknn', 
-}));
+
+const Origins = [
+    "chrome-extension://lkdhledpbhaplhlkpidfelelcmiinknn",
+    "chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll",
+]
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (Origins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+};
+
+app.use(cors(corsOptions));
 
 function ValidateKey(key){
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"))
