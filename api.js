@@ -50,7 +50,7 @@ app.listen(port, BackupIp, function (err) {
     console.log("Server listening on PORT", port);
 });
 app.use(cors({
-    origin: 'chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll', 
+    origin: 'chrome-extension://lkdhledpbhaplhlkpidfelelcmiinknn', 
 }));
 
 function ValidateKey(key){
