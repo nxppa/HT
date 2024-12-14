@@ -113,6 +113,14 @@ app.get("/validate", async (req, res) => {
     const token = req.query.token
     const IsValid = validateSessionToken(token)
     console.log(IsValid)
+    if (IsValid){
+        res.status(200).send({ success: true, message: 'TokenValid', token: token });
+        
+    } else {
+        res.status(403).send({ success: false, message: 'Token invalid', token: token });
+
+    }
+
     return IsValid
 });
 
