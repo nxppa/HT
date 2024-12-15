@@ -97,11 +97,10 @@ app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for al
         return res.status(400).send({ error: "Account parameter is required" });
     }
     const Response = await AnalyseAccount(AccountToScan)
-    /*
     if (typeof (Response) == "string") {
-        return res.status(404).send({ error: Response });
+       return res.status(200).send({Response});
+
     }
-    */
     res.status(200).send(Response);
 });
 app.get("/api/tools/generateWallet", async (req, res) => {
