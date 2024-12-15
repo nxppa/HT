@@ -26,6 +26,7 @@ function generateSessionToken(userId) {
     return jwt.sign({ userId, issuedAt, expiresAt }, SECRET_KEY);
 }
 function validateSessionToken(token) {
+    console.log(token)
     try {
         const payload = jwt.verify(token, SECRET_KEY);
         const currentTime = Math.floor(Date.now() / 1000);
@@ -88,7 +89,7 @@ function KeyCheck(res, key, token, Authentication) {
 }
 
 app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for all methods
-    if (!KeyCheck(res, req.query.key, req.query.session_token)) return;
+    if (!KeyCheck(res, req.query.key, req.query.session_token)) return; //TODO add support for private wallet scanning
 
     const AccountToScan = req.query.account
 
@@ -96,9 +97,11 @@ app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for al
         return res.status(400).send({ error: "Account parameter is required" });
     }
     const Response = await AnalyseAccount(AccountToScan)
+    /*
     if (typeof (Response) == "string") {
         return res.status(404).send({ error: Response });
     }
+    */
     res.status(200).send(Response);
 });
 app.get("/api/tools/generateWallet", async (req, res) => {
