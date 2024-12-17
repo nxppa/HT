@@ -141,7 +141,7 @@ app.get("/authenticate", async (req, res) => {
 
 
 app.get("/validate", async (req, res) => {
-    const token = req.query.token
+    const token = req.query.session_token
     const IsValid = validateSessionToken(token)
     if (IsValid){
         console.log("creating new token")
