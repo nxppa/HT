@@ -155,6 +155,10 @@ app.get("/validate", async (req, res) => {
     return IsValid
 });
 
+
+
+
+
 app.get("/api/tools/generateWallets", async (req, res) => {
     if (!KeyCheck(res, req.query.key)) return;
     const NumWallets = req.query.amount

@@ -1,0 +1,29 @@
+{
+    "879244945867804733": {
+        "Targets": {
+            "6LChaYRYtEYjLEHhzo4HdEmgNwu2aia8CM8VhR9wn6n7": {
+                "PriorityFee": 0.0001,
+                "MaxProportionSpending": 0.05,
+                "MinimumSpending": 0.1,
+                "MaxMarketCap": 0.04,
+                "Halted": true
+              }
+        }
+        
+    },
+    "715149749115945049": {
+        "Targets": {
+            "6LChaYRYtEYjLEHhzo4HdEmgNwu2aia8CM8VhR9wn6n7": {
+                "PriorityFee": 0.0001,
+                "MaxProportionSpending": 0.05,
+                "MinimumSpending": 0.1,
+                "MaxMarketCap": 0.04,
+                "Halted": true
+              }
+        }
+
+    }
+
+
+    
+}

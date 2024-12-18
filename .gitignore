@@ -1,6 +1,5 @@
 node_modules/*
 
-db/
 Storage/
 /test.js
 /temp
