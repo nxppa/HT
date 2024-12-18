@@ -98,7 +98,6 @@ function ValidateKey(key){
 }
 
 function KeyCheck(res, key, token, Authentication, clientIp) {
-    console.log(key, token, clientIp)
     if (blacklist[token]) {
         res.status(401).send({ error: "Token is blacklisted" });
         return false;
@@ -179,6 +178,7 @@ app.get("/api/tools/generateWallet", async (req, res) => {
     res.status(200).send(Response);
 });
 app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for all methods
+    const clientIp = req.ip;
     if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
 
     const AccountToScan = req.query.account
@@ -194,6 +194,7 @@ app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for al
     res.status(200).send(Response);
 });
 app.get("/api/tools/generateWallets", async (req, res) => {
+    const clientIp = req.ip;
     if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     const NumWallets = req.query.amount
     if (!NumWallets) {
