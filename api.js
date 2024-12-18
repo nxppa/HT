@@ -56,6 +56,7 @@ function validateSessionToken(token, currentIp) {
 
         return payload.userId;
     } catch (err) {
+        console.log(err)
         return null;
     }
 }
@@ -98,6 +99,7 @@ function ValidateKey(key){
 }
 
 function KeyCheck(res, key, token, Authentication, clientIp) {
+    console.log(key, token, clientIp)
     if (blacklist[token]) {
         res.status(401).send({ error: "Token is blacklisted" });
         return false;
