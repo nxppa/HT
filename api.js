@@ -50,7 +50,7 @@ function validateSessionToken(token, currentIp) {
             throw new Error('Token blacklisted');
         }
         if (payload.clientIp !== currentIp) {
-            throw new Error('IP address mismatch: ', payload.clientIp, currentIp);
+            throw new Error(`IP address mismatch. payload: ${payload.clientIp} | Current: ${currentIp}`);
         }
 
         return payload.userId;
