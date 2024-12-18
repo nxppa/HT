@@ -49,9 +49,8 @@ function validateSessionToken(token, currentIp) {
         if (blacklist[payload.jti]) {
             throw new Error('Token blacklisted');
         }
-
         if (payload.clientIp !== currentIp) {
-            throw new Error('IP address mismatch');
+            throw new Error('IP address mismatch: ', payload.clientIp, currentIp);
         }
 
         return payload.userId;
