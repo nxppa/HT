@@ -13,7 +13,7 @@ const AuthTimeMins = 8;
 let blacklist = {};
 
 // Configure Express to trust proxies (if behind a proxy)
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 // Function to invalidate token
 function invalidateToken(token) {
@@ -158,6 +158,12 @@ app.get("/api/tools/getBalance", async (req, res) => {
     res.status(200).send(Response);
 });
 
+app.get("/getMe", async (req, res) => {
+    const clientIp = req.ip;
+    console.log(`Client IP: ${clientIp}`);
+    res.status(200).send({clientIp});
+});
+
 
 app.get("/api/tools/generateWallet", async (req, res) => {
     if (!KeyCheck(res, req.query.key, req.query.session_token)) return;
@@ -211,3 +217,4 @@ app.get("/api/tools/generateWallets", async (req, res) => {
     }
     res.status(200).send(Response);
 });
+
