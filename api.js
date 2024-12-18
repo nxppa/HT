@@ -147,7 +147,8 @@ app.get("/validate", async (req, res) => {
 
 
 app.get("/api/tools/getBalance", async (req, res) => {
-    if (!KeyCheck(res, req.query.key, req.query.session_token)) return;
+    const clientIp = req.ip;
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     const Account = req.query.account
     if (!Account) {
         return res.status(400).send({ error: "Account parameter is required" });
@@ -167,7 +168,8 @@ app.get("/getMe", async (req, res) => {
 
 
 app.get("/api/tools/generateWallet", async (req, res) => {
-    if (!KeyCheck(res, req.query.key, req.query.session_token)) return;
+    const clientIp = req.ip;
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     const keypair = Keypair.generate();
     const PubKey = keypair.publicKey.toBase58()
     const PrivKey = Buffer.from(keypair.secretKey).toString("hex")
@@ -177,7 +179,7 @@ app.get("/api/tools/generateWallet", async (req, res) => {
     res.status(200).send(Response);
 });
 app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for all methods
-    if (!KeyCheck(res, req.query.key, req.query.session_token)) return; //TODO add support for private wallet scanning
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
 
     const AccountToScan = req.query.account
 
@@ -192,7 +194,7 @@ app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for al
     res.status(200).send(Response);
 });
 app.get("/api/tools/generateWallets", async (req, res) => {
-    if (!KeyCheck(res, req.query.key)) return;
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     const NumWallets = req.query.amount
     if (!NumWallets) {
         return res.status(400).send({ error: "Amount parameter is required" });
