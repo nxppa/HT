@@ -139,6 +139,7 @@ app.get("/validate", async (req, res) => {
         const newToken = generateSessionToken(payload.userId, clientIp);
         invalidateToken(token); // Invalidate the old token
         res.status(200).send({ success: true, message: 'TokenValid', token: newToken });
+        console.log("reinstating key")
     } else {
         res.status(403).send({ success: false, message: 'Token invalid', token: token });
     }
