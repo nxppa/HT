@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const { generateKey, decodeKey } = require("./Operations/PassGen.js")
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
 const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const app = express();
@@ -14,6 +15,13 @@ let blacklist = {};
 
 // Configure Express to trust proxies (if behind a proxy)
 app.set('trust proxy', 1);
+
+function GetUserData(Key) {
+    const User = decodeKey(Key)
+    const AllUsersData = JSON.parse(fs.readFileSync("./db/UserValues.json"));
+    const UserData = AllUsersData[User]
+    return UserData
+}
 
 // Function to invalidate token
 function invalidateToken(token) {
@@ -28,7 +36,9 @@ function invalidateToken(token) {
 function generateSessionToken(userId, clientIp) {
     const issuedAt = Math.floor(Date.now() / 1000);
     const expiresAt = issuedAt + AuthTimeMins * 60;
-    return jwt.sign({ userId, clientIp, issuedAt, expiresAt }, SECRET_KEY, { jwtid: generateJti() });
+    const NewToken = jwt.sign({ userId, clientIp, issuedAt, expiresAt }, SECRET_KEY, { jwtid: generateJti() });
+
+    return NewToken
 }
 
 // Function to generate a unique JWT ID
@@ -91,7 +101,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-function ValidateKey(key){
+function ValidateKey(key) {
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"));
     const KeyOwner = ValidKeys[key];
     return KeyOwner;
@@ -103,7 +113,7 @@ function KeyCheck(res, key, token, Authentication, clientIp) {
         return false;
     }
 
-    if ((!token || !validateSessionToken(token, clientIp)) && (!key || !ValidateKey(key)) ) {
+    if ((!token || !validateSessionToken(token, clientIp)) && (!key || !ValidateKey(key))) {
         res.status(401).send({ error: "API key needed" });
         return false;
     }
@@ -129,12 +139,23 @@ app.get("/authenticate", async (req, res) => {
     return res.status(200).send({ success: true, message: 'Authentication successful!', token: token });
 });
 
+app.get("/getData", async (req, res) => {
+    const clientIp = req.ip;
+    const key = req.query.key;
+
+    if (!KeyCheck(res, key, req.query.session_token, true, clientIp)) return;
+    if (key){
+        const Data = GetUserData(key)
+        res.status(200).send(Data);
+    }
+
+})
 app.get("/validate", async (req, res) => {
     const token = req.query.session_token;
     const clientIp = req.ip;
     const IsValid = validateSessionToken(token, clientIp);
 
-    if (IsValid){
+    if (IsValid) {
         const payload = jwt.decode(token);
         const newToken = generateSessionToken(payload.userId, clientIp);
         invalidateToken(token); // Invalidate the old token
@@ -163,7 +184,7 @@ app.get("/api/tools/getBalance", async (req, res) => {
 app.get("/getMe", async (req, res) => {
     const clientIp = req.ip;
     console.log(`Client IP: ${clientIp}`);
-    res.status(200).send({clientIp});
+    res.status(200).send({ clientIp });
 });
 
 
@@ -189,7 +210,7 @@ app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for al
     }
     const Response = await AnalyseAccount(AccountToScan)
     if (typeof (Response) == "string") {
-       return res.status(200).send({Response});
+        return res.status(200).send({ Response });
 
     }
     res.status(200).send(Response);
