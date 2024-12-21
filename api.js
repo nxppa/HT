@@ -169,6 +169,7 @@ app.get("/validate", async (req, res) => {
         res.status(200).send({ success: true, message: 'TokenValid', token: newToken });
         console.log("reinstating key")
     } else {
+        console.log("invalid token: ", token)
         res.status(403).send({ success: false, message: 'Token invalid', token: token });
     }
 });
