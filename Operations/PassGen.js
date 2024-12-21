@@ -79,7 +79,7 @@ function decodeKey(key) {
     
     // Convert seedBig to bytes to compute the actual checksum
     const byteArray = bigIntToBytes(seedBig);
-    const actualChecksum = Number(byteArray.reduce((sum, byte) => sum + byte, 0n) % 256n);
+    const actualChecksum = Number(byteArray.reduce((sum, byte) => sum + BigInt(byte), 0n) % 256n);
     
     // Validate the checksum
     if (actualChecksum !== expectedChecksum) {
@@ -99,10 +99,8 @@ function decodeKey(key) {
     // XOR with fixed keys to retrieve the original seed
     fixedKeys.forEach(key => {
         originalSeed ^= key;
-    }
-
-    );
-
+    });
+    
     return originalSeed.toString();
 }
 
