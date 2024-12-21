@@ -150,7 +150,7 @@ app.get("/getData", async (req, res) => {
         const Data = GetUserData(key)
         res.status(200).send(Data);
     } else if (SessionToken){
-        const key = TokenToKey(SessionToken)
+        const key = TokenToKey[SessionToken]
         const Data = GetUserData(key)
         res.status(200).send(Data);
         
