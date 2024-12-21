@@ -12,7 +12,7 @@ const BackupIp = "142.93.123.245";
 const SECRET_KEY = 'oeruahgbaoieurgboiWGEOYUFGPiweh9f'; // TODO: Use an environment variable
 const AuthTimeMins = 8;
 let blacklist = {};
-
+let TokenToKey = {}
 // Configure Express to trust proxies (if behind a proxy)
 app.set('trust proxy', 1);
 
@@ -30,15 +30,16 @@ function invalidateToken(token) {
     blacklist[decoded.jti] = true;
     setTimeout(() => {
         delete blacklist[decoded.jti];
+        delete TokenToKey[decoded.jti]
     }, (decoded.exp * 1000) - Date.now());
 }
 
 // Function to generate session token with IP
-function generateSessionToken(userId, clientIp) {
+function generateSessionToken(Key, clientIp) {
     const issuedAt = Math.floor(Date.now() / 1000);
     const expiresAt = issuedAt + AuthTimeMins * 60;
-    const NewToken = jwt.sign({ userId, clientIp, issuedAt, expiresAt }, SECRET_KEY, { jwtid: generateJti() });
-
+    const NewToken = jwt.sign({ Key, clientIp, issuedAt, expiresAt }, SECRET_KEY, { jwtid: generateJti() });
+    TokenToKey[NewToken] = Key
     return NewToken
 }
 
@@ -129,8 +130,7 @@ app.get("/authenticate", async (req, res) => {
     if (!KeyCheck(res, key, req.query.session_token, true, clientIp)) return;
 
     const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"));
-    const userId = ValidKeys[key];
-    const token = generateSessionToken(userId, clientIp);
+    const token = generateSessionToken(key, clientIp);
     console.log("Generating new token:", token);
 
     const Seconds = AuthTimeMins * 60;
@@ -158,7 +158,7 @@ app.get("/validate", async (req, res) => {
 
     if (IsValid) {
         const payload = jwt.decode(token);
-        const newToken = generateSessionToken(payload.userId, clientIp);
+        const newToken = generateSessionToken(TokenToKey[token], clientIp);
         invalidateToken(token); // Invalidate the old token
         res.status(200).send({ success: true, message: 'TokenValid', token: newToken });
         console.log("reinstating key")
