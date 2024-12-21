@@ -66,7 +66,7 @@ function validateSessionToken(token, currentIp) {
             throw new Error(`IP address mismatch. payload: ${payload.clientIp} | Current: ${currentIp}`);
         }
 
-        return payload.userId;
+        return payload.Key;
     } catch (err) {
         console.log(err)
         return null;
