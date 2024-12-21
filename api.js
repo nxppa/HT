@@ -152,6 +152,7 @@ app.get("/getData", async (req, res) => {
     } else if (SessionToken){
         const key = TokenToKey[SessionToken]
         const Data = GetUserData(key)
+        console.log("giving data: ", Data)
         res.status(200).send(Data);
         
     }
