@@ -17,6 +17,7 @@ let blacklist = {};
 app.set('trust proxy', 1);
 
 function GetUserData(Key) {
+    console.log(Key)
     const User = decodeKey(Key)
     const AllUsersData = JSON.parse(fs.readFileSync("./db/UserValues.json"));
     const UserData = AllUsersData[User]
