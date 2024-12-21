@@ -143,11 +143,16 @@ app.get("/authenticate", async (req, res) => {
 app.get("/getData", async (req, res) => {
     const clientIp = req.ip;
     const key = req.query.key;
-
-    if (!KeyCheck(res, key, req.query.session_token, true, clientIp)) return;
+    const SessionToken = req.query.session_token
+    if (!KeyCheck(res, key, SessionToken, true, clientIp)) return;
     if (key){
         const Data = GetUserData(key)
         res.status(200).send(Data);
+    } else if (SessionToken){
+        const key = TokenToKey(SessionToken)
+        const Data = GetUserData(key)
+        res.status(200).send(Data);
+        
     }
 
 })
