@@ -20,6 +20,7 @@ function GetUserData(Key) {
     const User = decodeKey(Key)
     const AllUsersData = JSON.parse(fs.readFileSync("./db/UserValues.json"));
     const UserData = AllUsersData[User]
+    console.log(AllUsersData, UserData, Key)
     return UserData
 }
 
