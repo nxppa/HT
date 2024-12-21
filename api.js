@@ -36,6 +36,7 @@ function invalidateToken(token) {
 
 // Function to generate session token with IP
 function generateSessionToken(Key, clientIp) {
+    console.log(Key)
     const issuedAt = Math.floor(Date.now() / 1000);
     const expiresAt = issuedAt + AuthTimeMins * 60;
     const NewToken = jwt.sign({ Key, clientIp, issuedAt, expiresAt }, SECRET_KEY, { jwtid: generateJti() });
