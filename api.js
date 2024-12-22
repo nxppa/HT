@@ -153,10 +153,9 @@ app.get("/getData", async (req, res) => {
         const key = TokenToKey[SessionToken]
         const Data = GetUserData(key)
         console.log("giving data: ", Data)
-        res.status(200).send(Data);
-        
+         res.status(200).send(Data);
     }
-
+    return
 })
 app.get("/validate", async (req, res) => {
     const token = req.query.session_token;
