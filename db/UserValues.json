@@ -7,7 +7,8 @@
                 "MinimumSpending": 0.1,
                 "MaxMarketCap": 0.04,
                 "Halted": true,
-                "Alias": "Assasin"
+                "Alias": "Assasin",
+                "Valid": true
               }
         }
         
@@ -20,7 +21,8 @@
                 "MinimumSpending": 0.1,
                 "MaxMarketCap": 0.04,
                 "Halted": true,
-                "Alias": "Assasin"
+                "Alias": "Assasin",
+                "Valid": true
               },
             "7D5gzuKRnBjKHaNP3rTF32NDS6UcqPNe9P6xScnxBS1o": {
                 "PriorityFee": 0.0001,
@@ -28,8 +30,9 @@
                 "MinimumSpending": 0.1,
                 "MaxMarketCap": 0.04,
                 "Halted": true,
-                "Alias": "Random guy"
-              }
+                "Alias": "Random guy",
+                "Valid": true  
+            }
         }
     }
 
