@@ -14,14 +14,42 @@ const AuthTimeMins = 8;
 let blacklist = {};
 let TokenToKey = {}
 app.set('trust proxy', 1);
-function EditDataBaseValue(UserID, Target, Param, Value){
-  const path = "./db/UserValues.json"
-  const data = fs.readFileSync(path);
-  Info = JSON.parse(data);
-  console.log(UserID, Target, Param)
-  Info[UserID].Targets[Target][Param] = Value
-  console.log(Info)
-  fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+
+
+const DataMap = {
+    "PriorityFee": "float",
+    "MaxProportionSpending": "float",
+    "MinimumSpending": "float",
+    "MaxMarketCap": "float",
+    "Halted": "boolean",
+    "Valid": "boolean",
+    "Alias": "string",
+}
+function convertValue(param, value) {
+    const type = DataMap[param];
+    switch (type) {
+        case "float":
+            return parseFloat(value);
+        case "boolean":
+            return value === "true" || value === true;
+        case "string":
+            return String(value);
+        default:
+            throw new Error(`Unsupported type for param: ${param}`);
+    }
+}
+function EditDataBaseValue(UserID, Target, Param, Value) {
+    const path = "./db/UserValues.json";
+    const data = fs.readFileSync(path);
+    const Info = JSON.parse(data);
+    console.log("Before:", Info);
+    if (!(Param in DataMap)) {
+        throw new Error(`Unknown parameter: ${Param}`);
+    }
+    const convertedValue = convertValue(Param, Value);
+    Info[UserID].Targets[Target][Param] = convertedValue;
+    console.log("After Update:", Info);
+    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
 }
 
 
@@ -156,14 +184,14 @@ app.get("/getData", async (req, res) => {
     const key = req.query.key;
     const SessionToken = req.query.session_token
     if (!KeyCheck(res, key, SessionToken, true, clientIp)) return;
-    if (key){
+    if (key) {
         const Data = GetUserData(key)
         res.status(200).send(Data);
-    } else if (SessionToken){
+    } else if (SessionToken) {
         const key = TokenToKey[SessionToken]
         const Data = GetUserData(key)
         console.log("giving data: ", Data)
-         res.status(200).send(Data);
+        res.status(200).send(Data);
     }
     return
 })
@@ -264,35 +292,26 @@ app.get("/api/tools/generateWallets", async (req, res) => {
 
 
 
-  const DataMap = {
-    "PriorityFee": "float",
-    "MaxProportionSpending": "float",
-    "MinimumSpending": "float",
-    "MaxMarketCap": "float",
-    "Halted": "boolean",
-    "Valid": "boolean",
-    "Alias": "string",
-  }
 
 app.post("/setValue", async (req, res) => { //TODO add ratelimits for all methods
     const clientIp = req.ip;
     if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
     //TODO add sanity checks for params
     let UserID = null
-    if (req.query.key){
+    if (req.query.key) {
         UserID = decodeKey(req.query.key)
     } else if (req.query.session_token) {
         const UserKey = TokenToKey[req.query.session_token]
         UserID = decodeKey(UserKey)
     }
-    
+
     console.log(UserID)
     const AccountToEdit = req.query.account
     const Param = req.query.param
     const Value = req.query.value
     EditDataBaseValue(UserID, AccountToEdit, Param, Value)
 
-    res.status(200).send({success: true});
+    res.status(200).send({ success: true });
 });
 
 //TODO make setValues endpoint
