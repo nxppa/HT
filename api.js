@@ -43,7 +43,8 @@ function NewWallet(UserID, WalletAddress, WalletData){
     const path = "./db/UserValues.json";
     const data = fs.readFileSync(path);
     const Info = JSON.parse(data);
-    Info[UserID].Target[WalletAddress] = WalletData
+
+    Info[UserID].Targets[WalletAddress] = WalletData
 
     //TODO make a check for duplicate wallets
 
