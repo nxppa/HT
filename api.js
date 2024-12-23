@@ -16,6 +16,7 @@ let TokenToKey = {}
 app.set('trust proxy', 1);
 
 
+
 const DataMap = {
     "PriorityFee": "float",
     "MaxProportionSpending": "float",
@@ -38,6 +39,16 @@ function convertValue(param, value) {
             throw new Error(`Unsupported type for param: ${param}`);
     }
 }
+function NewWallet(UserID, WalletAddress, WalletData){
+    const path = "./db/UserValues.json";
+    const data = fs.readFileSync(path);
+    const Info = JSON.parse(data);
+    Info[UserID].Target[WalletAddress] = WalletData
+
+    //TODO make a check for duplicate wallets
+
+}
+
 function EditDataBaseValue(UserID, Target, Param, Value) {
     const path = "./db/UserValues.json";
     const data = fs.readFileSync(path);
@@ -305,14 +316,29 @@ app.post("/setValue", async (req, res) => { //TODO add ratelimits for all method
         const UserKey = TokenToKey[req.query.session_token]
         UserID = decodeKey(UserKey)
     }
-
     console.log(UserID)
     const AccountToEdit = req.query.account
     const Param = req.query.param
     const Value = req.query.value
     const DataDictionary = EditDataBaseValue(UserID, AccountToEdit, Param, Value)
-
     res.status(200).send({ success: true, data: DataDictionary});
 });
+app.post("/newWallet", async (req, res) => { //TODO add ratelimits for all methods
+    const clientIp = req.ip;
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
+    //TODO add sanity checks for params
+    let UserID = null
+    if (req.query.key) {
+        UserID = decodeKey(req.query.key)
+    } else if (req.query.session_token) {
+        const UserKey = TokenToKey[req.query.session_token]
+        UserID = decodeKey(UserKey)
+    }
+    const Params = req.body
+    NewWallet(UserID, req.query.account, Params)
+    //TODO add new wallet
+    res.status(200).send({ success: true, data: DataDictionary});
+});
+
 
 //TODO make setValues endpoint
