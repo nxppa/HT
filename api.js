@@ -57,6 +57,7 @@ function RemoveWallet(UserID, AccountToRemove) {
     const data = fs.readFileSync(path);
     const Info = JSON.parse(data);
     delete Info[UserID].Targets[AccountToRemove];
+    console.log(Info)
     fs.writeFileSync(path, JSON.stringify(Info, null, 2));
 }
 
@@ -364,6 +365,7 @@ app.post("/removeWallet", async (req, res) => { //TODO add ratelimits for all me
         UserID = decodeKey(UserKey)
     }
     const AccountToRemove = req.query.account
+    console.log("removing: ", AccountToRemove)
     RemoveWallet(UserID, AccountToRemove)
     //TODO add new wallet
     res.status(200).send({ success: true, data: AccountToRemove});
