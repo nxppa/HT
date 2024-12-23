@@ -45,6 +45,7 @@ function NewWallet(UserID, WalletAddress, WalletData){
     const Info = JSON.parse(data);
 
     Info[UserID].Targets[WalletAddress] = WalletData
+    console.log(Info)
     fs.writeFileSync(path, JSON.stringify(Info, null, 2));
 
     //TODO make a check for duplicate wallets
