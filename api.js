@@ -20,6 +20,7 @@ function EditDataBaseValue(UserID, Target, Param, Value){
   Info = JSON.parse(data);
   console.log(UserID, Target, Param)
   Info[UserID].Targets[Target][Param] = Value
+  console.log(Info)
   fs.writeFileSync(path, JSON.stringify(Info, null, 2));
 }
 
