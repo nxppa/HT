@@ -86,6 +86,7 @@ app.listen(port, BackupIp, function (err) {
 const Origins = [
     "chrome-extension://lkdhledpbhaplhlkpidfelelcmiinknn",
     "chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll",
+    "chrome-extension://klehhdabnpholjlfjflaifpkgjnekjbi",
 ];
 
 const corsOptions = {
