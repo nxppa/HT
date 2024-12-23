@@ -13,8 +13,15 @@ const SECRET_KEY = 'oeruahgbaoieurgboiWGEOYUFGPiweh9f'; // TODO: Use an environm
 const AuthTimeMins = 8;
 let blacklist = {};
 let TokenToKey = {}
-// Configure Express to trust proxies (if behind a proxy)
 app.set('trust proxy', 1);
+function EditDataBaseValue(UserID, Target, Param, Value){
+  const path = "./db/UserValues"
+  const data = fs.readFileSync(path);
+  Info = JSON.parse(data);
+  Info[UserID][Target][Param] = Value
+  fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+}
+
 
 function GetUserData(Key) {
     const User = decodeKey(Key)
@@ -253,3 +260,37 @@ app.get("/api/tools/generateWallets", async (req, res) => {
     res.status(200).send(Response);
 });
 
+
+
+  const DataMap = {
+    "PriorityFee": "float",
+    "MaxProportionSpending": "float",
+    "MinimumSpending": "float",
+    "MaxMarketCap": "float",
+    "Halted": "boolean",
+    "Valid": "boolean",
+    "Alias": "string",
+  }
+
+app.post("/setValue", async (req, res) => { //TODO add ratelimits for all methods
+    const clientIp = req.ip;
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
+    //TODO add sanity checks for params
+    let UserID = null
+    if (req.query.key){
+        UserID = decodeKey(req.query.key)
+    } else if (req.query.session_token) {
+        const UserKey = TokenToKey[req.query.session_token]
+        UserID = decodeKey(UserKey)
+    }
+    
+    console.log(UserID)
+    const AccountToEdit = req.query.account
+    const Param = req.query.param
+    const Value = req.query.value
+    EditDataBaseValue(UserID, AccountToEdit, Param, Value)
+
+    res.status(200).send(Response);
+});
+
+//TODO make setValues endpoint
