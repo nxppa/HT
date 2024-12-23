@@ -15,7 +15,7 @@ let blacklist = {};
 let TokenToKey = {}
 app.set('trust proxy', 1);
 function EditDataBaseValue(UserID, Target, Param, Value){
-  const path = "./db/UserValues"
+  const path = "./db/UserValues.json"
   const data = fs.readFileSync(path);
   Info = JSON.parse(data);
   Info[UserID][Target][Param] = Value
