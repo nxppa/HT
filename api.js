@@ -51,6 +51,14 @@ function NewWallet(UserID, WalletAddress, WalletData){
     //TODO make a check for duplicate wallets
 
 }
+    
+function RemoveWallet(UserID, AccountToRemove) {
+    const path = "./db/UserValues.json";
+    const data = fs.readFileSync(path);
+    const Info = JSON.parse(data);
+    delete Info[UserID].Targets[AccountToRemove];
+    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+}
 
 function EditDataBaseValue(UserID, Target, Param, Value) {
     const path = "./db/UserValues.json";
@@ -342,6 +350,23 @@ app.post("/newWallet", async (req, res) => { //TODO add ratelimits for all metho
     console.log("Params: ", Params)
     //TODO add new wallet
     res.status(200).send({ success: true, data: Params});
+});
+
+app.post("/removeWallet", async (req, res) => { //TODO add ratelimits for all methods
+    const clientIp = req.ip;
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
+    //TODO add sanity checks for params
+    let UserID = null
+    if (req.query.key) {
+        UserID = decodeKey(req.query.key)
+    } else if (req.query.session_token) {
+        const UserKey = TokenToKey[req.query.session_token]
+        UserID = decodeKey(UserKey)
+    }
+    const AccountToRemove = req.query.account
+    RemoveWallet(UserID, AccountToRemove)
+    //TODO add new wallet
+    res.status(200).send({ success: true, data: AccountToRemove});
 });
 
 
