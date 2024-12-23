@@ -18,6 +18,7 @@ function EditDataBaseValue(UserID, Target, Param, Value){
   const path = "./db/UserValues.json"
   const data = fs.readFileSync(path);
   Info = JSON.parse(data);
+  console.log(UserID, Target, Param)
   Info[UserID][Target][Param] = Value
   fs.writeFileSync(path, JSON.stringify(Info, null, 2));
 }
