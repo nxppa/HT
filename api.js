@@ -338,7 +338,9 @@ app.post("/newWallet", async (req, res) => { //TODO add ratelimits for all metho
         UserID = decodeKey(UserKey)
     }
     const Params = req.body
+    console.log
     NewWallet(UserID, req.query.account, Params)
+    console.log("Params: ", Params)
     //TODO add new wallet
     res.status(200).send({ success: true, data: Params});
 });
