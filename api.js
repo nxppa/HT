@@ -50,6 +50,7 @@ function EditDataBaseValue(UserID, Target, Param, Value) {
     Info[UserID].Targets[Target][Param] = convertedValue;
     console.log("After Update:", Info);
     fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+    return Info
 }
 
 
@@ -309,9 +310,9 @@ app.post("/setValue", async (req, res) => { //TODO add ratelimits for all method
     const AccountToEdit = req.query.account
     const Param = req.query.param
     const Value = req.query.value
-    EditDataBaseValue(UserID, AccountToEdit, Param, Value)
+    const DataDictionary = EditDataBaseValue(UserID, AccountToEdit, Param, Value)
 
-    res.status(200).send({ success: true });
+    res.status(200).send({ success: true, data: DataDictionary});
 });
 
 //TODO make setValues endpoint
