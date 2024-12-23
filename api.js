@@ -292,7 +292,7 @@ app.post("/setValue", async (req, res) => { //TODO add ratelimits for all method
     const Value = req.query.value
     EditDataBaseValue(UserID, AccountToEdit, Param, Value)
 
-    res.status(200).send(Response);
+    res.status(200).send({success: true});
 });
 
 //TODO make setValues endpoint
