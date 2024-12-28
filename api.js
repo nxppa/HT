@@ -56,6 +56,7 @@ function SetWalletAddress(UserID, Old, New){
     const data = fs.readFileSync(path);
     const Info = JSON.parse(data);
     //TODO make sanity check here
+    console.log("Chaning!")
     Info[UserID].Targets[New] = Info[UserID].Targets[Old]
     delete Info[UserID].Targets[Old]
     fs.writeFileSync(path, JSON.stringify(Info, null, 2));
