@@ -51,13 +51,15 @@ function NewWallet(UserID, WalletAddress, WalletData){
     //TODO make a check for duplicate wallets
 
 }
-function SetWalletAddress(UserID, Old, New){
+function SetWalletAddress(UserID, Old, New, Data){
     const path = "./db/UserValues.json";
     const data = fs.readFileSync(path);
     const Info = JSON.parse(data);
     //TODO make sanity check here
     console.log("Chaning!")
-    Info[UserID].Targets[New] = Info[UserID].Targets[Old]
+    Info[UserID].Targets[New] = Data || Info[UserID].Targets[Old]
+
+
     delete Info[UserID].Targets[Old]
     fs.writeFileSync(path, JSON.stringify(Info, null, 2));
     return Info[UserID]
@@ -383,7 +385,8 @@ app.post("/setWalletAddress", async (req, res) => { //TODO add ratelimits for al
         const UserKey = TokenToKey[req.query.session_token]
         UserID = decodeKey(UserKey)
     }
-    const data = SetWalletAddress(UserID, req.query.old, req.query.new)
+    const Params = req.body
+    const data = SetWalletAddress(UserID, req.query.old, req.query.new, Params)
     res.status(200).send({ success: true, data: data});
 });
 
