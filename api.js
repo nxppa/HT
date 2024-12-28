@@ -51,7 +51,17 @@ function NewWallet(UserID, WalletAddress, WalletData){
     //TODO make a check for duplicate wallets
 
 }
-    
+function SetWalletAddress(UserID, Old, New){
+    const path = "./db/UserValues.json";
+    const data = fs.readFileSync(path);
+    const Info = JSON.parse(data);
+    //TODO make sanity check here
+    Info[UserID].Targets[New] = Info[UserID].Targets[Old]
+    delete Info[UserID].Targets[Old]
+    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+    return Info[UserID]
+}
+
 function RemoveWallet(UserID, AccountToRemove) {
     const path = "./db/UserValues.json";
     const data = fs.readFileSync(path);
@@ -73,9 +83,16 @@ function EditDataBaseValue(UserID, Target, Param, Value) {
     Info[UserID].Targets[Target][Param] = convertedValue;
     console.log("After Update:", Info);
     fs.writeFileSync(path, JSON.stringify(Info, null, 2));
-    return Info
+    return Info[UserID]
 }
-
+function SetDataBaseValues(UserID, Target, Values){
+    const path = "./db/UserValues.json";
+    const data = fs.readFileSync(path);
+    const Info = JSON.parse(data);
+    Info[UserID].Targets[Target] = Values;
+    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+    return Values
+}
 
 function GetUserData(Key) {
     const User = decodeKey(Key)
@@ -335,6 +352,41 @@ app.post("/setValue", async (req, res) => { //TODO add ratelimits for all method
     const DataDictionary = EditDataBaseValue(UserID, AccountToEdit, Param, Value)
     res.status(200).send({ success: true, data: DataDictionary});
 });
+
+
+app.post("/setValues", async (req, res) => { //TODO add ratelimits for all methods
+    const clientIp = req.ip;
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
+    //TODO add sanity checks for params
+    let UserID = null
+    if (req.query.key) {
+        UserID = decodeKey(req.query.key)
+    } else if (req.query.session_token) {
+        const UserKey = TokenToKey[req.query.session_token]
+        UserID = decodeKey(UserKey)
+    }
+    const Params = req.body
+    const AccountToEdit = req.query.account
+    const DataSet = SetDataBaseValues(UserID, AccountToEdit, Params)
+    res.status(200).send({ success: true, data: DataSet});
+});
+
+app.post("/setWalletAddress", async (req, res) => { //TODO add ratelimits for all methods
+    const clientIp = req.ip;
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; 
+    //TODO add sanity checks for params
+    let UserID = null
+    if (req.query.key) {
+        UserID = decodeKey(req.query.key)
+    } else if (req.query.session_token) {
+        const UserKey = TokenToKey[req.query.session_token]
+        UserID = decodeKey(UserKey)
+    }
+    const data = SetWalletAddress(UserID, req.query.old, req.query.new)
+    res.status(200).send({ success: true, data: data});
+});
+
+
 app.post("/newWallet", async (req, res) => { //TODO add ratelimits for all methods
     const clientIp = req.ip;
     if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
