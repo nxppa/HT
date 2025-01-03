@@ -39,69 +39,76 @@ function convertValue(param, value) {
             throw new Error(`Unsupported type for param: ${param}`);
     }
 }
-function NewWallet(UserID, WalletAddress, WalletData){
-    const path = "./db/UserValues.json";
+function GetData(JSONFile){
+    const path = `./db/${JSONFile}.json`;
     const data = fs.readFileSync(path);
     const Info = JSON.parse(data);
+    return Info
+}
+function WriteData(JSONFile, Dictionary){
+    const path = `./db/${JSONFile}.json`;
+    fs.writeFileSync(path, JSON.stringify(Dictionary, null, 2));
+}
+function KeyToUser(Key){
+    const Passes = GetData("Passes")
+    const User = Passes[Key]
+    return User
+}
 
-    Info[UserID].Targets[WalletAddress] = WalletData
-    console.log(Info)
-    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+
+
+function NewWallet(UserID, WalletAddress, WalletData){
+    let UserValues = GetData("UserValues")
+    UserValues[UserID].Targets[WalletAddress] = WalletData
+    console.log(UserValues)
+    WriteData("UserValues", UserValues)
 
     //TODO make a check for duplicate wallets
+}
+function NewUser(DiscordID){
+    //Create new pass, new uservalues
 
 }
+
+
 function SetWalletAddress(UserID, Old, New, Data){
-    const path = "./db/UserValues.json";
-    const data = fs.readFileSync(path);
-    const Info = JSON.parse(data);
+    let UserValues = GetData("UserValues")
     //TODO make sanity check here
     console.log("Chaning!")
-    Info[UserID].Targets[New] = Data || Info[UserID].Targets[Old]
-
-
-    delete Info[UserID].Targets[Old]
-    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
-    return Info[UserID]
+    UserValues[UserID].Targets[New] = Data || UserValues[UserID].Targets[Old]
+    delete UserValues[UserID].Targets[Old]
+    WriteData("UserValues", UserValues)
+    return UserValues[UserID]
 }
 
 function RemoveWallet(UserID, AccountToRemove) {
-    const path = "./db/UserValues.json";
-    const data = fs.readFileSync(path);
-    const Info = JSON.parse(data);
-    delete Info[UserID].Targets[AccountToRemove];
-    console.log(Info)
-    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+    let UserValues = GetData("UserValues")
+    delete UserValues[UserID].Targets[AccountToRemove];
+    WriteData("UserValues", UserValues)
 }
 
 function EditDataBaseValue(UserID, Target, Param, Value) {
-    const path = "./db/UserValues.json";
-    const data = fs.readFileSync(path);
-    const Info = JSON.parse(data);
-    console.log("Before:", Info);
+    let UserValues = GetData("UserValues")
     if (!(Param in DataMap)) {
         throw new Error(`Unknown parameter: ${Param}`);
     }
     const convertedValue = convertValue(Param, Value);
-    Info[UserID].Targets[Target][Param] = convertedValue;
-    console.log("After Update:", Info);
-    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
-    return Info[UserID]
+    UserValues[UserID].Targets[Target][Param] = convertedValue;
+    WriteData("UserValues", UserValues)
+    return UserValues[UserID]
 }
 function SetDataBaseValues(UserID, Target, Values){
-    const path = "./db/UserValues.json";
-    const data = fs.readFileSync(path);
-    const Info = JSON.parse(data);
-    Info[UserID].Targets[Target] = Values;
-    fs.writeFileSync(path, JSON.stringify(Info, null, 2));
+    let UserValues = GetData("UserValues")
+    UserValues[UserID].Targets[Target] = Values;
+    WriteData("UserValues", UserValues)
     return Values
 }
 
 function GetUserData(Key) {
     const User = decodeKey(Key)
-    const AllUsersData = JSON.parse(fs.readFileSync("./db/UserValues.json"));
-    const UserData = AllUsersData[User]
-    console.log(User, AllUsersData, UserData, Key)
+    const UserValues = GetData("UserValues")
+    const UserData = UserValues[User]
+    console.log(User, UserValues, UserData, Key)
     return UserData
 }
 
@@ -187,7 +194,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 function ValidateKey(key) {
-    const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"));
+    const ValidKeys = GetData("Passes")
     const KeyOwner = ValidKeys[key];
     return KeyOwner;
 }
@@ -209,16 +216,11 @@ function KeyCheck(res, key, token, Authentication, clientIp) {
 app.get("/authenticate", async (req, res) => {
     const key = req.query.key;
     const clientIp = req.ip;
-
     if (!KeyCheck(res, key, req.query.session_token, true, clientIp)) return;
-
-    const ValidKeys = JSON.parse(fs.readFileSync("./db/Passes.json"));
     const token = generateSessionToken(key, clientIp);
     console.log("Generating new token:", token);
-
     const Seconds = AuthTimeMins * 60;
     const Miliseconds = Seconds * 1000;
-
     res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: Miliseconds });
     return res.status(200).send({ success: true, message: 'Authentication successful!', token: token });
 });
@@ -387,7 +389,11 @@ app.post("/setWalletAddress", async (req, res) => { //TODO add ratelimits for al
     }
     const Params = req.body
     const data = SetWalletAddress(UserID, req.query.old, req.query.new, Params)
-    res.status(200).send({ success: true, data: data});
+
+    const WalletAnalysis = await AnalyseAccount(req.query.new)
+    console.log("analysis: ", WalletAnalysis)
+    const NewAddressIsValid = true
+    res.status(200).send({ success: true, IsValid: NewAddressIsValid});
 });
 
 
@@ -428,4 +434,70 @@ app.post("/removeWallet", async (req, res) => { //TODO add ratelimits for all me
 });
 
 
-//TODO make setValues endpoint
+
+
+// As soon as the script runs, parse through everyones userdata, make connections to listen to logs
+let targetWallets = {}
+let subscriptions = {}
+function subscribeToWalletTransactions(UserID, WalletAdd) {
+    const CurrWalletPubKey = new PublicKey(WalletAdd);
+    for (const index in connections) {
+      const connection = connections[index];
+      const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
+        if (!targetWallets[WalletAdd]) {
+          connection.removeOnLogsListener(subscriptions[WalletAdd][index]);
+          return;
+        }
+        if (!SolVal) {
+          //! no solvalue; wil break
+          //TODO make it log this
+          return
+        }
+        if (!StartedLogging) {
+          targetWallets[WalletAdd][2] = await GetTokens(WalletAdd);
+          return;
+        }
+        if (LoggedSignature.includes(logs.signature)) {
+          return;
+        }
+        if (LoggedSignature.length > MAX_SIGNATURES) {
+          targetWallets[WalletAdd][2] = await GetTokens(WalletAdd);
+          LoggedSignature.shift()
+        }
+        if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])) {
+          return
+        }
+        const ToSearchFor = [
+          `Program log: Instruction: PumpSell`,
+          `Program log: Instruction: PumpBuy`,
+          `Program log: Instruction: CloseAccount`,
+          `Program log: Create`,
+          `Program log: Instruction: Sell`,
+          `Program log: Instruction: Buy`
+        ];
+        const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
+        if (InString && !logs.err) {
+          LoggedSignature.push(logs.signature)
+          console.log(WalletAdd, "good data: ", logs);
+          handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs);
+        } else {
+          console.log("Useless data: ", logs.signature);
+        }
+      }, 'confirmed');
+      if (!subscriptions[WalletAdd]) {
+        subscriptions[WalletAdd] = {};
+      }
+      subscriptions[WalletAdd][index] = id;
+    }
+    UpdateWalletFactor(WalletAdd);
+  }
+
+async function main() {
+    const UserData = GetData("UserValues")
+    const UserPasses = GetData("Passes")
+    for (const Pass of UserPasses){
+
+    }
+
+}
+main()
