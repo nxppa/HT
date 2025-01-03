@@ -495,7 +495,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
 async function main() {
     const UserData = GetData("UserValues")
     const UserPasses = GetData("Passes")
-    for (const Pass of UserPasses){
+    for (const Pass in UserPasses){
 
     }
 
