@@ -455,8 +455,8 @@ app.post("/newUser", async (req, res) => { //TODO add ratelimits for all methods
     const MasterKey = req.query.MSK
     const id = req.query.id
     if (MasterKey != process.env.MasterKey){
+        console.log(MasterKey, process.env.MasterKey)
         res.status(403).send({ success: false, message: 'invalid key'});
-
         return
     }
     const NewAcc = NewUser(id)
