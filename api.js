@@ -65,9 +65,21 @@ function NewWallet(UserID, WalletAddress, WalletData){
 
     //TODO make a check for duplicate wallets
 }
+const NewUserTemplate = {
+    Targets:{},
+    ObfBaseTransKey:null,
+}
+
 function NewUser(DiscordID){
     //Create new pass, new uservalues
-
+    const NewKey = generateKey(DiscordID)
+    const UserData = GetUserData()
+    const Passes = GetData("Passes")
+    Passes[NewKey] = DiscordID
+    UserData[DiscordID] = NewUserTemplate
+    WriteData("Passes", Passes)
+    WriteData("UserValues", UserData)
+    return NewKey
 }
 
 
@@ -105,8 +117,11 @@ function SetDataBaseValues(UserID, Target, Values){
 }
 
 function GetUserData(Key) {
-    const User = decodeKey(Key)
     const UserValues = GetData("UserValues")
+    if (!Key){
+        return UserValues
+    }
+    const User = decodeKey(Key)
     const UserData = UserValues[User]
     console.log(User, UserValues, UserData, Key)
     return UserData
@@ -435,7 +450,18 @@ app.post("/removeWallet", async (req, res) => { //TODO add ratelimits for all me
     //TODO add new wallet
     res.status(200).send({ success: true, data: AccountToRemove});
 });
+app.post("/newUser", async (req, res) => { //TODO add ratelimits for all methods
+    const clientIp = req.ip;
+    const MasterKey = req.query.MSK
+    const id = req.query.id
+    if (MasterKey != process.env.MasterKey){
+        return
+    }
+    const NewUser = NewUser(id)
 
+    //TODO add new wallet
+    res.status(200).send({ success: true, key: NewUser});
+});
 
 
 
