@@ -455,12 +455,14 @@ app.post("/newUser", async (req, res) => { //TODO add ratelimits for all methods
     const MasterKey = req.query.MSK
     const id = req.query.id
     if (MasterKey != process.env.MasterKey){
+        res.status(403).send({ success: false, message: 'invalid key'});
+
         return
     }
-    const NewUser = NewUser(id)
+    const NewAcc = NewUser(id)
 
     //TODO add new wallet
-    res.status(200).send({ success: true, key: NewUser});
+    res.status(200).send({ success: true, key: NewAcc});
 });
 
 
