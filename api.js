@@ -110,6 +110,7 @@ function EditDataBaseValue(UserID, Target, Param, Value) {
 }
 function SetDataBaseValues(UserID, Target, Values){
     let UserValues = GetData("UserValues")
+    Values.Valid = UserValues[UserID].Targets[Target].Valid
     UserValues[UserID].Targets[Target] = Values;
     WriteData("UserValues", UserValues)
     return Values
@@ -399,9 +400,10 @@ app.post("/setWalletAddress", async (req, res) => { //TODO add ratelimits for al
         UserID = decodeKey(UserKey)
     }
     const Params = req.body
+    const WalletAnalysis = await AnalyseAccount(req.query.new)
+    Params.Valid = WalletAnalysis
     const data = SetWalletAddress(UserID, req.query.old, req.query.new, Params)
 
-    const WalletAnalysis = await AnalyseAccount(req.query.new)
     console.log("analysis: ", WalletAnalysis)
     let NewAddressIsValid = true
     if (!WalletAnalysis || WalletAnalysis.type != "Wallet"){
