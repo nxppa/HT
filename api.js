@@ -9,7 +9,6 @@ const app = express();
 const MaxWallets = 100;
 const port = 3000; // TODO: Make env files
 const BackupIp = "142.93.123.245";
-const SECRET_KEY = 'oeruahgbaoieurgboiWGEOYUFGPiweh9f'; // TODO: Use an environment variable
 const AuthTimeMins = 8;
 let blacklist = {};
 let TokenToKey = {}
@@ -71,7 +70,6 @@ const NewUserTemplate = {
 }
 
 function NewUser(DiscordID){
-    //Create new pass, new uservalues
     const IDInt = parseInt(DiscordID, 10)
     const NewKey = generateKey(IDInt)
     const UserData = GetUserData()
@@ -128,7 +126,6 @@ function GetUserData(Key) {
     return UserData
 }
 
-// Function to invalidate token
 function invalidateToken(token) {
     const decoded = jwt.decode(token);
     blacklist[decoded.jti] = true;
@@ -138,25 +135,22 @@ function invalidateToken(token) {
     }, (decoded.exp * 1000) - Date.now());
 }
 
-// Function to generate session token with IP
 function generateSessionToken(Key, clientIp) {
     console.log(Key)
     const issuedAt = Math.floor(Date.now() / 1000);
     const expiresAt = issuedAt + AuthTimeMins * 60;
-    const NewToken = jwt.sign({ Key, clientIp, issuedAt, expiresAt }, SECRET_KEY, { jwtid: generateJti() });
+    const NewToken = jwt.sign({ Key, clientIp, issuedAt, expiresAt }, process.env.JWT, { jwtid: generateJti() });
     TokenToKey[NewToken] = Key
     return NewToken
 }
 
-// Function to generate a unique JWT ID
 function generateJti() {
     return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
-// Function to validate session token and IP
 function validateSessionToken(token, currentIp) {
     try {
-        const payload = jwt.verify(token, SECRET_KEY);
+        const payload = jwt.verify(token, process.env.JWT);
         const currentTime = Math.floor(Date.now() / 1000);
 
         if (payload.expiresAt < currentTime) {
@@ -191,6 +185,7 @@ const Origins = [
     "chrome-extension://lkdhledpbhaplhlkpidfelelcmiinknn",
     "chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll",
     "chrome-extension://klehhdabnpholjlfjflaifpkgjnekjbi",
+    "chrome-extension://nbmoeigmlejgliinjpkjggobbbokeaje",
 ];
 
 const corsOptions = {
