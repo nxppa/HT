@@ -72,10 +72,11 @@ const NewUserTemplate = {
 
 function NewUser(DiscordID){
     //Create new pass, new uservalues
-    const NewKey = generateKey(DiscordID)
+    const IDInt = parseInt(DiscordID, 10)
+    const NewKey = generateKey(IDInt)
     const UserData = GetUserData()
     const Passes = GetData("Passes")
-    Passes[NewKey] = DiscordID
+    Passes[NewKey] = IDInt
     UserData[DiscordID] = NewUserTemplate
     WriteData("Passes", Passes)
     WriteData("UserValues", UserData)
