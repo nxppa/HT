@@ -888,39 +888,10 @@ async function AddWallet(Wallet, Alias = "", InitialFetch, NumWalletsTotal) {
   if (!InitialFetch) {
     EditValue("TargetWallets", GetData("TargetWallets").length, Wallet)
   }
-
+  
   const WalletSize = await getWalletBalance(Wallet)
   const CurrentWalletFactor = Math.min(await myWalletBalanceInSol / WalletSize, 1)
   const TheirLastTokens = await GetTokens(Wallet);
-
-  /*
-    if (InitialFetch) {
-      NumWalletsAdded += 1
-  
-      const Progress = roundToDigits(NumWalletsAdded / NumWalletsTotal, 2)
-      const PlaceEnding = Math.floor(BarSize * Progress + 0.5)
-      let ProgressString = "\\["
-      for (let x = 1; x < BarSize + 1; x++) {
-        ProgressString += x <= PlaceEnding ? Filled : Unfilled
-      }
-      const EstimatedTimeLeft = (NumWalletsTotal - NumWalletsAdded) * 6
-      ProgressString += `\] ${Progress * 100}%\n ETA: ${EstimatedTimeLeft} seconds`
-      console.log(ProgressString)
-      if (NumWalletsAdded == NumWalletsTotal) {
-        StartedLogging = true
-        let StartInidicator = SetParameters.Halted ? "🟨" : "🟩"
-        const Msg = StartInidicator + SetParameters.Halted ? "Finished adding wallets. Bot is halted" : "Finished adding wallets. Bot is active" + StartInidicator
-        for (id in IDToName) {
-          //SendStandaloneMessage((id).toString(), Msg, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
-        }
-      } else {
-        for (id in IDToName) {
-          //SendStandaloneMessage((id).toString(), ProgressString, "Markdown", "editMessageText", InitialMessageIDForEach[id].toString())
-  
-        }
-      }
-    }
-    */
   StartedLogging = true
   targetWallets[Wallet] = [CurrentWalletFactor, null, TheirLastTokens, WalletSize, Alias,]
   subscribeToWalletTransactions(Wallet);

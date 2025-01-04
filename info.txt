@@ -19,4 +19,6 @@ git config --global credential.helper "cache --timeout=360000"
 
 sudo systemctl start nginx
 
+/etc/nginx/sites-enabled/default
+
 https://flashy-radial-needle.SOLANA_MAINNET.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7

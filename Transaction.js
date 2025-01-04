@@ -12,9 +12,6 @@ connection.onLogs(MyWalletPubKey, async (logs, ctx) => {
 }, 'confirmed')
 
 
-
-
-
 async function main() {
   setTimeout(() => {
     Swap("D2Hc3ndqW95BGtC7KzftBPnvP4qrDEB9YSsC1q1Apump", 1, 40, 0.0001, "buy")
