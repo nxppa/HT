@@ -405,8 +405,10 @@ app.post("/setWalletAddress", async (req, res) => { //TODO add ratelimits for al
     let NewAddressIsValid = true
     if (!WalletAnalysis || WalletAnalysis.type != "Wallet"){
         NewAddressIsValid = false
+        Params.Halted = true
     }
     Params.Valid = NewAddressIsValid
+    
     const data = SetWalletAddress(UserID, req.query.old, req.query.new, Params)
     res.status(200).send({ success: true, IsValid: NewAddressIsValid});
 });
