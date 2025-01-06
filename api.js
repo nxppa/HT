@@ -728,7 +728,7 @@ async function main() {
         const CurrentUserTargets = UserData[UserID].Targets
         RPCConnectionsByUser[UserID] = {
             Main:null,
-            SubConnections:{}
+            SubConnections:[]
         }
         UserData[UserID].Connections.SubConnections.forEach((endpoint, index) => {
             console.log("adding rpc")
