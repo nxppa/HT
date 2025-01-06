@@ -715,6 +715,7 @@ async function main() {
     for (const Pass in UserPasses){
         const UserID = UserPasses[Pass]
         EachUserTargetData[UserID] = {}
+        console.log("uid: ", UserID)
         const CurrentUserTargets = UserData[UserID].Targets
         RPCConnectionsByUser[UserID] = {
             Main:null,
