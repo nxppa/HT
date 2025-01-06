@@ -5,6 +5,15 @@ const jwt = require('jsonwebtoken');
 const { generateKey, decodeKey } = require("./Operations/PassGen.js")
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
 const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
+const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
+const Bil = 1000000000
+let CompletedCopies = []
+async function GetBal(UserID, Wallet) {
+    //!important
+    //TODO Make it so that calling getbal with a private key as a parameter converts it to a public key,
+  const connection = RPCConnectionsByUser[UserID].Main
+  return await connection.getBalance(new PublicKey(Wallet)) / Bil //TODO make it so it uses multiple endpoints
+}
 const app = express();
 const MaxWallets = 100;
 const port = 3000; // TODO: Make env files
@@ -14,7 +23,23 @@ let blacklist = {};
 let TokenToKey = {}
 app.set('trust proxy', 1);
 
-
+function findMatchingStrings(stringsArray, substringsArray, Includes) {
+    for (let i = 0; i < stringsArray.length; i++) {
+      const originalString = stringsArray[i];
+      for (let j = 0; j < substringsArray.length; j++) {
+        if (Includes) {
+          if (originalString.includes(substringsArray[j])) {
+            return substringsArray[j]
+          }
+        } else {
+          if (originalString == substringsArray[j]) {
+            return substringsArray[j]
+          }
+        }
+      }
+    }
+    return null
+  }
 
 const DataMap = {
     "PriorityFee": "float",
@@ -67,7 +92,13 @@ function NewWallet(UserID, WalletAddress, WalletData){
 const NewUserTemplate = {
     Targets:{},
     ObfBaseTransKey:null,
+    Connections:{
+        Main:"https://public.ligmanode.com",
+        SubConnections:[]
+    }
 }
+
+
 
 function NewUser(DiscordID){
     const IDInt = parseInt(DiscordID, 10)
@@ -279,7 +310,7 @@ app.get("/api/tools/getBalance", async (req, res) => {
         return res.status(400).send({ error: "Account parameter is required" });
     }
     const Pub = new PublicKey(Account)
-    const Balance = await connection.getBalance(Pub) / Bil
+    const Balance = await connection.getBalance(Pub) / Bil //TODO fix this
     let Response = {}
     Response.Balance = Balance
     res.status(200).send(Response);
@@ -306,13 +337,19 @@ app.get("/api/tools/generateWallet", async (req, res) => {
 app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for all methods
     const clientIp = req.ip;
     if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
-
+    let key = null
+    if (req.query.key){
+        key = req.query.key
+    } else if (req.query.session_token) {
+        key = validateSessionToken(req.query.session_token, clientIp)
+    }
+    const UserID = KeyToUser(key)
     const AccountToScan = req.query.account
 
     if (!AccountToScan) {
         return res.status(400).send({ error: "Account parameter is required" });
     }
-    const Response = await AnalyseAccount(AccountToScan)
+    const Response = await AnalyseAccount(AccountToScan, RPCConnectionsByUser[UserID].SubConnections)
     if (typeof (Response) == "string") {
         return res.status(200).send({ Response });
 
@@ -400,7 +437,7 @@ app.post("/setWalletAddress", async (req, res) => { //TODO add ratelimits for al
         UserID = decodeKey(UserKey)
     }
     const Params = req.body
-    const WalletAnalysis = await AnalyseAccount(req.query.new)
+    const WalletAnalysis = await AnalyseAccount(req.query.new, RPCConnectionsByUser[UserID].SubConnections)
     
     let NewAddressIsValid = true
     if (!WalletAnalysis || WalletAnalysis.type != "Wallet"){
@@ -464,36 +501,160 @@ app.post("/newUser", async (req, res) => { //TODO add ratelimits for all methods
     res.status(200).send({ success: true, key: NewAcc});
 });
 
+async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
+    let Diagnosed = false
+    if (deep >= 8) {
+      console.log("max retries for changes logged exceeded")
+      return
+    }
+    try {
+      const TheirLastTokens = EachUserTargetData[UserID][WalletAddress].PreviousTokens
+      const TheirCurrentTokens = await GetTokens(WalletAddress, TheirLastTokens, RPCConnectionsByUser[UserID].SubConnections);
+      if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
+        console.log("no change in wallet detected. Retrying", deep + 1)
+        await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
+        return
+      } else {
+        if (deep != 0) {
+          console.log("deepness: ", deep)
+        }
+      }
+      const WalletFactor = targetWallets[WalletAddress][0]
+      for (const mint in TheirCurrentTokens) {
+        const CurrentMintAmount = TheirCurrentTokens[mint]
+        const LastMintAmount = TheirLastTokens[mint]
+        if (mint in TheirLastTokens) {
+          const balanceChange = CurrentMintAmount - LastMintAmount
+          const transactionType = inferTransactionType(balanceChange);
+          if (transactionType !== 'no change') {
+            if (SpecialTokens[mint]) {
+              Diagnosed = true
+              continue
+            }
+            if (transactionType == "buy") {
+              // token amount IN MINT
+              const HowManyTokensToBuy = balanceChange * WalletFactor
+              console.log("mint comparison: ", CurrentMintAmount, LastMintAmount, TheirLastTokens, TheirCurrentTokens)
+              console.log(GetTime(), "BUYING", HowManyTokensToBuy, balanceChange, WalletFactor, logs)
+  
+              const SwapData = {
+                transactionType: "buy",
+                mintAddress: mint,
+                AmountOfTokensToSwap: HowManyTokensToBuy,
+                Wallet: WalletAddress,
+                Signature: signature,
+                logs: logs,
+                AmountTheyreBuying: CurrentMintAmount,
+              }
+              await enqueueSwap(SwapData);
+              Diagnosed = true
+            } else if (transactionType == "sell") {
+              // token amount IN MINT
+              const FactorSold = Math.abs(balanceChange) / LastMintAmount
+              const MyTokenAmountSelling = MyTokens[mint] * FactorSold || 0
+              console.log(balanceChange, LastMintAmount, MyTokens, FactorSold, MyTokenAmountSelling, null, logs)
+              console.log(GetTime(), "SELLING", MyTokenAmountSelling, mint)
+  
+              const SwapData = {
+                transactionType: "sell",
+                mintAddress: mint,
+                AmountOfTokensToSwap: MyTokenAmountSelling,
+                Wallet: WalletAddress,
+                Signature: signature,
+                logs: logs,
+                FactorSold: FactorSold,
+              }
+  
+              await enqueueSwap(SwapData);
+              Diagnosed = true
+            }
+          }
+        } else {
+          //Token amount IN MINT
+          const HowManyTokensToBuy = CurrentMintAmount * WalletFactor
+          console.log(HowManyTokensToBuy, SolVal, CurrentMintAmount, WalletFactor, mint)
+          console.log(GetTime(), "BUYING INITIAL", HowManyTokensToBuy)
+  
+          const SwapData = {
+            transactionType: "buy",
+            mintAddress: mint,
+            AmountOfTokensToSwap: HowManyTokensToBuy,
+            Wallet: WalletAddress,
+            Signature: signature,
+            logs: logs,
+            AmountTheyreBuying: CurrentMintAmount,
+  
+          }
+  
+          await enqueueSwap(SwapData);
+          Diagnosed = true
+  
+        }
+      }
+      for (const mint in TheirLastTokens) {
+        if (TheirCurrentTokens[mint] == null) {
+          const AllMyMint = MyTokens[mint] || 0;
+          console.log(GetTime(), "SELLING ALL", AllMyMint);
+  
+          const SwapData = {
+            transactionType: "sell",
+            mintAddress: mint,
+            AmountOfTokensToSwap: AllMyMint,
+            Wallet: WalletAddress,
+            Signature: signature,
+            logs: logs,
+            FactorSold: 1,
+          }
+          await enqueueSwap(SwapData);
+          Diagnosed = true;
+        }
+      }
+      targetWallets[WalletAddress][2] = TheirCurrentTokens
+    } catch (error) {
+      if (error.response && error.response.status === 429) {
+        console.warn('Encountered 429 Too Many Requests. slow down.');
+      } else {
+        console.error('Unexpected error during token balance check:', error);
+      }
+    }
+    if (!Diagnosed) {
+      console.log("?no change? retrying", TransType, logs, GetTime(), deep + 1)
+      await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
+      return
+    }
+  }
 
 
-// As soon as the script runs, parse through everyones userdata, make connections to listen to logs
+function handleTradeEvent(signature, TransType, Address, logs, UserID) {
+    if (!CompletedCopies.includes(signature)) {
+      checkTokenBalances(signature, TransType, Address, logs, 0, UserID)
+    } else {
+      console.log("FOR SOME REASON GEEKED")
+    }
+  }
+  
 let EachUserTargetData = {}
-
+let LoggedSignatures = []
 let subscriptions = {}
+const MAX_SIGNATURES = 1000
 function subscribeToWalletTransactions(UserID, WalletAdd) {
     const CurrWalletPubKey = new PublicKey(WalletAdd);
-    for (const index in connections) {
-      const connection = connections[index];
+    for (const index in RPCConnectionsByUser[UserID].SubConnections) {
+      const connection = RPCConnectionsByUser[UserID].SubConnections[index]
       const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
-        if (!targetWallets[WalletAdd]) {
-          connection.removeOnLogsListener(subscriptions[WalletAdd][index]);
-          return;
-        }
         if (!SolVal) {
           //! no solvalue; wil break
           //TODO make it log this
           return
         }
-        if (!StartedLogging) {
-          targetWallets[WalletAdd][2] = await GetTokens(WalletAdd);
+        if (LoggedSignatures.includes(logs.signature)) {
           return;
         }
-        if (LoggedSignature.includes(logs.signature)) {
-          return;
-        }
-        if (LoggedSignature.length > MAX_SIGNATURES) {
-          targetWallets[WalletAdd][2] = await GetTokens(WalletAdd);
-          LoggedSignature.shift()
+        if (LoggedSignatures.length > MAX_SIGNATURES) {
+            EachUserTargetData[UserID][WalletAdd].PreviousTokens = GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections)
+            //! important
+            //TODO make it update wallet factor and size 
+            LoggedSignatures.shift()
         }
         if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])) {
           return
@@ -508,21 +669,46 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
         ];
         const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
         if (InString && !logs.err) {
-          LoggedSignature.push(logs.signature)
+          LoggedSignatures.push(logs.signature)
           console.log(WalletAdd, "good data: ", logs);
-          handleTradeEvent(logs.signature, InString, WalletAdd,  logs.logs);
+          handleTradeEvent(logs.signature, InString, WalletAdd,  logs.logs, UserID);
+          //! important
         } else {
           console.log("Useless data: ", logs.signature);
         }
       }, 'confirmed');
-      if (!subscriptions[WalletAdd]) {
+      if (!subscriptions[WalletAdd]) { 
+        //! important
+        //TODO make it remove onlogs on shutdown
         subscriptions[WalletAdd] = {};
       }
       subscriptions[WalletAdd][index] = id;
     }
-    UpdateWalletFactor(WalletAdd);
+    UpdateWalletFactor(UserID, WalletAdd);
   }
+  async function UpdateWalletFactor(UserID, Wallet){
+    const WalletSize = await GetBal(UserID, Wallet);
+    const UserWalletSize = await GetBal(UserID, UserData[UserID].ObfBaseTransKey)
+    EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
+    EachUserTargetData[UserID][Wallet].WalletSize = WalletSize
+  }
+async function AddWalletToScript(UserID, Wallet){
+    const UserData = GetData("UserValues")
+    const UserWalletKey = UserData[UserID].ObfBaseTransKey
+    const CurrentTokens = GetTokens(Wallet, null, RPCConnectionsByUser[UserID].SubConnections)
+    const WalletSize = GetBal(UserID, Wallet)
+    const UserWalletSize = GetBal(UserID, UserWalletKey) //TODO make an input for ObfBaseTransKey on client and parse to server
+    const WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
+    EachUserTargetData[UserID][Wallet] = {PreviousTokens: CurrentTokens, WalletFactor: WalletFactor, WalletSize:WalletSize}
+    //! switched off for debug
+    //! subscribeToWalletTransactions(UserID, Wallet)
+}
 
+let RPCConnectionsByUser = {}
+async function AddRPCToScript(UserID, Link){
+    const ConnectArr = RPCConnectionsByUser[UserID].SubConnections
+    RPCConnectionsByUser[UserID].SubConnections[ConnectArr.length] = new Connection(Link, { commitment: 'confirmed' });
+}
 async function main() {
     const UserData = GetData("UserValues")
     const UserPasses = GetData("Passes")
@@ -530,11 +716,17 @@ async function main() {
         const UserID = UserPasses[Pass]
         EachUserTargetData[UserID] = {}
         const CurrentUserTargets = UserData[UserID].Targets
+        RPCConnectionsByUser[UserID] = {
+            Main:null,
+            SubConnections:{}
+        }
+        UserData[UserID].Connections.SubConnections.forEach((endpoint, index) => {
+            AddRPCToScript(UserID, endpoint)
+          });
+        RPCConnectionsByUser[UserID].Connections.Main = new Connection(UserData[UserID].Connections.Main)
         for (const TargetWallet in CurrentUserTargets){
-            const TargetData = CurrentUserTargets[TargetWallet]
-            EachUserTargetData[UserID][TargetWallet] = {PreviousTokens: null, WalletFactor: null, WalletSize:null}//TODO fill this info
+            AddWalletToScript(UserID, TargetWallet)
         }
     }
-
 }
 main()
