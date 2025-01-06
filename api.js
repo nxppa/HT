@@ -712,8 +712,8 @@ async function AddWalletToScript(UserID, Wallet){
 
 let RPCConnectionsByUser = {}
 async function AddRPCToScript(UserID, Link){
-    const ConnectArr = RPCConnectionsByUser[UserID].SubConnections
-    RPCConnectionsByUser[UserID].SubConnections[ConnectArr.length] = new Connection(Link, { commitment: 'confirmed' });
+    const ArrEnd = RPCConnectionsByUser[UserID].SubConnections.length
+    RPCConnectionsByUser[UserID].SubConnections[ArrEnd] = new Connection(Link, { commitment: 'confirmed' });
 }
 async function main() {
     const UserData = GetData("UserValues")
