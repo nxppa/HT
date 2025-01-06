@@ -19,13 +19,13 @@ async function GetBal(UserID, Wallet) {
             const keypair = Keypair.fromSecretKey(privateKeyBytes);
             publicKey = keypair.publicKey;
         } catch (error) {
-            throw new Error("Invalid private key provided.");
+            throw new Error(`Invalid private key provided. ${Wallet}`);
         }
     } else {
         try {
             publicKey = new PublicKey(Wallet);
         } catch (error) {
-            throw new Error("Invalid public key provided.");
+            throw new Error(`Invalid public key provided. ${Wallet}`);
         }
     }
     const connection = RPCConnectionsByUser[UserID].Main;
