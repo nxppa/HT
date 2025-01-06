@@ -15,7 +15,8 @@ async function GetBal(UserID, Wallet) {
     let publicKey;
     if (isPrivateKey(Wallet)) {
         try {
-            const keypair = Keypair.fromSecretKey(new Uint8Array(JSON.parse(Wallet)));
+            const privateKeyBytes = decodePrivateKey(Wallet);
+            const keypair = Keypair.fromSecretKey(privateKeyBytes);
             publicKey = keypair.publicKey;
         } catch (error) {
             throw new Error("Invalid private key provided.");
@@ -24,21 +25,19 @@ async function GetBal(UserID, Wallet) {
         try {
             publicKey = new PublicKey(Wallet);
         } catch (error) {
-            throw new Error(`Invalid public key provided: ${Wallet}`);
+            throw new Error("Invalid public key provided.");
         }
     }
     const connection = RPCConnectionsByUser[UserID].Main;
     return await connection.getBalance(publicKey) / Bil; // TODO make it so it uses multiple endpoints
 }
-function isPrivateKey(wallet) {
-    try {
-        const parsed = JSON.parse(wallet);
-        return Array.isArray(parsed) && parsed.length === 64;
-    } catch {
-        return false;
-    }
-}
 
+function isPrivateKey(wallet) {
+    return typeof wallet === 'string' && wallet.length > 44; // Adjust length as needed
+}
+function decodePrivateKey(privateKeyString) {
+    return Uint8Array.from(Buffer.from(privateKeyString, 'base64'));
+}
 function print(str){
     console.log(str)
 }
