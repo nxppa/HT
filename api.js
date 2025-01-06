@@ -734,7 +734,8 @@ async function main() {
             console.log("adding rpc")
             AddRPCToScript(UserID, endpoint)
           });
-        RPCConnectionsByUser[UserID].Connections.Main = new Connection(UserData[UserID].Connections.Main)
+
+        RPCConnectionsByUser[UserID].Main = new Connection(UserData[UserID].Connections.Main)
         for (const TargetWallet in CurrentUserTargets){
             AddWalletToScript(UserID, TargetWallet)
         }
