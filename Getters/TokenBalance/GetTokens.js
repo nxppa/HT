@@ -29,16 +29,8 @@ function deepEqual(obj1, obj2) {
     }
     return true;
 }
-const connections = {};
 
-async function fetchTokensFromEndpoint(rpc, address, programId) {
-    if (!connections[rpc]){
-        console.log("creating connection")
-        connection = new Connection(rpc, { commitment: 'confirmed' });
-        connections[rpc] = connection
-    } else {
-        connection = connections[rpc]
-    }
+async function fetchTokensFromEndpoint(connection, address, programId) {
     const response = await connection.getParsedTokenAccountsByOwner(address, { programId });
     const tokens = {};
 
@@ -55,16 +47,16 @@ async function fetchTokensFromEndpoint(rpc, address, programId) {
     return tokens;
 }
 
-async function GetTokens(Address, previousTokens = null) {
+async function GetTokens(Address, previousTokens = null, SOLANA_RPC_ENDPOINTS) {
     const key = new PublicKey(Address);
     const startTime = Date.now();
     let matchingTokens = null;
-    const fetchPromises = Object.entries(SOLANA_RPC_ENDPOINTS).map(([name, rpc]) =>
-        fetchTokensFromEndpoint(rpc, key, TPID).catch((error) => {
-            console.log(`Error with RPC ${name}:`, error.message);
-            return null
+    const fetchPromises = SOLANA_RPC_ENDPOINTS.map((connection, index) =>
+        fetchTokensFromEndpoint(connection, key, TPID).catch((error) => {
+            console.log(`Error with RPC connection ${index}:`, error.message);
+            return null;
         })
-    )
+    );
     try {
         const tokensList = await Promise.any(fetchPromises);
         if (previousTokens) {
