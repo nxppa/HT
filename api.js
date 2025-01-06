@@ -8,7 +8,7 @@ const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
 let CompletedCopies = []
-
+const bs58 = require('bs58'); // For decoding base58-encoded private keys
 async function GetBal(UserID, Wallet) {
     //!important
     //TODO Make it so that calling getbal with a private key as a parameter converts it to a public key
@@ -19,26 +19,25 @@ async function GetBal(UserID, Wallet) {
             const keypair = Keypair.fromSecretKey(privateKeyBytes);
             publicKey = keypair.publicKey;
         } catch (error) {
-            console.log(error)
-            throw new Error(`Invalid private key provided. ${Wallet}`);
+            throw new Error("Invalid private key provided.");
         }
     } else {
         try {
             publicKey = new PublicKey(Wallet);
         } catch (error) {
-            throw new Error(`Invalid public key provided. ${Wallet}`);
+            throw new Error("Invalid public key provided.");
         }
     }
     const connection = RPCConnectionsByUser[UserID].Main;
     return await connection.getBalance(publicKey) / Bil; // TODO make it so it uses multiple endpoints
 }
-
 function isPrivateKey(wallet) {
-    return typeof wallet === 'string' && wallet.length > 44; // Adjust length as needed
+    return typeof wallet === 'string' && wallet.length >= 88; // Adjust as needed
 }
 function decodePrivateKey(privateKeyString) {
-    return Uint8Array.from(Buffer.from(privateKeyString, 'base64'));
+    return bs58.decode(privateKeyString); // Use bs58 to decode the private key
 }
+
 function print(str){
     console.log(str)
 }
