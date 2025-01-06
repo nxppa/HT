@@ -715,6 +715,7 @@ async function AddRPCToScript(UserID, Link){
     const ArrEnd = RPCConnectionsByUser[UserID].SubConnections.length
     RPCConnectionsByUser[UserID].SubConnections[ArrEnd] = new Connection(Link, { commitment: 'confirmed' });
 }
+//879244945867804700
 async function main() {
     const UserData = GetData("UserValues")
     const UserPasses = GetData("Passes")
@@ -723,6 +724,7 @@ async function main() {
         EachUserTargetData[UserID] = {}
         console.log("uid: ", UserID)
         console.log("ud: ", UserData)
+        console.log("pass: ", Pass)
         const CurrentUserTargets = UserData[UserID].Targets
         RPCConnectionsByUser[UserID] = {
             Main:null,
