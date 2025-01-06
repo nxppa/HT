@@ -8,12 +8,38 @@ const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
 let CompletedCopies = []
+const { Keypair, PublicKey } = require('@solana/web3.js'); // Ensure you're importing required classes
+
 async function GetBal(UserID, Wallet) {
     //!important
-    //TODO Make it so that calling getbal with a private key as a parameter converts it to a public key,
-  const connection = RPCConnectionsByUser[UserID].Main
-  return await connection.getBalance(new PublicKey(Wallet)) / Bil //TODO make it so it uses multiple endpoints
+    //TODO Make it so that calling getbal with a private key as a parameter converts it to a public key
+    let publicKey;
+    if (isPrivateKey(Wallet)) {
+        try {
+            const keypair = Keypair.fromSecretKey(new Uint8Array(JSON.parse(Wallet)));
+            publicKey = keypair.publicKey;
+        } catch (error) {
+            throw new Error("Invalid private key provided.");
+        }
+    } else {
+        try {
+            publicKey = new PublicKey(Wallet);
+        } catch (error) {
+            throw new Error("Invalid public key provided.");
+        }
+    }
+    const connection = RPCConnectionsByUser[UserID].Main;
+    return await connection.getBalance(publicKey) / Bil; // TODO make it so it uses multiple endpoints
 }
+function isPrivateKey(wallet) {
+    try {
+        const parsed = JSON.parse(wallet);
+        return Array.isArray(parsed) && parsed.length === 64;
+    } catch {
+        return false;
+    }
+}
+
 function print(str){
     console.log(str)
 }
