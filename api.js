@@ -728,6 +728,7 @@ async function main() {
             SubConnections:{}
         }
         UserData[UserID].Connections.SubConnections.forEach((endpoint, index) => {
+            console.log("adding rpc")
             AddRPCToScript(UserID, endpoint)
           });
         RPCConnectionsByUser[UserID].Connections.Main = new Connection(UserData[UserID].Connections.Main)
