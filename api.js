@@ -14,6 +14,9 @@ async function GetBal(UserID, Wallet) {
   const connection = RPCConnectionsByUser[UserID].Main
   return await connection.getBalance(new PublicKey(Wallet)) / Bil //TODO make it so it uses multiple endpoints
 }
+function print(str){
+    console.log(str)
+}
 const app = express();
 const MaxWallets = 100;
 const port = 3000; // TODO: Make env files
@@ -349,6 +352,9 @@ app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for al
     if (!AccountToScan) {
         return res.status(400).send({ error: "Account parameter is required" });
     }
+    console.log("user: ", UserID)
+    console.log("db: ", RPCConnectionsByUser)
+
     const Response = await AnalyseAccount(AccountToScan, RPCConnectionsByUser[UserID].SubConnections)
     if (typeof (Response) == "string") {
         return res.status(200).send({ Response });
