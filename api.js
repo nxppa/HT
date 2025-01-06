@@ -719,7 +719,7 @@ async function main() {
     const UserData = GetData("UserValues")
     const UserPasses = GetData("Passes")
     for (const Pass in UserPasses){
-        const UserID = UserPasses[Pass]
+        const UserID = String(UserPasses[Pass])
         EachUserTargetData[UserID] = {}
         console.log("uid: ", UserID)
         const CurrentUserTargets = UserData[UserID].Targets
