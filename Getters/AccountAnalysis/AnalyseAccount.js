@@ -48,7 +48,7 @@ function containsNonBase58Character(str) {
     }
 }
 
-async function AnalyseAccount(Account) {
+async function AnalyseAccount(Account, Connections) {
     let Response = {
         data: {
 
@@ -123,7 +123,7 @@ async function AnalyseAccount(Account) {
     Response.type = "Wallet"
     Response.data.account = Account
     Response.data.balance = TheirBal
-    const OpenPositions = await GetTokens(Account);
+    const OpenPositions = await GetTokens(Account, null, Connections);
     Response.data.openPositions = OpenPositions
     return Response;
 }
