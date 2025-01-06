@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const bs58 = require("bs58").default
 const { generateKey, decodeKey } = require("./Operations/PassGen.js")
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
 const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
