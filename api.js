@@ -19,6 +19,7 @@ async function GetBal(UserID, Wallet) {
             const keypair = Keypair.fromSecretKey(privateKeyBytes);
             publicKey = keypair.publicKey;
         } catch (error) {
+            console.log(error)
             throw new Error(`Invalid private key provided. ${Wallet}`);
         }
     } else {
