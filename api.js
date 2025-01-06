@@ -8,7 +8,6 @@ const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
 let CompletedCopies = []
-const { Keypair, PublicKey } = require('@solana/web3.js'); // Ensure you're importing required classes
 
 async function GetBal(UserID, Wallet) {
     //!important
