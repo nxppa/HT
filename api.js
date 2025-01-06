@@ -24,7 +24,7 @@ async function GetBal(UserID, Wallet) {
         try {
             publicKey = new PublicKey(Wallet);
         } catch (error) {
-            throw new Error("Invalid public key provided: ", Wallet);
+            throw new Error(`Invalid public key provided: ${Wallet}`);
         }
     }
     const connection = RPCConnectionsByUser[UserID].Main;
