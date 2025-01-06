@@ -467,7 +467,8 @@ app.post("/newUser", async (req, res) => { //TODO add ratelimits for all methods
 
 
 // As soon as the script runs, parse through everyones userdata, make connections to listen to logs
-let targetWallets = {}
+let EachUserTargetData = {}
+
 let subscriptions = {}
 function subscribeToWalletTransactions(UserID, WalletAdd) {
     const CurrWalletPubKey = new PublicKey(WalletAdd);
@@ -509,7 +510,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
         if (InString && !logs.err) {
           LoggedSignature.push(logs.signature)
           console.log(WalletAdd, "good data: ", logs);
-          handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs);
+          handleTradeEvent(logs.signature, InString, WalletAdd,  logs.logs);
         } else {
           console.log("Useless data: ", logs.signature);
         }
@@ -526,7 +527,13 @@ async function main() {
     const UserData = GetData("UserValues")
     const UserPasses = GetData("Passes")
     for (const Pass in UserPasses){
-
+        const UserID = UserPasses[Pass]
+        EachUserTargetData[UserID] = {}
+        const CurrentUserTargets = UserData[UserID].Targets
+        for (const TargetWallet in CurrentUserTargets){
+            const TargetData = CurrentUserTargets[TargetWallet]
+            EachUserTargetData[UserID][TargetWallet] = {PreviousTokens: null, WalletFactor: null, WalletSize:null}//TODO fill this info
+        }
     }
 
 }
