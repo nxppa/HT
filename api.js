@@ -8,36 +8,21 @@ const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
 let CompletedCopies = []
-const bs58 = require('bs58'); // For decoding base58-encoded private keys
 async function GetBal(UserID, Wallet) {
     //!important
-    //TODO Make it so that calling getbal with a private key as a parameter converts it to a public key
-    let publicKey;
-    if (isPrivateKey(Wallet)) {
-        try {
-            const privateKeyBytes = decodePrivateKey(Wallet);
-            const keypair = Keypair.fromSecretKey(privateKeyBytes);
-            publicKey = keypair.publicKey;
-        } catch (error) {
-            throw new Error("Invalid private key provided.");
-        }
-    } else {
-        try {
-            publicKey = new PublicKey(Wallet);
-        } catch (error) {
-            throw new Error("Invalid public key provided.");
-        }
+    //TODO Make it so that calling getbal with a private key as a parameter converts it to a public key,
+  const connection = RPCConnectionsByUser[UserID].Main
+  return await connection.getBalance(new PublicKey(Wallet)) / Bil //TODO make it so it uses multiple endpoints
+}
+function PrivToPub(privateKeyString) {
+    try {
+        const privateKeyBytes = bs58.decode(privateKeyString);
+        const keypair = Keypair.fromSecretKey(privateKeyBytes);
+        return keypair.publicKey.toBase58();
+    } catch (error) {
+        throw new Error("Invalid private key. Unable to convert to public key.");
     }
-    const connection = RPCConnectionsByUser[UserID].Main;
-    return await connection.getBalance(publicKey) / Bil; // TODO make it so it uses multiple endpoints
 }
-function isPrivateKey(wallet) {
-    return typeof wallet === 'string' && wallet.length >= 88; // Adjust as needed
-}
-function decodePrivateKey(privateKeyString) {
-    return bs58.decode(privateKeyString); // Use bs58 to decode the private key
-}
-
 function print(str){
     console.log(str)
 }
@@ -717,7 +702,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
   }
   async function UpdateWalletFactor(UserID, Wallet){
     const WalletSize = await GetBal(UserID, Wallet);
-    const UserWalletSize = await GetBal(UserID, UserData[UserID].ObfBaseTransKey)
+    const UserWalletSize = await GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
     EachUserTargetData[UserID][Wallet].WalletSize = WalletSize
   }
@@ -726,7 +711,7 @@ async function AddWalletToScript(UserID, Wallet){
     const UserWalletKey = UserData[UserID].ObfBaseTransKey
     const CurrentTokens = GetTokens(Wallet, null, RPCConnectionsByUser[UserID].SubConnections)
     const WalletSize = GetBal(UserID, Wallet)
-    const UserWalletSize = GetBal(UserID, UserWalletKey) //TODO make an input for ObfBaseTransKey on client and parse to server
+    const UserWalletSize = GetBal(UserID, PrivToPub(UserWalletKey)) //TODO make an input for ObfBaseTransKey on client and parse to server
     const WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
     EachUserTargetData[UserID][Wallet] = {PreviousTokens: CurrentTokens, WalletFactor: WalletFactor, WalletSize:WalletSize}
     //! switched off for debug
