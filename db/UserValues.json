@@ -11,7 +11,7 @@
                 "Valid": true
               }
         },
-        "ObfBaseTransKey": "54fcJH1GBkP7EqDx3PMgfUph4yG9e3J6yYP2bDB5sWYStPNZMdj1zXKm6C7cnmmWoNPE1yrSv3Ws4VHnyhcH3R4i",
+        "ObfBaseTransKey": "26f8U58aCJo4pES31DjTN6BThnwe7m1kbfj1dSvNoYjRdB4VbQAjRvrPF4LhCc3b98AhrReSqPJZg4VouHWyjxCV",
         "Connections": {
             "Main":"https://public.ligmanode.com",
             "SubConnections":[
@@ -47,7 +47,7 @@
                 "Valid": true  
             }
         },
-        "ObfBaseTransKey": "54fcJH1GBkP7EqDx3PMgfUph4yG9e3J6yYP2bDB5sWYStPNZMdj1zXKm6C7cnmmWoNPE1yrSv3Ws4VHnyhcH3R4i",
+        "ObfBaseTransKey": "26f8U58aCJo4pES31DjTN6BThnwe7m1kbfj1dSvNoYjRdB4VbQAjRvrPF4LhCc3b98AhrReSqPJZg4VouHWyjxCV",
         "Connections": {
             "Main":"https://public.ligmanode.com",
             "SubConnections":[
