@@ -14,14 +14,16 @@ async function GetBal(UserID, Wallet) {
   const connection = RPCConnectionsByUser[UserID].Main
   return await connection.getBalance(new PublicKey(Wallet)) / Bil //TODO make it so it uses multiple endpoints
 }
-function PrivToPub(privateKeyString) {
-    try {
-        const privateKeyBytes = bs58.decode(privateKeyString);
-        const keypair = Keypair.fromSecretKey(privateKeyBytes);
-        return keypair.publicKey.toBase58();
-    } catch (error) {
-        throw new Error("Invalid private key. Unable to convert to public key.");
-    }
+function PrivToPub(PrivateKey) {
+  try {
+    const privateKeyArray = bs58.decode(PrivateKey);
+    console.log(privateKeyArray)
+    const keypair = Keypair.fromSecretKey(privateKeyArray);
+    return keypair.publicKey.toBase58();
+  } catch (error) {
+    console.log(error)
+    throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
+  }
 }
 function print(str){
     console.log(str)
