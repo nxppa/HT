@@ -104,11 +104,10 @@ const NewUserTemplate = {
 
 
 function NewUser(DiscordID){
-    const IDInt = parseInt(DiscordID, 10)
     const NewKey = generateKey(IDInt)
     const UserData = GetUserData()
     const Passes = GetData("Passes")
-    Passes[NewKey] = IDInt
+    Passes[NewKey] = DiscordID
     UserData[DiscordID] = NewUserTemplate
     WriteData("Passes", Passes)
     WriteData("UserValues", UserData)
@@ -715,6 +714,7 @@ async function AddRPCToScript(UserID, Link){
     const ArrEnd = RPCConnectionsByUser[UserID].SubConnections.length
     RPCConnectionsByUser[UserID].SubConnections[ArrEnd] = new Connection(Link, { commitment: 'confirmed' });
 }
+//9WD3qzitzuC1r
 //879244945867804700
 async function main() {
     const UserData = GetData("UserValues")
