@@ -714,6 +714,7 @@ let subscriptions = {}
 const MAX_SIGNATURES = 1000
 function subscribeToWalletTransactions(UserID, WalletAdd) {
     const CurrWalletPubKey = new PublicKey(WalletAdd);
+    const UserData = GetData("UserValues")
     const CurrentClientBal = GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
     
     for (const index in RPCConnectionsByUser[UserID].SubConnections) {
