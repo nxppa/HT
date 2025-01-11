@@ -642,7 +642,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
             } else {
                 //Token amount IN MINT
                 const HowManyTokensToBuy = CurrentMintAmount * WalletFactor
-                console.log(HowManyTokensToBuy, SolVal, CurrentMintAmount, WalletFactor, mint)
+                console.log(HowManyTokensToBuy, SolVal, CurrentMintAmount, WalletFactor, mint, signature)
                 console.log(GetTime(), "BUYING INITIAL", HowManyTokensToBuy)
 
                 const SwapData = {
