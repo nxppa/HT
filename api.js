@@ -782,7 +782,9 @@ async function main() {
         RPCConnectionsByUser[UserID].Main = new Connection(UserData[UserID].Connections.Main)
 
         for (const TargetWallet in CurrentUserTargets) {
-            AddWalletToScript(UserID, TargetWallet)
+            if (UserData[UserID].Targets[TargetWallet].Valid == true){
+                AddWalletToScript(UserID, TargetWallet)
+            }
         }
         const MyWallet = PrivToPub(UserData[UserID].ObfBaseTransKey)
         const PersonalWalletPubKey = new PublicKey(MyWallet)
