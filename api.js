@@ -770,10 +770,13 @@ process.on('SIGINT', async () => {
 });
 
 
-async function UpdateWalletFactor(UserID, Wallet) {
+async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null) {
     const UserData = GetData("UserValues")
     const WalletSize = await GetBal(UserID, Wallet);
-    const UserWalletSize = await GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
+
+    console.log("WS Details: ", UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
+
+    const UserWalletSize = PresetWalletSize || await GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
     console.log("user wallet size: ", UserWalletSize)
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
     EachUserTargetData[UserID][Wallet].WalletSize = WalletSize
