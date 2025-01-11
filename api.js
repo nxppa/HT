@@ -712,23 +712,28 @@ const MAX_SIGNATURES = 1000
 function subscribeToWalletTransactions(UserID, WalletAdd) {
     const CurrWalletPubKey = new PublicKey(WalletAdd);
     for (const index in RPCConnectionsByUser[UserID].SubConnections) {
-        const connection = RPCConnectionsByUser[UserID].SubConnections[index]
+        const connection = RPCConnectionsByUser[UserID].SubConnections[index];
         const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
             if (!SolVal) {
-                //! no solvalue; wil break
-                //TODO make it log this
-                return
+                //! no solvalue; will break
+                //TODO: log this
+                return;
             }
             if (LoggedSignatures.includes(logs.signature)) {
                 return;
             }
             if (LoggedSignatures.length > MAX_SIGNATURES) {
-                EachUserTargetData[UserID][WalletAdd].PreviousTokens = GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections)
-                UpdateWalletFactor(UserID, WalletAdd)
-                LoggedSignatures.shift()
+                // Kick off the async call without waiting
+                (async () => {
+                    const tokens = await GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections);
+                    EachUserTargetData[UserID][WalletAdd].PreviousTokens = tokens;
+                    UpdateWalletFactor(UserID, WalletAdd);
+                })();
+
+                LoggedSignatures.shift();
             }
             if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])) {
-                return
+                return;
             }
             const ToSearchFor = [
                 `Program log: Instruction: PumpSell`,
@@ -740,7 +745,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             ];
             const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
             if (InString && !logs.err) {
-                LoggedSignatures.push(logs.signature)
+                LoggedSignatures.push(logs.signature);
                 handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs, UserID);
             } else {
                 console.log("Useless data: ", logs.signature);
@@ -753,6 +758,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
     }
     UpdateWalletFactor(UserID, WalletAdd);
 }
+
 process.on('SIGINT', async () => {
     console.info('Received SIGINT. Shutting down at ', GetTime());
     for (const User in subscriptions) {
