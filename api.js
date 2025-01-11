@@ -11,6 +11,23 @@ const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
 let CompletedCopies = []
+const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
+let SolVal = FetchSolVal()
+async function updateValue() {
+  const Fetched = await FetchSolVal()
+  if (Fetched) {
+    SolVal = Fetched
+  }
+}
+function startConstantUpdate() {
+  setInterval(async () => {
+    await updateValue()
+  }, 10000)
+}
+updateValue()
+startConstantUpdate()
+
+
 async function GetBal(UserID, Wallet) {
     //!important
     const connection = RPCConnectionsByUser[UserID].Main
@@ -115,6 +132,7 @@ function NewWallet(UserID, WalletAddress, WalletData) {
     UserValues[UserID].Targets[WalletAddress] = WalletData
     console.log(UserValues)
     WriteData("UserValues", UserValues)
+    AddWalletToScript(UserID, WalletAddress)
 
     //TODO make a check for duplicate wallets, make a check to see if its client's wallet
 }
