@@ -32,7 +32,12 @@ async function GetBal(UserID, Wallet) {
     //!important
     const connection = RPCConnectionsByUser[UserID].Main
     //TODO make it so it uses main and subconnections instead of just main
-    return await connection.getBalance(new PublicKey(Wallet)) / Bil 
+    try {
+        const Balance = await connection.getBalance(new PublicKey(Wallet)) / Bil 
+        return Balance
+    } catch (e){
+        return "err"
+    }
 }
 function PrivToPub(PrivateKey) {
     try {
