@@ -495,6 +495,7 @@ app.post("/newWallet", async (req, res) => {
     }
     const Params = req.body
     NewWallet(UserID, req.query.account, Params)
+    
     console.log("Params: ", Params)
     res.status(200).send({ success: true, data: Params });
 });
@@ -737,6 +738,7 @@ async function UpdateWalletFactor(UserID, Wallet) {
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
     EachUserTargetData[UserID][Wallet].WalletSize = WalletSize
 }
+//TODO make remove wallet from script (for when deleting and changing names)
 async function AddWalletToScript(UserID, Wallet) {
     const UserData = GetData("UserValues")
     const UserWalletKey = UserData[UserID].ObfBaseTransKey
