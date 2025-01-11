@@ -586,9 +586,6 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         }
         const TheirCurrentTokens = await GetTokens(WalletAddress, TheirLastTokens, RPCConnectionsByUser[UserID].SubConnections);
         
-        console.log("previous Tokens: ", TheirLastTokens)
-        console.log("current tokens:", TheirCurrentTokens)
-
         if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
             console.log("no change in wallet detected. Retrying", deep + 1)
             await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
