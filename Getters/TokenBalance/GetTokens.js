@@ -1,16 +1,6 @@
 require('dotenv').config();
 const { Connection, PublicKey } = require('@solana/web3.js');
 
-const SOLANA_RPC_ENDPOINTS = {
-    //"mainnet-beta": "https://api.mainnet-beta.solana.com",
-    //"publicnode": "https://solana-rpc.publicnode.com/",
-    //"tracker": "https://rpc-mainnet.solanatracker.io/?api_key=81b71925-ca06-487c-ac6c-155d8a9e3cda",
-    //"chainstack": "https://solana-mainnet.core.chainstack.com/155d8d316c41d2ab16e07ee9190e409c",
-    "quiknode-2": "https://virulent-few-dawn.solana-mainnet.quiknode.pro/272b003581d3e1ec81ab5ccf9f7a8008cb0453ec",
-    "quiknode-1": "https://flashy-radial-needle.solana-mainnet.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7",
-    "helius": "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f",
-    "ligma": "https://public.ligmanode.com",
-};
 
 const TPID = new PublicKey(process.env.ProgramID);
 function deepEqual(obj1, obj2) {

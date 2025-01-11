@@ -774,6 +774,7 @@ async function UpdateWalletFactor(UserID, Wallet) {
     const UserData = GetData("UserValues")
     const WalletSize = await GetBal(UserID, Wallet);
     const UserWalletSize = await GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
+    console.log("user wallet size: ", UserWalletSize)
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
     EachUserTargetData[UserID][Wallet].WalletSize = WalletSize
 }
