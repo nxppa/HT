@@ -14,42 +14,47 @@ let CompletedCopies = []
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 let SolVal = FetchSolVal()
 async function updateValue() {
-  const Fetched = await FetchSolVal()
-  if (Fetched) {
-    SolVal = Fetched
-  }
+    const Fetched = await FetchSolVal()
+    if (Fetched) {
+        SolVal = Fetched
+    }
 }
 function startConstantUpdate() {
-  setInterval(async () => {
-    await updateValue()
-  }, 10000)
+    setInterval(async () => {
+        await updateValue()
+    }, 10000)
 }
 updateValue()
 startConstantUpdate()
 function GetTime(raw) {
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric',
-      fractionalSecondDigits: 3,
-      hour12: false,
-      timeZone: 'Australia/Sydney',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        fractionalSecondDigits: 3,
+        hour12: false,
+        timeZone: 'Australia/Sydney',
     });
     const timeString = formatter.format(now);
     const time = raw ? timeString : `[${timeString}]`;
-  
-    return time;
-  }
 
+    return time;
+}
+const SpecialTokens = {
+    EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: "USDC",
+    So11111111111111111111111111111111111111112: "WSOL",
+    Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: "USDT",
+    HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr: "EURC",
+}
 async function GetBal(UserID, Wallet) {
     //!important
     const connection = RPCConnectionsByUser[UserID].Main
     //TODO make it so it uses main and subconnections instead of just main
     try {
-        const Balance = await connection.getBalance(new PublicKey(Wallet)) / Bil 
+        const Balance = await connection.getBalance(new PublicKey(Wallet)) / Bil
         return Balance
-    } catch (e){
+    } catch (e) {
         return "err"
     }
 }
@@ -151,7 +156,7 @@ function NewWallet(UserID, WalletAddress, WalletData) {
     UserValues[UserID].Targets[WalletAddress] = WalletData
     console.log(UserValues)
     WriteData("UserValues", UserValues)
-    if (WalletData.Valid){
+    if (WalletData.Valid) {
         AddWalletToScript(UserID, WalletAddress)
     }
 
@@ -444,7 +449,7 @@ app.get("/api/tools/generateWallets", async (req, res) => {
 //TODO add sanity checks for all params
 //TODO add ratelimits for all methods
 
-app.post("/setValue", async (req, res) => { 
+app.post("/setValue", async (req, res) => {
     const clientIp = req.ip;
     if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     let UserID = null
@@ -517,7 +522,7 @@ app.post("/newWallet", async (req, res) => {
     const Params = req.body
     Params.Valid = false
     NewWallet(UserID, req.query.account, Params)
-    
+
     console.log("Params: ", Params)
     res.status(200).send({ success: true, data: Params });
 });
@@ -558,8 +563,8 @@ function inferTransactionType(amount) {
         return 'no change'
     }
 }
-function enqueueSwap(Data){
-console.log("ENQUEUED SWAP ", Data)
+function enqueueSwap(Data) {
+    console.log("ENQUEUED SWAP ", Data)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     let Diagnosed = false
@@ -741,16 +746,16 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
 }
 process.on('SIGINT', async () => {
     console.info('Received SIGINT. Shutting down at ', GetTime());
-    for (const User in subscriptions){
+    for (const User in subscriptions) {
         for (const wallet in subscriptions[User]) {
             for (const index in subscriptions[wallet]) {
-              await connections[index].removeOnLogsListener(subscriptions[UserID][wallet][index]);
+                await connections[index].removeOnLogsListener(subscriptions[UserID][wallet][index]);
             }
-          }
+        }
     }
 
     process.exit(0);
-  });
+});
 
 
 async function UpdateWalletFactor(UserID, Wallet) {
@@ -804,7 +809,7 @@ async function main() {
         RPCConnectionsByUser[UserID].Main = new Connection(UserData[UserID].Connections.Main)
 
         for (const TargetWallet in CurrentUserTargets) {
-            if (UserData[UserID].Targets[TargetWallet].Valid == true){
+            if (UserData[UserID].Targets[TargetWallet].Valid == true) {
                 AddWalletToScript(UserID, TargetWallet)
             }
         }
