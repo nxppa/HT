@@ -584,7 +584,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                 console.log("deepness: ", deep)
             }
         }
-        const WalletFactor = EachUserTargetData[UserID][WalletAddress].WalletFactor
+        const WalletFactor = EachUserTargetData[UserID].Targets[WalletAddress].WalletFactor
         for (const mint in TheirCurrentTokens) {
             const CurrentMintAmount = TheirCurrentTokens[mint]
             const LastMintAmount = TheirLastTokens[mint]
