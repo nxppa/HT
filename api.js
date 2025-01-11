@@ -26,7 +26,21 @@ function startConstantUpdate() {
 }
 updateValue()
 startConstantUpdate()
-
+function GetTime(raw) {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      fractionalSecondDigits: 3,
+      hour12: false,
+      timeZone: 'Australia/Sydney',
+    });
+    const timeString = formatter.format(now);
+    const time = raw ? timeString : `[${timeString}]`;
+  
+    return time;
+  }
 
 async function GetBal(UserID, Wallet) {
     //!important
