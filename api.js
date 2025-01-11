@@ -11,9 +11,9 @@ const Bil = 1000000000
 let CompletedCopies = []
 async function GetBal(UserID, Wallet) {
     //!important
-    //TODO Make it so that calling getbal with a private key as a parameter converts it to a public key,
     const connection = RPCConnectionsByUser[UserID].Main
-    return await connection.getBalance(new PublicKey(Wallet)) / Bil //TODO make it so it uses multiple endpoints
+    //TODO make it so it uses main and subconnections instead of just main
+    return await connection.getBalance(new PublicKey(Wallet)) / Bil 
 }
 function PrivToPub(PrivateKey) {
     try {
@@ -31,8 +31,8 @@ function print(str) {
 }
 const app = express();
 const MaxWallets = 100;
-const port = 3000; // TODO: Make env files
-const BackupIp = "142.93.123.245";
+const port = process.env.port
+const WebIP = process.env.WebIP
 const AuthTimeMins = 8;
 let blacklist = {};
 let TokenToKey = {}
@@ -231,12 +231,8 @@ function validateSessionToken(token, currentIp) {
     }
 }
 
-const SOLANA_RPC_ENDPOINT = "https://public.ligmanode.com"; // TODO: Maybe make it use multiple endpoints 
-const connection = new Connection(SOLANA_RPC_ENDPOINT, {
-    commitment: 'confirmed',
-});
 
-app.listen(port, BackupIp, function (err) {
+app.listen(port, WebIP, function (err) {
     if (err) console.log(err);
     console.log("Server listening on PORT", port);
 });
@@ -330,19 +326,6 @@ app.get("/validate", async (req, res) => {
 });
 
 
-app.get("/api/tools/getBalance", async (req, res) => {
-    const clientIp = req.ip;
-    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
-    const Account = req.query.account
-    if (!Account) {
-        return res.status(400).send({ error: "Account parameter is required" });
-    }
-    const Pub = new PublicKey(Account)
-    const Balance = await connection.getBalance(Pub) / Bil //TODO fix this
-    let Response = {}
-    Response.Balance = Balance
-    res.status(200).send(Response);
-});
 
 app.get("/getMe", async (req, res) => {
     const clientIp = req.ip;
@@ -417,12 +400,12 @@ app.get("/api/tools/generateWallets", async (req, res) => {
 });
 
 
+//TODO add sanity checks for all params
+//TODO add ratelimits for all methods
 
-
-app.post("/setValue", async (req, res) => { //TODO add ratelimits for all methods
+app.post("/setValue", async (req, res) => { 
     const clientIp = req.ip;
-    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
-    //TODO add sanity checks for params
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     let UserID = null
     if (req.query.key) {
         UserID = decodeKey(req.query.key)
@@ -439,10 +422,9 @@ app.post("/setValue", async (req, res) => { //TODO add ratelimits for all method
 });
 
 
-app.post("/setValues", async (req, res) => { //TODO add ratelimits for all methods
+app.post("/setValues", async (req, res) => {
     const clientIp = req.ip;
-    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
-    //TODO add sanity checks for params
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     let UserID = null
     if (req.query.key) {
         UserID = decodeKey(req.query.key)
@@ -456,10 +438,9 @@ app.post("/setValues", async (req, res) => { //TODO add ratelimits for all metho
     res.status(200).send({ success: true, data: DataSet });
 });
 
-app.post("/setWalletAddress", async (req, res) => { //TODO add ratelimits for all methods
+app.post("/setWalletAddress", async (req, res) => {
     const clientIp = req.ip;
     if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
-    //TODO add sanity checks for params
     let UserID = null
     if (req.query.key) {
         UserID = decodeKey(req.query.key)
@@ -482,10 +463,9 @@ app.post("/setWalletAddress", async (req, res) => { //TODO add ratelimits for al
 });
 
 
-app.post("/newWallet", async (req, res) => { //TODO add ratelimits for all methods
+app.post("/newWallet", async (req, res) => {
     const clientIp = req.ip;
-    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
-    //TODO add sanity checks for params
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     let UserID = null
     if (req.query.key) {
         UserID = decodeKey(req.query.key)
@@ -496,14 +476,12 @@ app.post("/newWallet", async (req, res) => { //TODO add ratelimits for all metho
     const Params = req.body
     NewWallet(UserID, req.query.account, Params)
     console.log("Params: ", Params)
-    //TODO add new wallet
     res.status(200).send({ success: true, data: Params });
 });
 
-app.post("/removeWallet", async (req, res) => { //TODO add ratelimits for all methods
+app.post("/removeWallet", async (req, res) => {
     const clientIp = req.ip;
-    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
-    //TODO add sanity checks for params
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return
     let UserID = null
     if (req.query.key) {
         UserID = decodeKey(req.query.key)
@@ -514,10 +492,9 @@ app.post("/removeWallet", async (req, res) => { //TODO add ratelimits for all me
     const AccountToRemove = req.query.account
     console.log("removing: ", AccountToRemove)
     RemoveWallet(UserID, AccountToRemove)
-    //TODO add new wallet
     res.status(200).send({ success: true, data: AccountToRemove });
 });
-app.post("/newUser", async (req, res) => { //TODO add ratelimits for all methods
+app.post("/newUser", async (req, res) => {
     const clientIp = req.ip;
     const MasterKey = req.query.MSK
     const id = req.query.id
@@ -527,8 +504,6 @@ app.post("/newUser", async (req, res) => { //TODO add ratelimits for all methods
         return
     }
     const NewAcc = NewUser(id)
-
-    //TODO add new wallet
     res.status(200).send({ success: true, key: NewAcc });
 });
 function inferTransactionType(amount) {
@@ -539,6 +514,9 @@ function inferTransactionType(amount) {
     } else {
         return 'no change'
     }
+}
+function enqueueSwap(Data){
+console.log("ENQUEUED SWAP ", Data)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     let Diagnosed = false
@@ -689,9 +667,6 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             if (LoggedSignatures.length > MAX_SIGNATURES) {
                 EachUserTargetData[UserID][WalletAdd].PreviousTokens = GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections)
                 UpdateWalletFactor(UserID, WalletAdd)
-                //! important
-                //TODO make it update wallet factor and size 
-
                 LoggedSignatures.shift()
             }
             if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])) {
@@ -708,7 +683,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
             if (InString && !logs.err) {
                 LoggedSignatures.push(logs.signature)
-                console.log(WalletAdd, "good data: ", logs);
+                console.log("Would handle trade event ", logs.signature, WalletAdd, UserID);
                 handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs, UserID);
             } else {
                 console.log("Useless data: ", logs.signature);
