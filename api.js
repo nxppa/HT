@@ -714,6 +714,8 @@ let subscriptions = {}
 const MAX_SIGNATURES = 1000
 function subscribeToWalletTransactions(UserID, WalletAdd) {
     const CurrWalletPubKey = new PublicKey(WalletAdd);
+    const CurrentClientBal = GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
+    
     for (const index in RPCConnectionsByUser[UserID].SubConnections) {
         const connection = RPCConnectionsByUser[UserID].SubConnections[index]
         const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
@@ -727,7 +729,8 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             }
             if (LoggedSignatures.length > MAX_SIGNATURES) {
                 EachUserTargetData[UserID][WalletAdd].PreviousTokens = GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections)
-                UpdateWalletFactor(UserID, WalletAdd)
+
+                UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
                 LoggedSignatures.shift()
             }
             if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])) {
@@ -754,7 +757,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
         }
         subscriptions[UserID][WalletAdd][index] = id;
     }
-    UpdateWalletFactor(UserID, WalletAdd);
+    UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal);
 }
 process.on('SIGINT', async () => {
     console.info('Received SIGINT. Shutting down at ', GetTime());
