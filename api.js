@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
@@ -711,6 +713,7 @@ process.on('SIGINT', async () => {
 
 
 async function UpdateWalletFactor(UserID, Wallet) {
+    const UserData = GetData("UserValues")
     const WalletSize = await GetBal(UserID, Wallet);
     const UserWalletSize = await GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
