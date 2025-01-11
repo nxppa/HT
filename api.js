@@ -55,6 +55,7 @@ async function GetBal(UserID, Wallet) {
         const Balance = await connection.getBalance(new PublicKey(Wallet)) / Bil
         return Balance
     } catch (e) {
+        console.log("COULD NOT GET BALANCE")
         return "err"
     }
 }
@@ -567,7 +568,7 @@ function enqueueSwap(Data) {
     if (CompletedCopies.includes(Data.Signature)) { //TODO make it shift and clear old signatures
         console.log("duplicate transaction detected. skipping")
         return
-      }
+    }
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
@@ -773,12 +774,9 @@ async function UpdateWalletFactor(UserID, Wallet) {
 //TODO make remove wallet from script (for when deleting and changing names)
 async function AddWalletToScript(UserID, Wallet) {
     const UserData = GetData("UserValues")
-    const UserWalletKey = UserData[UserID].ObfBaseTransKey
     const CurrentTokens = GetTokens(Wallet, null, RPCConnectionsByUser[UserID].SubConnections)
-    const WalletSize = GetBal(UserID, Wallet)
-    const UserWalletSize = GetBal(UserID, PrivToPub(UserWalletKey)) //TODO make an input for ObfBaseTransKey on client and parse to server
-    const WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
-    EachUserTargetData[UserID][Wallet] = { PreviousTokens: CurrentTokens, WalletFactor: WalletFactor, WalletSize: WalletSize }
+    EachUserTargetData[UserID][Wallet] = { PreviousTokens: CurrentTokens}
+    UpdateWalletFactor(UserID, Wallet)
     subscribeToWalletTransactions(UserID, Wallet)
 }
 
