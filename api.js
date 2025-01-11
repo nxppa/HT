@@ -795,7 +795,6 @@ async function main() {
         console.log("ud: ", UserData)
         console.log("pass: ", Pass)
         const CurrentUserTargets = UserData[UserID].Targets
-        EachUserTokens[UserID] = GetTokens(CurrentUserTargets)
 
         subscriptions[UserID] = {}
         RPCConnectionsByUser[UserID] = {
@@ -808,18 +807,20 @@ async function main() {
         });
 
         RPCConnectionsByUser[UserID].Main = new Connection(UserData[UserID].Connections.Main)
-
+       
+        const MyWallet = PrivToPub(UserData[UserID].ObfBaseTransKey)
+        
         for (const TargetWallet in CurrentUserTargets) {
             if (UserData[UserID].Targets[TargetWallet].Valid == true) {
                 AddWalletToScript(UserID, TargetWallet)
             }
         }
-        const MyWallet = PrivToPub(UserData[UserID].ObfBaseTransKey)
         const PersonalWalletPubKey = new PublicKey(MyWallet)
         RPCConnectionsByUser[UserID].Main.onLogs(PersonalWalletPubKey, async (logs, ctx) => {
             Events.emit(`${UserID}:${logs.signature}`, logs)
         }, 'confirmed')
-
+        
+        EachUserTokens[UserID] = GetTokens(MyWallet, null, RPCConnectionsByUser[UserID].SubConnections)
     }
 }
 main()
