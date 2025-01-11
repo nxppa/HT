@@ -33,7 +33,7 @@ function print(str) {
 }
 const app = express();
 const MaxWallets = 100;
-const port = process.env.port
+const port = process.env.PORT
 const WebIP = process.env.WebIP
 const AuthTimeMins = 8;
 let blacklist = {};
