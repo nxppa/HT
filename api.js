@@ -574,12 +574,12 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
     const UserTokens = EachUserTokens[UserID]
 
     let Diagnosed = false
-    if (deep >= 8) {
+    if (deep >= 20) {
         console.log("max retries for changes logged exceeded")
         return
     }
     try {
-        const TheirLastTokens = CurrentTargetWalletData.PreviousTokens
+        let TheirLastTokens = CurrentTargetWalletData.PreviousTokens
         if (TheirLastTokens instanceof Promise) {
             TheirLastTokens = await TheirLastTokens;
         }
