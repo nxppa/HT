@@ -273,7 +273,6 @@ function validateSessionToken(token, currentIp) {
 
         return payload.Key;
     } catch (err) {
-        console.log(err)
         return null;
     }
 }
@@ -572,6 +571,7 @@ function enqueueSwap(Data) {
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
+    const UserTokens = EachUserTokens[UserID]
     console.log("CurrentTargetWalletData: ", CurrentTargetWalletData)
     let Diagnosed = false
     if (deep >= 8) {
@@ -621,8 +621,8 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     } else if (transactionType == "sell") {
                         // token amount IN MINT
                         const FactorSold = Math.abs(balanceChange) / LastMintAmount
-                        const MyTokenAmountSelling = MyTokens[mint] * FactorSold || 0
-                        console.log(balanceChange, LastMintAmount, MyTokens, FactorSold, MyTokenAmountSelling, null, logs)
+                        const MyTokenAmountSelling = UserTokens[mint] * FactorSold || 0
+                        console.log(balanceChange, LastMintAmount, UserTokens, FactorSold, MyTokenAmountSelling, null, logs)
                         console.log(GetTime(), "SELLING", MyTokenAmountSelling, mint)
 
                         const SwapData = {
@@ -662,7 +662,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         }
         for (const mint in TheirLastTokens) {
             if (TheirCurrentTokens[mint] == null) {
-                const AllMyMint = MyTokens[mint] || 0;
+                const AllMyMint = UserTokens[mint] || 0;
                 console.log(GetTime(), "SELLING ALL", AllMyMint);
                 const SwapData = {
                     transactionType: "sell",
@@ -737,7 +737,6 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
             if (InString && !logs.err) {
                 LoggedSignatures.push(logs.signature)
-                console.log("Would handle trade event ", logs.signature, WalletAdd, UserID);
                 handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs, UserID);
             } else {
                 console.log("Useless data: ", logs.signature);
@@ -773,13 +772,12 @@ async function UpdateWalletFactor(UserID, Wallet) {
 }
 //TODO make remove wallet from script (for when deleting and changing names)
 async function AddWalletToScript(UserID, Wallet) {
-    const UserData = GetData("UserValues")
     const CurrentTokens = GetTokens(Wallet, null, RPCConnectionsByUser[UserID].SubConnections)
     EachUserTargetData[UserID][Wallet] = { PreviousTokens: CurrentTokens}
     UpdateWalletFactor(UserID, Wallet)
     subscribeToWalletTransactions(UserID, Wallet)
 }
-
+let EachUserTokens = {}
 let RPCConnectionsByUser = {}
 async function AddRPCToScript(UserID, Link) {
     const ArrEnd = RPCConnectionsByUser[UserID].SubConnections.length
@@ -797,7 +795,7 @@ async function main() {
         console.log("ud: ", UserData)
         console.log("pass: ", Pass)
         const CurrentUserTargets = UserData[UserID].Targets
-
+        EachUserTokens[UserID] = GetTokens(CurrentUserTargets)
 
         subscriptions[UserID] = {}
         RPCConnectionsByUser[UserID] = {
