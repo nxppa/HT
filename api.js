@@ -567,13 +567,15 @@ function enqueueSwap(Data) {
     console.log("ENQUEUED SWAP ", Data)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
+    const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
+    console.log("CurrentTargetWalletData: ", CurrentTargetWalletData)
     let Diagnosed = false
     if (deep >= 8) {
         console.log("max retries for changes logged exceeded")
         return
     }
     try {
-        const TheirLastTokens = EachUserTargetData[UserID][WalletAddress].PreviousTokens
+        const TheirLastTokens = CurrentTargetWalletData.PreviousTokens
         const TheirCurrentTokens = await GetTokens(WalletAddress, TheirLastTokens, RPCConnectionsByUser[UserID].SubConnections);
         if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
             console.log("no change in wallet detected. Retrying", deep + 1)
@@ -584,7 +586,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                 console.log("deepness: ", deep)
             }
         }
-        const WalletFactor = EachUserTargetData[UserID].Targets[WalletAddress].WalletFactor
+        const WalletFactor = CurrentTargetWalletData.WalletFactor
         for (const mint in TheirCurrentTokens) {
             const CurrentMintAmount = TheirCurrentTokens[mint]
             const LastMintAmount = TheirLastTokens[mint]
@@ -671,7 +673,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                 Diagnosed = true;
             }
         }
-        EachUserTargetData[UserID][WalletAddress].PreviousTokens = TheirCurrentTokens
+        CurrentTargetWalletData.PreviousTokens = TheirCurrentTokens
     } catch (error) {
         if (error.response && error.response.status === 429) {
             console.warn('Encountered 429 Too Many Requests. slow down.');
