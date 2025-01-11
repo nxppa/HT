@@ -564,6 +564,7 @@ function inferTransactionType(amount) {
     }
 }
 function enqueueSwap(Data) {
+    CompletedCopies.push(Data.Signature)
     console.log("ENQUEUED SWAP ", Data)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
