@@ -132,7 +132,9 @@ function NewWallet(UserID, WalletAddress, WalletData) {
     UserValues[UserID].Targets[WalletAddress] = WalletData
     console.log(UserValues)
     WriteData("UserValues", UserValues)
-    AddWalletToScript(UserID, WalletAddress)
+    if (WalletData.Valid){
+        AddWalletToScript(UserID, WalletAddress)
+    }
 
     //TODO make a check for duplicate wallets, make a check to see if its client's wallet
 }
@@ -494,6 +496,7 @@ app.post("/newWallet", async (req, res) => {
         UserID = decodeKey(UserKey)
     }
     const Params = req.body
+    Params.Valid = false
     NewWallet(UserID, req.query.account, Params)
     
     console.log("Params: ", Params)
