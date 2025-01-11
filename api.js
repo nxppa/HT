@@ -572,7 +572,7 @@ function enqueueSwap(Data) {
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
     const UserTokens = EachUserTokens[UserID]
-    console.log("CurrentTargetWalletData: ", CurrentTargetWalletData)
+
     let Diagnosed = false
     if (deep >= 8) {
         console.log("max retries for changes logged exceeded")
@@ -581,6 +581,10 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
     try {
         const TheirLastTokens = CurrentTargetWalletData.PreviousTokens
         const TheirCurrentTokens = await GetTokens(WalletAddress, TheirLastTokens, RPCConnectionsByUser[UserID].SubConnections);
+        
+        console.log("previous Tokens: ", TheirLastTokens)
+        console.log("current tokens:", TheirCurrentTokens)
+
         if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
             console.log("no change in wallet detected. Retrying", deep + 1)
             await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
