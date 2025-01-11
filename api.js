@@ -564,8 +564,10 @@ function inferTransactionType(amount) {
     }
 }
 function enqueueSwap(Data) {
-    CompletedCopies.push(Data.Signature)
-    console.log("ENQUEUED SWAP ", Data)
+    if (CompletedCopies.includes(Data.Signature)) { //TODO make it shift and clear old signatures
+        console.log("duplicate transaction detected. skipping")
+        return
+      }
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
