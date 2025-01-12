@@ -50,9 +50,7 @@ function containsNonBase58Character(str) {
 
 async function AnalyseAccount(Account, Connections) {
     let Response = {
-        data: {
-
-        },
+        data: {},
         type: null
     }
 

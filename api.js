@@ -568,7 +568,7 @@ function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
-    console.log("WOULD ENQUEUE SWAP ", Data)
+    console.log(`WOULD ENQUEUE SWAP AT ${Date.now()}`, Data)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
