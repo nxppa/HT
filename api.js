@@ -286,8 +286,15 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
-
-
+function SendWS(UserID, Dictionary){
+    const UserWebSocket = UserIDToWebsocket[UserID]
+    if (UserWebSocket){
+        return ws.send(JSON.stringify(Dictionary))
+    } else {
+        return false
+    }    
+}
+let UserIDToWebsocket = {}
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 4000 }); //TODO make this env
 wss.on('connection', (ws, req) => {
@@ -303,11 +310,15 @@ wss.on('connection', (ws, req) => {
     }
     const UserID = KeyToUser(Key)
     console.log("USER: ", UserID)
-    ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
+    UserIDToWebsocket[UserID] = ws
+    SendWS(UserID, { message: 'Welcome to the WebSocket server!' });
     ws.on('message', (message) => {
-        console.log(`Message from client:`, message);
+
+        console.log(`Message from client:`, message)
+
     });
     ws.on('close', () => {
+        delete UserIDToWebsocket[UserID]
         console.log(`Client with sessionToken ${sessionToken} disconnected`);
     });
 });
@@ -574,6 +585,8 @@ async function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
+    const MessageToClient = Data
+    SendWS(Data.User, MessageToClient)
     console.log(`WOULD ENQUEUE SWAP AT ${Date.now()}`, Data)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
