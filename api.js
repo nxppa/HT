@@ -289,7 +289,7 @@ app.use(cors(corsOptions));
 function SendWS(UserID, Dictionary){
     const UserWebSocket = UserIDToWebsocket[UserID]
     if (UserWebSocket){
-        return ws.send(JSON.stringify(Dictionary))
+        return UserWebSocket.send(JSON.stringify(Dictionary))
     } else {
         return false
     }    
