@@ -16,6 +16,7 @@ tmux attach
 tmux ls
 
 git config --global credential.helper "cache --timeout=360000"
+sudo systemctl reload nginx
 
 sudo systemctl start nginx
 

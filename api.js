@@ -288,38 +288,29 @@ const Origins = [
     "chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll",
     "chrome-extension://klehhdabnpholjlfjflaifpkgjnekjbi",
     "chrome-extension://nbmoeigmlejgliinjpkjggobbbokeaje",
+    
 ];
 
 const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        if (Origins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
+    credentials: true // Allow cookies or authentication headers
 };
+
 app.use(express.json());
 app.use(cors(corsOptions));
 
 
+
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 4000   }); //TODO make this env
+const wss = new WebSocket.Server({ port: 4000 }); //TODO make this env
 wss.on('connection', (ws, req) => {
     console.log("rcvd")
     const params = new URLSearchParams(req.url.split('?')[1]);
     const sessionToken = params.get('session_token');
-    const clientIp = req.socket.remoteAddress;
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    if (!validateSessionToken(sessionToken, clientIp)) {
-        ws.close(4001, 'Invalid session token');
-        return;
-    }
-    console.log(`Client connected with sessionToken: ${sessionToken}`);
     ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
     ws.on('message', (message) => {
         console.log(`Message from client:`, message);
