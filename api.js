@@ -62,7 +62,6 @@ async function GetBal(UserID, Wallet) {
 function PrivToPub(PrivateKey) {
     try {
         const privateKeyArray = bs58.decode(PrivateKey);
-        console.log(privateKeyArray)
         const keypair = Keypair.fromSecretKey(privateKeyArray);
         return keypair.publicKey.toBase58();
     } catch (error) {
