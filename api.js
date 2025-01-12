@@ -65,12 +65,8 @@ function PrivToPub(PrivateKey) {
         const keypair = Keypair.fromSecretKey(privateKeyArray);
         return keypair.publicKey.toBase58();
     } catch (error) {
-        console.log(error)
         throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
     }
-}
-function print(str) {
-    console.log(str)
 }
 const app = express();
 const MaxWallets = 100;
@@ -791,11 +787,7 @@ process.on('SIGINT', async () => {
 async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null) {
     const UserData = GetData("UserValues")
     const WalletSize = await GetBal(UserID, Wallet);
-
-    console.log("WS Details: ", UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
-
     const UserWalletSize = PresetWalletSize || await GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
-    console.log("user wallet size: ", UserWalletSize)
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
     EachUserTargetData[UserID][Wallet].WalletSize = WalletSize
 }

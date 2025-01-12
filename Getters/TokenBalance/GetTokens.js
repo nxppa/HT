@@ -68,11 +68,11 @@ async function GetTokens(Address, previousTokens = null, SOLANA_RPC_ENDPOINTS) {
             matchingTokens = tokensList
         }
         const endTime = Date.now();
-        console.log(`Total operation time for GetTokens: ${(endTime - startTime) / 1000}s`);
+        console.log(`Total operation time for GetTokens: for ${Address} ${(endTime - startTime) / 1000}s`);
         return matchingTokens || tokensList
     } catch (errors) {
         const endTime = Date.now();
-        console.log(`Total operation time for GetTokens (failed): ${(endTime - startTime) / 1000}s`);
+        console.log(`Total operation time for GetTokens for ${Address} (failed): ${(endTime - startTime) / 1000}s`);
         throw new Error('All RPC endpoints failed to fetch token accounts.');
     }
 }
