@@ -615,6 +615,9 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
             }
         }
         const WalletFactor = CurrentTargetWalletData.WalletFactor
+        if (Number.isNaN(WalletFactor)){
+            console.warn("WALLET FACTOR IS NAN. accompanying data: ", UserID, CurrentTargetWalletData)
+        }
         for (const mint in TheirCurrentTokens) {
             const CurrentMintAmount = TheirCurrentTokens[mint]
             const LastMintAmount = TheirLastTokens[mint]
