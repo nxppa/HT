@@ -308,12 +308,14 @@ app.use(cors(corsOptions));
 
 
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 8080  }); //TODO make this env
+const wss = new WebSocket.Server({ port: 3000  }); //TODO make this env
 wss.on('connection', (ws, req) => {
     console.log("rcvd")
     const params = new URLSearchParams(req.url.split('?')[1]);
     const sessionToken = params.get('session_token');
-    if (!validateSessionToken(sessionToken)) {
+    const clientIp = req.socket.remoteAddress;
+
+    if (!validateSessionToken(sessionToken, clientIp)) {
         ws.close(4001, 'Invalid session token');
         return;
     }
