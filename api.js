@@ -277,14 +277,6 @@ app.listen(port, WebIP, function (err) {
     console.log("Server listening on PORT", port);
 });
 
-const Origins = [
-    "chrome-extension://lkdhledpbhaplhlkpidfelelcmiinknn",
-    "chrome-extension://cdglhdpadffbnjbgbglpmkokgfdjmcll",
-    "chrome-extension://klehhdabnpholjlfjflaifpkgjnekjbi",
-    "chrome-extension://nbmoeigmlejgliinjpkjggobbbokeaje",
-    
-];
-
 const corsOptions = {
     origin: '*', // Allow all origins
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
@@ -296,15 +288,17 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 
-
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 4000 }); //TODO make this env
 wss.on('connection', (ws, req) => {
     console.log("rcvd")
     const params = new URLSearchParams(req.url.split('?')[1]);
     const sessionToken = params.get('session_token');
+    const queryParams = new URLSearchParams(url.parse(req.url).query);
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-
+    console.log("IP: ", clientIp)
+    console.log("params: ", queryParams)
+    
     ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
     ws.on('message', (message) => {
         console.log(`Message from client:`, message);
@@ -593,7 +587,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
             TheirLastTokens = await TheirLastTokens;
         }
         const TheirCurrentTokens = await GetTokens(WalletAddress, TheirLastTokens, RPCConnectionsByUser[UserID].SubConnections);
-        
+
         if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
             console.log("no change in wallet detected. Retrying", deep + 1)
             await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
@@ -725,7 +719,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
     const CurrWalletPubKey = new PublicKey(WalletAdd);
     const UserData = GetData("UserValues")
     const CurrentClientBal = GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
-    
+
     for (const index in RPCConnectionsByUser[UserID].SubConnections) {
         const connection = RPCConnectionsByUser[UserID].SubConnections[index]
         const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
@@ -793,7 +787,7 @@ async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null) {
 //TODO make remove wallet from script (for when deleting and changing names)
 async function AddWalletToScript(UserID, Wallet) {
     const CurrentTokens = GetTokens(Wallet, null, RPCConnectionsByUser[UserID].SubConnections)
-    EachUserTargetData[UserID][Wallet] = { PreviousTokens: CurrentTokens}
+    EachUserTargetData[UserID][Wallet] = { PreviousTokens: CurrentTokens }
     UpdateWalletFactor(UserID, Wallet)
     subscribeToWalletTransactions(UserID, Wallet)
 }
@@ -805,7 +799,7 @@ async function AddRPCToScript(UserID, Link) {
 }
 //9WD3qzitzuC1r
 //879244945867804700
-async function AddUserToScript(UserID){
+async function AddUserToScript(UserID) {
     const UserData = GetData("UserValues")
     EachUserTargetData[UserID] = {}
     CompletedCopies[UserID] = []
