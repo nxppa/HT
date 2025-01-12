@@ -297,7 +297,12 @@ wss.on('connection', (ws, req) => {
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     console.log("IP: ", clientIp)
     console.log("params: ", params)
-
+    const Key = validateSessionToken(sessionToken, clientIp) 
+    if (!Key){
+        return
+    }
+    const UserID = KeyToUser(key)
+    console.log("USER: ", UserID)
     ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
     ws.on('message', (message) => {
         console.log(`Message from client:`, message);
