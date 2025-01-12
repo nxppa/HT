@@ -310,6 +310,7 @@ app.use(cors(corsOptions));
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 8080  }); //TODO make this env
 wss.on('connection', (ws, req) => {
+    console.log("rcvd")
     const params = new URLSearchParams(req.url.split('?')[1]);
     const sessionToken = params.get('session_token');
     if (!validateSessionToken(sessionToken)) {
