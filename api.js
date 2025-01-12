@@ -740,6 +740,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
     for (const index in RPCConnectionsByUser[UserID].SubConnections) {
         const connection = RPCConnectionsByUser[UserID].SubConnections[index]
         const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
+            console.log("logs: ", logs)
             if (!SolVal) {
                 //! no solvalue; wil break
                 //TODO make it log this
