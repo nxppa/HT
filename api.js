@@ -305,29 +305,22 @@ const corsOptions = {
 };
 app.use(express.json());
 app.use(cors(corsOptions));
+
+
 const WebSocket = require('ws');
-
-// Mock session token validation
-
-const wss = new WebSocket.Server({ port: process.env.PORT });
+const wss = new WebSocket.Server({ port: 8080  }); //TODO make this env
 wss.on('connection', (ws, req) => {
     const params = new URLSearchParams(req.url.split('?')[1]);
     const sessionToken = params.get('session_token');
-
     if (!validateSessionToken(sessionToken)) {
         ws.close(4001, 'Invalid session token');
         return;
     }
-
     console.log(`Client connected with sessionToken: ${sessionToken}`);
-
-    // Send a welcome message
     ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
-
     ws.on('message', (message) => {
         console.log(`Message from client:`, message);
     });
-
     ws.on('close', () => {
         console.log(`Client with sessionToken ${sessionToken} disconnected`);
     });
