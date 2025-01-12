@@ -305,6 +305,33 @@ const corsOptions = {
 };
 app.use(express.json());
 app.use(cors(corsOptions));
+const WebSocket = require('ws');
+
+// Mock session token validation
+
+const wss = new WebSocket.Server({ port: process.env.PORT });
+wss.on('connection', (ws, req) => {
+    const params = new URLSearchParams(req.url.split('?')[1]);
+    const sessionToken = params.get('session_token');
+
+    if (!validateSessionToken(sessionToken)) {
+        ws.close(4001, 'Invalid session token');
+        return;
+    }
+
+    console.log(`Client connected with sessionToken: ${sessionToken}`);
+
+    // Send a welcome message
+    ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
+
+    ws.on('message', (message) => {
+        console.log(`Message from client:`, message);
+    });
+
+    ws.on('close', () => {
+        console.log(`Client with sessionToken ${sessionToken} disconnected`);
+    });
+});
 
 function ValidateKey(key) {
     const ValidKeys = GetData("Passes")
@@ -391,9 +418,9 @@ app.get("/api/tools/generateWallet", async (req, res) => {
     Response.privateKey = PrivKey
     res.status(200).send(Response);
 });
-app.get("/api/tools/scanner", async (req, res) => { //TODO add ratelimits for all methods
+app.get("/api/tools/scanner", async (req, res) => {
     const clientIp = req.ip;
-    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return; //TODO add support for private wallet scanning
+    if (!KeyCheck(res, req.query.key, req.query.session_token, false, clientIp)) return;
     let key = null
     if (req.query.key) {
         key = req.query.key

@@ -130,9 +130,7 @@ function GetTime(raw) {
   return time;
 }
 async function getWalletBalance(Wallet) {
-
   return await connection.getBalance(new PublicKey(Wallet)) / Bil //TODO make it so it uses multiple endpoints
-
 }
 function ToDecimalString(num) {
   if (Math.abs(num) < 1e-6) {
@@ -488,15 +486,11 @@ async function checkTokenBalances(signature, TransType, Addy, logs, deep) {
     await checkTokenBalances(signature, TransType, Addy, logs, deep + 1)
     return
   }
-
-
-
 }
 
 function handleTradeEvent(signature, TransType, Address, logs) {
   if (!CompletedCopies.includes(signature)) {
     checkTokenBalances(signature, TransType, Address, logs, 0)
-
   } else {
     console.log("FOR SOME REASON GEEKED")
   }
@@ -873,14 +867,11 @@ function subscribeToWalletTransactions(WalletAdd) {
 
 process.on('SIGINT', async () => {
   console.info('Received SIGINT. Shutting down at ', GetTime());
-
   for (const wallet in subscriptions) {
     for (const index in subscriptions[wallet]) {
       await connections[index].removeOnLogsListener(subscriptions[wallet][index]);
     }
   }
-
-
   process.exit(0);
 });
 
