@@ -10,7 +10,7 @@ const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
 const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
-let CompletedCopies = []
+let CompletedCopies = {}
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 let SolVal = FetchSolVal()
 async function updateValue() {
@@ -577,8 +577,8 @@ function inferTransactionType(amount) {
         return 'no change'
     }
 }
-function enqueueSwap(Data) {
-    if (CompletedCopies.includes(Data.Signature)) { //TODO make it shift and clear old signatures
+async function enqueueSwap(Data) {
+    if (CompletedCopies[Data.User].includes(Data.Signature)) { //TODO make it shift and clear old signatures
         console.log("duplicate transaction detected. skipping")
         return
     }
@@ -634,6 +634,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             Signature: signature,
                             logs: logs,
                             AmountTheyreBuying: CurrentMintAmount,
+                            User: UserID
                         }
                         await enqueueSwap(SwapData);
                         Diagnosed = true
@@ -652,6 +653,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             Signature: signature,
                             logs: logs,
                             FactorSold: FactorSold,
+                            User: UserID
                         }
 
                         await enqueueSwap(SwapData);
@@ -672,7 +674,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     Signature: signature,
                     logs: logs,
                     AmountTheyreBuying: CurrentMintAmount,
-
+                    User: UserID
                 }
                 await enqueueSwap(SwapData);
                 Diagnosed = true
@@ -691,6 +693,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     Signature: signature,
                     logs: logs,
                     FactorSold: 1,
+                    User: UserID
                 }
                 await enqueueSwap(SwapData);
                 Diagnosed = true;
@@ -713,7 +716,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
 
 
 function handleTradeEvent(signature, TransType, Address, logs, UserID) {
-    if (!CompletedCopies.includes(signature)) {
+    if (!CompletedCopies[UserID].includes(signature)) {
         checkTokenBalances(signature, TransType, Address, logs, 0, UserID)
     } else {
         console.log("FOR SOME REASON GEEKED")
@@ -812,42 +815,38 @@ async function AddRPCToScript(UserID, Link) {
 }
 //9WD3qzitzuC1r
 //879244945867804700
-async function main() {
+async function AddUserToScript(UserID){
     const UserData = GetData("UserValues")
+    EachUserTargetData[UserID] = {}
+    CompletedCopies[UserID] = []
+    const CurrentUserTargets = UserData[UserID].Targets
+    subscriptions[UserID] = {}
+    RPCConnectionsByUser[UserID] = {
+        Main: null,
+        SubConnections: []
+    }
+    UserData[UserID].Connections.SubConnections.forEach((endpoint, index) => {
+        console.log("adding rpc")
+        AddRPCToScript(UserID, endpoint)
+    });
+    RPCConnectionsByUser[UserID].Main = new Connection(UserData[UserID].Connections.Main)
+    const MyWallet = PrivToPub(UserData[UserID].ObfBaseTransKey)
+    for (const TargetWallet in CurrentUserTargets) {
+        if (UserData[UserID].Targets[TargetWallet].Valid == true) {
+            AddWalletToScript(UserID, TargetWallet)
+        }
+    }
+    const PersonalWalletPubKey = new PublicKey(MyWallet)
+    RPCConnectionsByUser[UserID].Main.onLogs(PersonalWalletPubKey, async (logs, ctx) => {
+        Events.emit(`${UserID}:${logs.signature}`, logs)
+    }, 'confirmed')
+    EachUserTokens[UserID] = GetTokens(MyWallet, null, RPCConnectionsByUser[UserID].SubConnections)
+}
+async function main() {
     const UserPasses = GetData("Passes")
     for (const Pass in UserPasses) {
         const UserID = String(UserPasses[Pass])
-        EachUserTargetData[UserID] = {}
-        console.log("uid: ", UserID)
-        console.log("ud: ", UserData)
-        console.log("pass: ", Pass)
-        const CurrentUserTargets = UserData[UserID].Targets
-
-        subscriptions[UserID] = {}
-        RPCConnectionsByUser[UserID] = {
-            Main: null,
-            SubConnections: []
-        }
-        UserData[UserID].Connections.SubConnections.forEach((endpoint, index) => {
-            console.log("adding rpc")
-            AddRPCToScript(UserID, endpoint)
-        });
-
-        RPCConnectionsByUser[UserID].Main = new Connection(UserData[UserID].Connections.Main)
-       
-        const MyWallet = PrivToPub(UserData[UserID].ObfBaseTransKey)
-        
-        for (const TargetWallet in CurrentUserTargets) {
-            if (UserData[UserID].Targets[TargetWallet].Valid == true) {
-                AddWalletToScript(UserID, TargetWallet)
-            }
-        }
-        const PersonalWalletPubKey = new PublicKey(MyWallet)
-        RPCConnectionsByUser[UserID].Main.onLogs(PersonalWalletPubKey, async (logs, ctx) => {
-            Events.emit(`${UserID}:${logs.signature}`, logs)
-        }, 'confirmed')
-        
-        EachUserTokens[UserID] = GetTokens(MyWallet, null, RPCConnectionsByUser[UserID].SubConnections)
+        AddUserToScript(UserID)
     }
 }
 main()
