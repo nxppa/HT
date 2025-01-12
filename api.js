@@ -301,7 +301,7 @@ wss.on('connection', (ws, req) => {
     if (!Key){
         return
     }
-    const UserID = KeyToUser(key)
+    const UserID = KeyToUser(Key)
     console.log("USER: ", UserID)
     ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
     ws.on('message', (message) => {
