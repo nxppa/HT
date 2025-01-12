@@ -585,9 +585,9 @@ async function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
-    const MessageToClient = Data
+    let MessageToClient = Data
+    MessageToClient.Time = Date.now()
     SendWS(Data.User, MessageToClient)
-    console.log(`WOULD ENQUEUE SWAP AT ${Date.now()}`, Data)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
@@ -740,7 +740,6 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
     for (const index in RPCConnectionsByUser[UserID].SubConnections) {
         const connection = RPCConnectionsByUser[UserID].SubConnections[index]
         const id = connection.onLogs(CurrWalletPubKey, async (logs, ctx) => {
-            console.log("logs: ", logs)
             if (!SolVal) {
                 //! no solvalue; wil break
                 //TODO make it log this
