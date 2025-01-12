@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
@@ -299,7 +298,7 @@ app.use(cors(corsOptions));
 
 
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 4000 }); //TODO make this env
+const wss = new WebSocket("wss://bayharbour.boats"); //TODO make this env
 wss.on('connection', (ws, req) => {
     console.log("rcvd")
     const params = new URLSearchParams(req.url.split('?')[1]);
