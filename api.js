@@ -294,11 +294,10 @@ wss.on('connection', (ws, req) => {
     console.log("rcvd")
     const params = new URLSearchParams(req.url.split('?')[1]);
     const sessionToken = params.get('session_token');
-    const queryParams = new URLSearchParams(url.parse(req.url).query);
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     console.log("IP: ", clientIp)
-    console.log("params: ", queryParams)
-    
+    console.log("params: ", params)
+
     ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
     ws.on('message', (message) => {
         console.log(`Message from client:`, message);
