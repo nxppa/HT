@@ -583,7 +583,6 @@ function inferTransactionType(amount) {
 }
 async function enqueueSwap(Data) {
     let UserData = GetData("UserValues")
-    let TargetWallet = UserData[Data.User]
     //TODO make it shift and clear recent transactions
     if (CompletedCopies[Data.User].includes(Data.Signature)) { //TODO make it shift and clear old signatures
         console.log("duplicate transaction detected. skipping")
@@ -594,7 +593,8 @@ async function enqueueSwap(Data) {
         data: Data,
     }
     MessageToClient.Time = Date.now()
-    TargetWallet.RecentTransactions.push(Data)
+    UserData[Data.User].RecentTransactions.push(Data)
+    WriteData("UserValues", UserData)
     SendWS(Data.User, MessageToClient)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
