@@ -538,7 +538,6 @@ app.post("/newWallet", async (req, res) => {
     }
     const Params = req.body
     Params.Valid = false
-    Params.RecentTransactions = []
     NewWallet(UserID, req.query.account, Params)
 
     console.log("Params: ", Params)
