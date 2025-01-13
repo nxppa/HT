@@ -591,7 +591,8 @@ async function enqueueSwap(Data) {
         type: "Transaction",
         data: Data,
     }
-    MessageToClient.Time = Date.now()
+    MessageToClient.data.Time = Date.now()
+    console.log("error parsing:  ", SwapData)
     UserData[Data.User].Targets[Data.Wallet].RecentTransactions.push(Data)
     WriteData("UserValues", UserData)
     SendWS(Data.User, MessageToClient)
