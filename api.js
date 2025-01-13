@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const bs58 = require("bs58").default
 const { generateKey, decodeKey } = require("./Operations/PassGen.js")
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
-const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
+const { Connection, PublicKey, Keypair, Transaction } = require('@solana/web3.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
 let CompletedCopies = {}
@@ -161,9 +161,9 @@ const NewUserTemplate = {
     Targets: {},
     ObfBaseTransKey: null,
     Connections: {
-        Main: "https://public.ligmanode.com",
+        Main: null,
         SubConnections: [
-            "https://public.ligmanode.com",
+            null,
         ]
     }
 }
@@ -538,6 +538,7 @@ app.post("/newWallet", async (req, res) => {
     }
     const Params = req.body
     Params.Valid = false
+    Params.RecentTransactions = []
     NewWallet(UserID, req.query.account, Params)
 
     console.log("Params: ", Params)
@@ -581,12 +582,19 @@ function inferTransactionType(amount) {
     }
 }
 async function enqueueSwap(Data) {
+    let UserData = GetData("UserValues")
+    let TargetWallet = UserData[Data.User]
+    //TODO make it shift and clear recent transactions
     if (CompletedCopies[Data.User].includes(Data.Signature)) { //TODO make it shift and clear old signatures
         console.log("duplicate transaction detected. skipping")
         return
     }
-    let MessageToClient = Data
+    let MessageToClient = {
+        type: "Transaction",
+        data: Data,
+    }
     MessageToClient.Time = Date.now()
+    TargetWallet.RecentTransactions.push(Data)
     SendWS(Data.User, MessageToClient)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
