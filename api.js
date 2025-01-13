@@ -592,7 +592,7 @@ async function enqueueSwap(Data) {
         data: Data,
     }
     MessageToClient.Time = Date.now()
-    UserData[Data.User].RecentTransactions.push(Data)
+    UserData[Data.User].Targets[Data.Wallet].RecentTransactions.push(Data)
     WriteData("UserValues", UserData)
     SendWS(Data.User, MessageToClient)
 }
