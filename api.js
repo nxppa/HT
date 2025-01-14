@@ -352,7 +352,7 @@ app.get("/authenticate", async (req, res) => {
     const Seconds = AuthTimeMins * 60;
     const Miliseconds = Seconds * 1000;
     res.cookie('session_token', token, { httpOnly: true, secure: true, maxAge: Miliseconds });
-    return res.status(200).send({ success: true, message: 'Authentication successful!', token: token });
+    return res.status(200).send({ success: true, message: 'Authentication successful!', token: token, UserData: GetUserData(key) });
 });
 
 app.get("/getData", async (req, res) => {
@@ -378,9 +378,10 @@ app.get("/validate", async (req, res) => {
 
     if (IsValid) {
         const payload = jwt.decode(token);
-        const newToken = generateSessionToken(TokenToKey[token], clientIp);
+        const Key = TokenToKey[token]
+        const newToken = generateSessionToken(Key, clientIp);
         invalidateToken(token); // Invalidate the old token
-        res.status(200).send({ success: true, message: 'TokenValid', token: newToken });
+        res.status(200).send({ success: true, message: 'TokenValid', token: newToken, UserData: GetUserData(Key) });
         console.log("reinstating key")
     } else {
         console.log("invalid token: ", token)
