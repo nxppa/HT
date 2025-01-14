@@ -593,7 +593,7 @@ async function enqueueSwap(Data) {
     }
     MessageToClient.data.Time = Date.now()
     console.log("error parsing:  ", SwapData)
-    UserData[Data.User].Targets[Data.Wallet].RecentTransactions.push(Data)
+    UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
     WriteData("UserValues", UserData)
     SendWS(Data.User, MessageToClient)
 }
@@ -646,7 +646,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             transactionType: "buy",
                             mintAddress: mint,
                             AmountOfTokensToSwap: HowManyTokensToBuy,
-                            Wallet: WalletAddress,
+                            CopyingWallet: WalletAddress,
                             Signature: signature,
                             logs: logs,
                             AmountTheyreBuying: CurrentMintAmount,
@@ -665,7 +665,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             transactionType: "sell",
                             mintAddress: mint,
                             AmountOfTokensToSwap: MyTokenAmountSelling,
-                            Wallet: WalletAddress,
+                            CopyingWallet: WalletAddress,
                             Signature: signature,
                             logs: logs,
                             FactorSold: FactorSold,
@@ -686,7 +686,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     transactionType: "buy",
                     mintAddress: mint,
                     AmountOfTokensToSwap: HowManyTokensToBuy,
-                    Wallet: WalletAddress,
+                    CopyingWallet: WalletAddress,
                     Signature: signature,
                     logs: logs,
                     AmountTheyreBuying: CurrentMintAmount,
@@ -705,7 +705,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     transactionType: "sell",
                     mintAddress: mint,
                     AmountOfTokensToSwap: AllMyMint,
-                    Wallet: WalletAddress,
+                    CopyingWallet: WalletAddress,
                     Signature: signature,
                     logs: logs,
                     FactorSold: 1,
