@@ -592,7 +592,7 @@ async function enqueueSwap(Data) {
         data: Data,
     }
     MessageToClient.data.Time = Date.now()
-    console.log("error parsing:  ", SwapData)
+    console.log("error parsing:  ", Data)
     UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
     WriteData("UserValues", UserData)
     SendWS(Data.User, MessageToClient)
@@ -603,6 +603,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
 
     let Diagnosed = false
     if (deep >= 20) {
+        //TODO make it so its a time limit aswell as max retries limit
         console.log("max retries for changes logged exceeded")
         return
     }
