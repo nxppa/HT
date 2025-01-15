@@ -588,11 +588,14 @@ async function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
+    
+    
     let MessageToClient = {
         type: "Transaction",
         data: Data,
     }
     MessageToClient.data.Time = Date.now()
+    delete MessageToClient.data.logs
     console.log("error parsing:  ", Data)
     UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
     WriteData("UserValues", UserData)
