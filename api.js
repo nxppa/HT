@@ -311,7 +311,7 @@ wss.on('connection', (ws, req) => {
     const UserID = KeyToUser(Key)
     console.log("USER: ", UserID)
     UserIDToWebsocket[UserID] = ws
-    SendWS(UserID, { message: 'Welcome to the WebSocket server!' });
+    SendWS(UserID, { message: 'established ws connection' });
     ws.on('message', (message) => {
 
         console.log(`Message from client:`, message)
@@ -588,16 +588,16 @@ async function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
-    
-    
     let MessageToClient = {
         type: "Transaction",
         data: Data,
     }
     MessageToClient.data.Time = Date.now()
     delete MessageToClient.data.logs
+    delete MessageToClient.data.User
     console.log("error parsing:  ", Data)
     UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
+    //TODO make it parse the symbol and image of the coin
     WriteData("UserValues", UserData)
     SendWS(Data.User, MessageToClient)
 }
