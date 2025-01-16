@@ -12,6 +12,7 @@ const Bil = 1000000000
 let CompletedCopies = {}
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 let SolVal = FetchSolVal()
+let MaxRecentTransactionsPerWallet = 50 //TODO make this editable via console
 async function updateValue() {
     const Fetched = await FetchSolVal()
     if (Fetched) {
@@ -597,6 +598,9 @@ async function enqueueSwap(Data) {
     delete MessageToClient.data.User
     console.log("error parsing:  ", Data)
     UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
+    if (UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet){
+        UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.shift()
+    }
     //TODO make it parse the symbol and image of the coin
     WriteData("UserValues", UserData)
     SendWS(Data.User, MessageToClient)
