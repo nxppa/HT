@@ -702,7 +702,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     CopyingWallet: WalletAddress,
                     Signature: signature,
                     logs: logs,
-                    AmountTheyreBuying: balanceChange,
+                    AmountTheyreBuying: CurrentMintAmount,
                     User: UserID
                 }
                 await enqueueSwap(SwapData);
