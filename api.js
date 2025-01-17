@@ -13,6 +13,8 @@ let CompletedCopies = {}
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 let SolVal = FetchSolVal()
 let MaxRecentTransactionsPerWallet = 50 //TODO make this editable via console
+const { getAsset } = require("./Getters/AssetInfo/Helius.js")
+
 async function updateValue() {
     const Fetched = await FetchSolVal()
     if (Fetched) {
@@ -589,6 +591,8 @@ async function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
+    const AssetData = await getAsset(data.mintAddress)
+    Data.Token = AssetData
     let MessageToClient = {
         type: "Transaction",
         data: Data,

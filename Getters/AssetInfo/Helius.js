@@ -2,7 +2,7 @@
 require('dotenv').config();
 
 async function getAsset(assetId) {
-    const url = `https://mainnet.helius-rpc.com/?api-key=${process.env.HeliusApiKey}`;
+    const url = `https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f`; //TODO make this managed by server
 
     const body = {
         "jsonrpc": "2.0",
@@ -31,7 +31,7 @@ async function getAsset(assetId) {
             "name": data.result.content.metadata.name,
             "description": data.result.content.metadata.description,
             "symbol": data.result.content.metadata.symbol,
-            //"Image": data.result.content.files.uri
+            "Image": data.result.content.links.image
         }
         return Output;
     } catch (error) {
