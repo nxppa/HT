@@ -152,7 +152,6 @@ function KeyToUser(Key) {
 function NewWallet(UserID, WalletAddress, WalletData) {
     let UserValues = GetData("UserValues")
     UserValues[UserID].Targets[WalletAddress] = WalletData
-    console.log(UserValues)
     WriteData("UserValues", UserValues)
     if (WalletData.Valid) {
         AddWalletToScript(UserID, WalletAddress)
@@ -226,7 +225,6 @@ function GetUserData(Key) {
     }
     const User = decodeKey(Key)
     const UserData = UserValues[User]
-    console.log(User, UserValues, UserData, Key)
     return UserData
 }
 
@@ -240,7 +238,6 @@ function invalidateToken(token) {
 }
 
 function generateSessionToken(Key, clientIp) {
-    console.log(Key)
     const issuedAt = Math.floor(Date.now() / 1000);
     const expiresAt = issuedAt + AuthTimeMins * 60;
     const NewToken = jwt.sign({ Key, clientIp, issuedAt, expiresAt }, process.env.JWT, { jwtid: generateJti() });
@@ -256,18 +253,15 @@ function validateSessionToken(token, currentIp) {
     try {
         const payload = jwt.verify(token, process.env.JWT);
         const currentTime = Math.floor(Date.now() / 1000);
-
         if (payload.expiresAt < currentTime) {
             throw new Error('Token expired');
         }
-
         if (blacklist[payload.jti]) {
             throw new Error('Token blacklisted');
         }
         if (payload.clientIp !== currentIp) {
             throw new Error(`IP address mismatch. payload: ${payload.clientIp} | Current: ${currentIp}`);
         }
-
         return payload.Key;
     } catch (err) {
         return null;
@@ -305,14 +299,11 @@ wss.on('connection', (ws, req) => {
     const params = new URLSearchParams(req.url.split('?')[1]);
     const sessionToken = params.get('session_token');
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    console.log("IP: ", clientIp)
-    console.log("params: ", params)
     const Key = validateSessionToken(sessionToken, clientIp) 
     if (!Key){
         return
     }
     const UserID = KeyToUser(Key)
-    console.log("USER: ", UserID)
     UserIDToWebsocket[UserID] = ws
     SendWS(UserID, { message: 'established ws connection' });
     ws.on('message', (message) => {
@@ -369,7 +360,6 @@ app.get("/getData", async (req, res) => {
     } else if (SessionToken) {
         const key = TokenToKey[SessionToken]
         const Data = GetUserData(key)
-        console.log("giving data: ", Data)
         res.status(200).send(Data);
     }
     return
@@ -385,7 +375,6 @@ app.get("/validate", async (req, res) => {
         const newToken = generateSessionToken(Key, clientIp);
         invalidateToken(token); // Invalidate the old token
         res.status(200).send({ success: true, message: 'TokenValid', token: newToken, UserData: GetUserData(Key) });
-        console.log("reinstating key")
     } else {
         console.log("invalid token: ", token)
         res.status(403).send({ success: false, message: 'Token invalid', token: token });
@@ -427,9 +416,6 @@ app.get("/api/tools/scanner", async (req, res) => {
     if (!AccountToScan) {
         return res.status(400).send({ error: "Account parameter is required" });
     }
-    console.log("user: ", UserID)
-    console.log("db: ", RPCConnectionsByUser)
-
     const Response = await AnalyseAccount(AccountToScan, RPCConnectionsByUser[UserID].SubConnections)
     if (typeof (Response) == "string") {
         return res.status(200).send({ Response });
