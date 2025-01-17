@@ -658,7 +658,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             CopyingWallet: WalletAddress,
                             Signature: signature,
                             logs: logs,
-                            AmountTheyreBuying: CurrentMintAmount,
+                            AmountTheyreBuying: balanceChange,
                             User: UserID
                         }
                         await enqueueSwap(SwapData);
@@ -698,7 +698,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     CopyingWallet: WalletAddress,
                     Signature: signature,
                     logs: logs,
-                    AmountTheyreBuying: CurrentMintAmount,
+                    AmountTheyreBuying: balanceChange,
                     User: UserID
                 }
                 await enqueueSwap(SwapData);
