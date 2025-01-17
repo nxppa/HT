@@ -591,7 +591,7 @@ async function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
-    const AssetData = await getAsset(data.mintAddress)
+    const AssetData = await getAsset(Data.mintAddress)
     Data.Token = AssetData
     let MessageToClient = {
         type: "Transaction",
