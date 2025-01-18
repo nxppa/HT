@@ -577,6 +577,13 @@ async function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
+    const User = Data.User
+
+
+
+
+
+    
     const AssetData = await getAsset(Data.mintAddress)
     Data.Token = AssetData
     let MessageToClient = {
@@ -584,16 +591,16 @@ async function enqueueSwap(Data) {
         data: Data,
     }
     MessageToClient.data.Time = Date.now()
-    delete MessageToClient.data.logs
     delete MessageToClient.data.User
+    delete MessageToClient.data.logs
     console.log("error parsing:  ", Data)
-    UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
-    if (UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet){
-        UserData[Data.User].Targets[Data.CopyingWallet].RecentTransactions.shift()
+    UserData[User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
+    if (UserData[User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet){
+        UserData[User].Targets[Data.CopyingWallet].RecentTransactions.shift()
     }
     //TODO make it parse the symbol and image of the coin
     WriteData("UserValues", UserData)
-    SendWS(Data.User, MessageToClient)
+    SendWS(User, MessageToClient)
 }
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
