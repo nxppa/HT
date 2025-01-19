@@ -592,9 +592,9 @@ async function enqueueSwap(Data) {
     MessageToClient.data.Time = Date.now()
 
     if (UserData[User].Targets[Data.CopyingWallet].Halted){
-        MessageToClient.Halted = true
+        MessageToClient.data.Halted = true
     } else {
-        MessageToClient.Halted = false
+        MessageToClient.data.Halted = false
     }
     MessageToClient.data.SuccessfullyEnacted = Math.random() > 0.1 ? true : false //!
     
