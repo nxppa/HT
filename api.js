@@ -582,7 +582,6 @@ async function enqueueSwap(Data) {
 
 
 
-
     
     const AssetData = await getAsset(Data.mintAddress)
     Data.Token = AssetData
@@ -591,6 +590,14 @@ async function enqueueSwap(Data) {
         data: Data,
     }
     MessageToClient.data.Time = Date.now()
+
+    if (UserData[User].Targets[Data.CopyingWallet].Halted){
+        MessageToClient.Halted = true
+    } else {
+        MessageToClient.Halted = false
+    }
+    MessageToClient.data.SuccessfullyEnacted = Math.random() > 0.1 ? true : false //!
+    
     delete MessageToClient.data.User
     delete MessageToClient.data.logs
     console.log("error parsing:  ", Data)
