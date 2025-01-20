@@ -579,7 +579,9 @@ async function enqueueSwap(Data) {
     }
     const User = Data.User
 
-
+    if (AmountTheyreBuying < 1000){
+        console.log("PARSED TINY TRANSACTION!",MessageToClient.data.logs)
+    }
 
 
     
