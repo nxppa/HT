@@ -770,6 +770,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
                 //TODO make it log this
                 return
             }
+            UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
             if (LoggedSignatures.includes(logs.signature)) {
                 return;
             }
@@ -795,7 +796,6 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             } else {
                 console.log("Useless data: ", logs.signature);
             }
-            UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
         }, 'confirmed');
         if (!subscriptions[UserID][WalletAdd]) {
             subscriptions[UserID][WalletAdd] = {};
