@@ -12,7 +12,7 @@ const Bil = 1000000000
 let CompletedCopies = {}
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 let SolVal = FetchSolVal()
-let MaxRecentTransactionsPerWallet = 50 //TODO make this editable via console
+let MaxRecentTransactionsPerWallet = 25 //TODO make this editable via console
 const { getAsset } = require("./Getters/AssetInfo/Helius.js")
 
 async function updateValue() {
@@ -614,7 +614,6 @@ async function enqueueSwap(Data) {
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
     const UserTokens = EachUserTokens[UserID]
-
     let Diagnosed = false
     if (deep >= 20) {
         //TODO make it so its a time limit aswell as max retries limit
@@ -825,7 +824,11 @@ async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null) {
     const WalletSize = await GetBal(UserID, Wallet);
     const UserWalletSize = PresetWalletSize || await GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
+    const BalanceBefore = EachUserTargetData[UserID][Wallet].WalletSize
     EachUserTargetData[UserID][Wallet].WalletSize = WalletSize
+    const SOLBalChange = WalletSize - BalanceBefore
+    console.log("SOLBAL CHANGE: ", SOLBalChange)
+    return SOLBalChange
 }
 //TODO make remove wallet from script (for when deleting and changing names)
 async function AddWalletToScript(UserID, Wallet) {

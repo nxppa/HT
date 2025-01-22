@@ -5,6 +5,9 @@ So11111111111111111111111111111111111111112
 HT bot
 7223785939:AAGfMOJ1lZ_6gweR3i-P5CRDoMiLtY7c1WM
 
+//https://www.youtube.com/watch?v=mOKPj7-LgKM //! transfers
+//https://www.youtube.com/watch?v=NT-oYdV67u4 //! Raydium swaps
+
 
 
 sudo lsof -i :80
@@ -21,5 +24,3 @@ sudo systemctl reload nginx
 sudo systemctl start nginx
 
 /etc/nginx/sites-enabled/default
-
-https://flashy-radial-needle.SOLANA_MAINNET.quiknode.pro/1f355b50797c678551df08ed13bb94295ebebfc7
