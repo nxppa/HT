@@ -775,7 +775,6 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             }
             if (LoggedSignatures.length > MAX_SIGNATURES) {
                 EachUserTargetData[UserID][WalletAdd].PreviousTokens = GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections)
-                UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
                 LoggedSignatures.shift()
             }
             if (findMatchingStrings(logs.logs, ["Program log: Instruction: TransferChecked"])) {
@@ -789,6 +788,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
                 `Program log: Instruction: Sell`,
                 `Program log: Instruction: Buy`
             ];
+            UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
             const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
             if (InString && !logs.err) {
                 LoggedSignatures.push(logs.signature)
