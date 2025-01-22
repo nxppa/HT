@@ -770,10 +770,10 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
                 //TODO make it log this
                 return
             }
-            UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
             if (LoggedSignatures.includes(logs.signature)) {
                 return;
             }
+            UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal, logs.signature)
             if (LoggedSignatures.length > MAX_SIGNATURES) {
                 EachUserTargetData[UserID][WalletAdd].PreviousTokens = GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections)
                 LoggedSignatures.shift()
@@ -818,7 +818,7 @@ process.on('SIGINT', async () => {
 });
 
 
-async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null) {
+async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null, Signature = null) {
     const UserData = GetData("UserValues");
     const getUserWalletSizePromise = PresetWalletSize !== null
       ? Promise.resolve(PresetWalletSize)
@@ -832,7 +832,7 @@ async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null) {
     const BalanceBefore = EachUserTargetData[UserID][Wallet].WalletSize;
     EachUserTargetData[UserID][Wallet].WalletSize = WalletSize;
     const SOLBalChange = WalletSize - BalanceBefore;
-    console.log("SOLBAL CHANGE: ", SOLBalChange);
+    console.log("SOLBAL CHANGE: ", SOLBalChange, Signature);
     return SOLBalChange;
   }
   
