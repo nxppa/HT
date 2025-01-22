@@ -775,7 +775,6 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             }
             if (LoggedSignatures.length > MAX_SIGNATURES) {
                 EachUserTargetData[UserID][WalletAdd].PreviousTokens = GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections)
-
                 UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
                 LoggedSignatures.shift()
             }
@@ -820,16 +819,23 @@ process.on('SIGINT', async () => {
 
 
 async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null) {
-    const UserData = GetData("UserValues")
-    const WalletSize = await GetBal(UserID, Wallet);
-    const UserWalletSize = PresetWalletSize || await GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey))
+    const UserData = GetData("UserValues");
+    const getUserWalletSizePromise = PresetWalletSize !== null
+      ? Promise.resolve(PresetWalletSize)
+      : GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey));
+    const getWalletSizePromise = GetBal(UserID, Wallet);
+    const [WalletSize, UserWalletSize] = await Promise.all([
+      getWalletSizePromise,
+      getUserWalletSizePromise
+    ]);
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
-    const BalanceBefore = EachUserTargetData[UserID][Wallet].WalletSize
-    EachUserTargetData[UserID][Wallet].WalletSize = WalletSize
-    const SOLBalChange = WalletSize - BalanceBefore
-    console.log("SOLBAL CHANGE: ", SOLBalChange)
-    return SOLBalChange
-}
+    const BalanceBefore = EachUserTargetData[UserID][Wallet].WalletSize;
+    EachUserTargetData[UserID][Wallet].WalletSize = WalletSize;
+    const SOLBalChange = WalletSize - BalanceBefore;
+    console.log("SOLBAL CHANGE: ", SOLBalChange);
+    return SOLBalChange;
+  }
+  
 //TODO make remove wallet from script (for when deleting and changing names)
 async function AddWalletToScript(UserID, Wallet) {
     const CurrentTokens = GetTokens(Wallet, null, RPCConnectionsByUser[UserID].SubConnections)
