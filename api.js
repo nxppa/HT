@@ -788,7 +788,6 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
                 `Program log: Instruction: Sell`,
                 `Program log: Instruction: Buy`
             ];
-            UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
             const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
             if (InString && !logs.err) {
                 LoggedSignatures.push(logs.signature)
@@ -796,6 +795,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             } else {
                 console.log("Useless data: ", logs.signature);
             }
+            UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal)
         }, 'confirmed');
         if (!subscriptions[UserID][WalletAdd]) {
             subscriptions[UserID][WalletAdd] = {};
