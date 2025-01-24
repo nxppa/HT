@@ -607,7 +607,6 @@ async function enqueueSwap(Data) {
     if (UserData[User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet){
         UserData[User].Targets[Data.CopyingWallet].RecentTransactions.shift()
     }
-    //TODO make it parse the symbol and image of the coin
     WriteData("UserValues", UserData)
     SendWS(User, MessageToClient)
 }
