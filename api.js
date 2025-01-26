@@ -610,7 +610,7 @@ async function enqueueSwap(Data) {
     WriteData("UserValues", UserData)
     SendWS(User, MessageToClient)
 }
-async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID, SolBalChange) {
+async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
     const UserTokens = EachUserTokens[UserID]
     let Diagnosed = false
@@ -628,7 +628,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
 
         if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
             console.log("no change in wallet detected. Retrying", deep + 1)
-            await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID, SolBalChange)
+            await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
             return
         } else {
             if (deep != 0) {
@@ -750,9 +750,9 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
 }
 
 
-function handleTradeEvent(signature, TransType, Address, logs, UserID, SolBalChange) {
+function handleTradeEvent(signature, TransType, Address, logs, UserID) {
     if (!CompletedCopies[UserID].includes(signature)) {
-        checkTokenBalances(signature, TransType, Address, logs, 0, UserID, SolBalChange)
+        checkTokenBalances(signature, TransType, Address, logs, 0, UserID)
     } else {
         console.log("FOR SOME REASON GEEKED")
     }
@@ -804,7 +804,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
             if (InString && !logs.err) {
                 LoggedSignatures.push(logs.signature)
-                handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs, UserID, SolBalChange);
+                handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs, UserID);
             } else {
                 console.log("Useless data: ", logs.signature);
             }
