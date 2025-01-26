@@ -610,7 +610,7 @@ async function enqueueSwap(Data) {
     WriteData("UserValues", UserData)
     SendWS(User, MessageToClient)
 }
-async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
+async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID, SolBalChange) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
     const UserTokens = EachUserTokens[UserID]
     let Diagnosed = false
@@ -628,7 +628,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
 
         if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
             console.log("no change in wallet detected. Retrying", deep + 1)
-            await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
+            await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID, SolBalChange)
             return
         } else {
             if (deep != 0) {
@@ -663,7 +663,8 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             Signature: signature,
                             logs: logs,
                             AmountTheyreBuying: balanceChange,
-                            User: UserID
+                            User: UserID,
+                            SolBalChange: SolBalChange,
                         }
                         await enqueueSwap(SwapData);
                         Diagnosed = true
@@ -682,7 +683,9 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             Signature: signature,
                             logs: logs,
                             FactorSold: FactorSold,
-                            User: UserID
+                            User: UserID,
+                            SolBalChange: SolBalChange,
+
                         }
 
                         await enqueueSwap(SwapData);
@@ -703,7 +706,9 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     Signature: signature,
                     logs: logs,
                     AmountTheyreBuying: CurrentMintAmount,
-                    User: UserID
+                    User: UserID,
+                    SolBalChange: SolBalChange,
+
                 }
                 await enqueueSwap(SwapData);
                 Diagnosed = true
@@ -722,7 +727,8 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     Signature: signature,
                     logs: logs,
                     FactorSold: 1,
-                    User: UserID
+                    User: UserID,
+                    SolBalChange: SolBalChange,
                 }
                 await enqueueSwap(SwapData);
                 Diagnosed = true;
@@ -744,9 +750,9 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
 }
 
 
-function handleTradeEvent(signature, TransType, Address, logs, UserID) {
+function handleTradeEvent(signature, TransType, Address, logs, UserID, SolBalChange) {
     if (!CompletedCopies[UserID].includes(signature)) {
-        checkTokenBalances(signature, TransType, Address, logs, 0, UserID)
+        checkTokenBalances(signature, TransType, Address, logs, 0, UserID, SolBalChange)
     } else {
         console.log("FOR SOME REASON GEEKED")
     }
@@ -772,7 +778,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             if (LoggedSignatures.includes(logs.signature)) {
                 return;
             }
-            UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal, logs.signature)
+            const SolBalChange = UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal, logs.signature)
             if (LoggedSignatures.length > MAX_SIGNATURES) {
                 EachUserTargetData[UserID][WalletAdd].PreviousTokens = GetTokens(WalletAdd, null, RPCConnectionsByUser[UserID].SubConnections)
                 LoggedSignatures.shift()
@@ -791,7 +797,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             const InString = findMatchingStrings(logs.logs, ToSearchFor, false);
             if (InString && !logs.err) {
                 LoggedSignatures.push(logs.signature)
-                handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs, UserID);
+                handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs, UserID, SolBalChange);
             } else {
                 console.log("Useless data: ", logs.signature);
             }
