@@ -780,7 +780,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
             }
             UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal, logs.signature)
             .then(SOLBalChange => {
-                if (SolBalChange){
+                if (SOLBalChange){
                     console.log("SOLBalChange: ", SOLBalChange, logs.signature);
                 }
             })
