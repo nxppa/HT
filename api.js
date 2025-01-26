@@ -823,23 +823,27 @@ process.on('SIGINT', async () => {
 });
 
 
-async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null, Signature = null) {
+async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null, Signature = null, retries = 3) {
     const UserData = GetData("UserValues");
     const getUserWalletSizePromise = PresetWalletSize !== null
       ? Promise.resolve(PresetWalletSize)
       : GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey));
     const getWalletSizePromise = GetBal(UserID, Wallet);
-    const [WalletSize, UserWalletSize] = await Promise.all([
-      getWalletSizePromise,
-      getUserWalletSizePromise
-    ]);
+    const [WalletSize, UserWalletSize] = await Promise.all([getWalletSizePromise, getUserWalletSizePromise]);
+
     EachUserTargetData[UserID][Wallet].WalletFactor = Math.min(UserWalletSize / WalletSize, 1);
     const BalanceBefore = EachUserTargetData[UserID][Wallet].WalletSize;
     EachUserTargetData[UserID][Wallet].WalletSize = WalletSize;
     const SOLBalChange = WalletSize - BalanceBefore;
     console.log("SOLBAL CHANGE: ", SOLBalChange, Signature);
+    if (SOLBalChange === 0 && retries > 0) {
+        console.log("No change detected, retrying...");
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Adjust delay as needed
+        return UpdateWalletFactor(UserID, Wallet, PresetWalletSize, Signature, retries - 1);
+    }
+
     return SOLBalChange;
-  }
+}
   
 //TODO make remove wallet from script (for when deleting and changing names)
 async function AddWalletToScript(UserID, Wallet) {
