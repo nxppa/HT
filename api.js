@@ -664,7 +664,6 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             logs: logs,
                             AmountTheyreBuying: balanceChange,
                             User: UserID,
-                            SolBalChange: SolBalChange,
                         }
                         await enqueueSwap(SwapData);
                         Diagnosed = true
@@ -684,7 +683,6 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                             logs: logs,
                             FactorSold: FactorSold,
                             User: UserID,
-                            SolBalChange: SolBalChange,
 
                         }
 
@@ -707,7 +705,6 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     logs: logs,
                     AmountTheyreBuying: CurrentMintAmount,
                     User: UserID,
-                    SolBalChange: SolBalChange,
 
                 }
                 await enqueueSwap(SwapData);
@@ -728,7 +725,6 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     logs: logs,
                     FactorSold: 1,
                     User: UserID,
-                    SolBalChange: SolBalChange,
                 }
                 await enqueueSwap(SwapData);
                 Diagnosed = true;
