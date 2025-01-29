@@ -582,7 +582,7 @@ async function enqueueSwap(Data) {
     if (Data.AmountTheyreBuying < 1000){
         console.log("PARSED TINY TRANSACTION!",Data)
     }
-
+    console.log("DETECTED AT ", GetTime())
 
     
     const AssetData = await getAsset(Data.mintAddress)
