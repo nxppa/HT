@@ -526,8 +526,14 @@ app.post("/newWallet", async (req, res) => {
         const UserKey = TokenToKey[req.query.session_token]
         UserID = decodeKey(UserKey)
     }
-    const Params = req.body
-    Params.Valid = false
+    const WalletAnalysis = await AnalyseAccount(req.query.new, RPCConnectionsByUser[UserID].SubConnections)
+    let NewAddressIsValid = true
+    if (!WalletAnalysis || WalletAnalysis.type != "Wallet") {
+        NewAddressIsValid = false
+        Params.Halted = true
+    }
+    Params.Valid = NewAddressIsValid
+
     NewWallet(UserID, req.query.account, Params)
 
     console.log("Params: ", Params)
