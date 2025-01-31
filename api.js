@@ -526,6 +526,7 @@ app.post("/newWallet", async (req, res) => {
         const UserKey = TokenToKey[req.query.session_token]
         UserID = decodeKey(UserKey)
     }
+    const Params = req.body
     const WalletAnalysis = await AnalyseAccount(req.query.new, RPCConnectionsByUser[UserID].SubConnections)
     let NewAddressIsValid = true
     if (!WalletAnalysis || WalletAnalysis.type != "Wallet") {
