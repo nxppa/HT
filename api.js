@@ -579,8 +579,10 @@ function inferTransactionType(amount) {
 }
 async function enqueueSwap(Data) {
     let UserData = GetData("UserValues")
-    //TODO make it shift and clear recent transactions
-    if (CompletedCopies[Data.User].includes(Data.Signature)) { //TODO make it shift and clear old signatures
+    if (CompletedCopies[Data.User].length > 100){
+        CompletedCopies[Data.User].shift()
+    }
+    if (CompletedCopies[Data.User].includes(Data.Signature)) {
         console.log("duplicate transaction detected. skipping")
         return
     }
@@ -592,6 +594,7 @@ async function enqueueSwap(Data) {
     console.log("DETECTED AT ", GetTime())
 
     
+    // Client processing
     const AssetData = await getAsset(Data.mintAddress)
     Data.Token = AssetData
     let MessageToClient = {
@@ -609,7 +612,6 @@ async function enqueueSwap(Data) {
     
     delete MessageToClient.data.User
     delete MessageToClient.data.logs
-    console.log("error parsing:  ", Data)
     UserData[User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
     if (UserData[User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet){
         UserData[User].Targets[Data.CopyingWallet].RecentTransactions.shift()
