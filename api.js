@@ -628,10 +628,9 @@ async function enqueueSwap(Data) {
     console.log("DETECTED AT ", GetTime())
     const Key = UserData[User].ObfBaseTransKey
 
-    const TargetWalletData = UserData.Targets[Data.CopyingWallet]
+    const TargetWalletData = UserData[User].Targets[Data.CopyingWallet]
     const PrioFee = TargetWalletData.PriorityFee
     const {Successful, Signature} = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main)
-
 
 
     // Client processing
