@@ -613,24 +613,24 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
 
 async function enqueueSwap(Data) {
     let UserData = GetData("UserValues")
-    if (CompletedCopies[Data.User].length > 100) {
-        CompletedCopies[Data.User].shift()
+    const User = User
+    if (CompletedCopies[User].length > 100) {
+        CompletedCopies[User].shift()
     }
-    if (CompletedCopies[Data.User].includes(Data.Signature)) {
+    if (CompletedCopies[User].includes(Data.Signature)) {
         console.log("duplicate transaction detected. skipping")
         return
     }
-    const User = Data.User
 
     if (Data.AmountTheyreBuying < 1000) {
         console.log("PARSED TINY TRANSACTION!", Data)
     }
     console.log("DETECTED AT ", GetTime())
-    const Key = UserData[Data.User].ObfBaseTransKey
+    const Key = UserData[User].ObfBaseTransKey
 
     const TargetWalletData = UserData.Targets[Data.CopyingWallet]
     const PrioFee = TargetWalletData.PriorityFee
-    const {Successful, Signature} = await HandleSwap(Data.User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[UserID].Main)
+    const {Successful, Signature} = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main)
 
 
 
@@ -648,7 +648,7 @@ async function enqueueSwap(Data) {
         MessageToClient.data.Halted = false
     }
     MessageToClient.data.SuccessfullyEnacted = Successful //!
-    delete MessageToClient.data.User
+    delete MessageToClient.User
     delete MessageToClient.data.logs
     UserData[User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
     if (UserData[User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet) {
