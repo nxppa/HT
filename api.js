@@ -577,6 +577,9 @@ function inferTransactionType(amount) {
         return 'no change'
     }
 }
+function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, TransactionType){
+
+}
 async function enqueueSwap(Data) {
     let UserData = GetData("UserValues")
     if (CompletedCopies[Data.User].length > 100){
@@ -592,8 +595,16 @@ async function enqueueSwap(Data) {
         console.log("PARSED TINY TRANSACTION!",Data)
     }
     console.log("DETECTED AT ", GetTime())
+    const Key = UserData[UserID].ObfBaseTransKey
+    let AmountSwapping = null
 
+    const TargetWalletData = UserData.Targets[Data.CopyingWallet]
+    const PrioFee = TargetWalletData.PriorityFee
+    HandleSwap(Data.User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType)
     
+
+
+
     // Client processing
     const AssetData = await getAsset(Data.mintAddress)
     Data.Token = AssetData
@@ -602,14 +613,12 @@ async function enqueueSwap(Data) {
         data: Data,
     }
     MessageToClient.data.Time = Date.now()
-
     if (UserData[User].Targets[Data.CopyingWallet].Halted){
         MessageToClient.data.Halted = true
     } else {
         MessageToClient.data.Halted = false
     }
     MessageToClient.data.SuccessfullyEnacted = Math.random() > 0.1 ? true : false //!
-    
     delete MessageToClient.data.User
     delete MessageToClient.data.logs
     UserData[User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
