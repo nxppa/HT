@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const Events = require("events")
 const fs = require('fs');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -10,12 +11,13 @@ const { Connection, PublicKey, Keypair, Transaction } = require('@solana/web3.js
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
 let CompletedCopies = {}
+let SignatureAnalysis = {}
 const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 let SolVal = FetchSolVal()
 let MaxRecentTransactionsPerWallet = 25 //TODO make this editable via console
 const { getAsset } = require("./Getters/AssetInfo/Helius.js")
 const { Swap } = require('./Operations/PumpPortal.js');
-
+let TokensByUser = {}
 async function updateValue() {
     const Fetched = await FetchSolVal()
     if (Fetched) {
@@ -284,13 +286,13 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
-function SendWS(UserID, Dictionary){
+function SendWS(UserID, Dictionary) {
     const UserWebSocket = UserIDToWebsocket[UserID]
-    if (UserWebSocket){
+    if (UserWebSocket) {
         return UserWebSocket.send(JSON.stringify(Dictionary))
     } else {
         return false
-    }    
+    }
 }
 let UserIDToWebsocket = {}
 const WebSocket = require('ws');
@@ -300,8 +302,8 @@ wss.on('connection', (ws, req) => {
     const params = new URLSearchParams(req.url.split('?')[1]);
     const sessionToken = params.get('session_token');
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const Key = validateSessionToken(sessionToken, clientIp) 
-    if (!Key){
+    const Key = validateSessionToken(sessionToken, clientIp)
+    if (!Key) {
         return
     }
     const UserID = KeyToUser(Key)
@@ -579,13 +581,39 @@ function inferTransactionType(amount) {
     }
 }
 
-function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection){
-    Swap(Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection)
+async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection) {
+    let MaxNumRetrying = 10
+    if (TransactionType == "buy") {
+        TokensByUser[UserID][Mint] = TokensByUser[UserID][Mint] ? TokensByUser[UserID][Mint] : 0
+        TokensByUser[UserID][Mint] += Amount //! imaginary tokens
+        MaxNumRetrying = 1
+    }
+    let Successful = false
+    let Signature = null
+    for (let i = 1; i < MaxNumRetrying; i++) {
+        const ParsedSignature = await Swap(Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection)
+        if (!ParsedSignature) {
+            continue // ! no signature; continue
+        }
+        Signature = ParsedSignature
+        await new Promise((resolve) => {
+            Events.once(`${UserID}:${Signature}`, (Param) => {
+                if (Param === Signature) resolve();
+            });
+        });
+        const Analysis = SignatureAnalysis[Signature]
+        const LogsArray = logs.logs
+        if (findMatchingStrings(LogsArray, ["Error", "panicked"], true) || Analysis.err) {
+            continue
+        }
+        Successful = true
+    }
+    return {Successful, Signature}
 }
 
 async function enqueueSwap(Data) {
     let UserData = GetData("UserValues")
-    if (CompletedCopies[Data.User].length > 100){
+    if (CompletedCopies[Data.User].length > 100) {
         CompletedCopies[Data.User].shift()
     }
     if (CompletedCopies[Data.User].includes(Data.Signature)) {
@@ -594,15 +622,15 @@ async function enqueueSwap(Data) {
     }
     const User = Data.User
 
-    if (Data.AmountTheyreBuying < 1000){
-        console.log("PARSED TINY TRANSACTION!",Data)
+    if (Data.AmountTheyreBuying < 1000) {
+        console.log("PARSED TINY TRANSACTION!", Data)
     }
     console.log("DETECTED AT ", GetTime())
     const Key = UserData[UserID].ObfBaseTransKey
 
     const TargetWalletData = UserData.Targets[Data.CopyingWallet]
     const PrioFee = TargetWalletData.PriorityFee
-    HandleSwap(Data.User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[UserID].Main)
+    const {Successful, Signature} = await HandleSwap(Data.User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[UserID].Main)
 
 
 
@@ -614,16 +642,16 @@ async function enqueueSwap(Data) {
         data: Data,
     }
     MessageToClient.data.Time = Date.now()
-    if (UserData[User].Targets[Data.CopyingWallet].Halted){
+    if (UserData[User].Targets[Data.CopyingWallet].Halted) {
         MessageToClient.data.Halted = true
     } else {
         MessageToClient.data.Halted = false
     }
-    MessageToClient.data.SuccessfullyEnacted = Math.random() > 0.1 ? true : false //!
+    MessageToClient.data.SuccessfullyEnacted = Successful //!
     delete MessageToClient.data.User
     delete MessageToClient.data.logs
     UserData[User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
-    if (UserData[User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet){
+    if (UserData[User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet) {
         UserData[User].Targets[Data.CopyingWallet].RecentTransactions.shift()
     }
     WriteData("UserValues", UserData)
@@ -655,7 +683,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
             }
         }
         const WalletFactor = CurrentTargetWalletData.WalletFactor
-        if (Number.isNaN(WalletFactor)){
+        if (Number.isNaN(WalletFactor)) {
             console.warn("WALLET FACTOR IS NAN. accompanying data: ", UserID, CurrentTargetWalletData)
         }
         for (const mint in TheirCurrentTokens) {
@@ -794,11 +822,11 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
                 return;
             }
             UpdateWalletFactor(UserID, WalletAdd, CurrentClientBal, logs.signature)
-            .then(SOLBalChange => {
-                if (SOLBalChange){
-                    console.log("SOLBalChange: ", SOLBalChange, logs.signature, WalletAdd);
-                }
-            })
+                .then(SOLBalChange => {
+                    if (SOLBalChange) {
+                        console.log("SOLBalChange: ", SOLBalChange, logs.signature, WalletAdd);
+                    }
+                })
 
 
             if (LoggedSignatures.length > MAX_SIGNATURES) {
@@ -848,8 +876,8 @@ process.on('SIGINT', async () => {
 async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null, Signature = null, retries = 3) {
     const UserData = GetData("UserValues");
     const getUserWalletSizePromise = PresetWalletSize !== null
-      ? Promise.resolve(PresetWalletSize)
-      : GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey));
+        ? Promise.resolve(PresetWalletSize)
+        : GetBal(UserID, PrivToPub(UserData[UserID].ObfBaseTransKey));
     const getWalletSizePromise = GetBal(UserID, Wallet);
     const [WalletSize, UserWalletSize] = await Promise.all([getWalletSizePromise, getUserWalletSizePromise]);
 
@@ -864,7 +892,7 @@ async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null, Signa
 
     return SOLBalChange;
 }
-  
+
 //TODO make remove wallet from script (for when deleting and changing names)
 async function AddWalletToScript(UserID, Wallet) {
     const CurrentTokens = GetTokens(Wallet, null, RPCConnectionsByUser[UserID].SubConnections)
@@ -884,6 +912,7 @@ async function AddUserToScript(UserID) {
     const UserData = GetData("UserValues")
     EachUserTargetData[UserID] = {}
     CompletedCopies[UserID] = []
+    TokensByUser[UserID] = {}
     const CurrentUserTargets = UserData[UserID].Targets
     subscriptions[UserID] = {}
     RPCConnectionsByUser[UserID] = {
@@ -903,7 +932,8 @@ async function AddUserToScript(UserID) {
     }
     const PersonalWalletPubKey = new PublicKey(MyWallet)
     RPCConnectionsByUser[UserID].Main.onLogs(PersonalWalletPubKey, async (logs, ctx) => {
-        Events.emit(`${UserID}:${logs.signature}`, logs)
+        Events.emit(`${UserID}:${logs.signature}`, logs.signature)
+        SignatureAnalysis[logs.signature] = logs.logs //TODO make this shift and clear
     }, 'confirmed')
     EachUserTokens[UserID] = GetTokens(MyWallet, null, RPCConnectionsByUser[UserID].SubConnections)
 }
