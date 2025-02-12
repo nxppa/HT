@@ -613,7 +613,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
 
 async function enqueueSwap(Data) {
     let UserData = GetData("UserValues")
-    const User = User
+    const User = Data.User
     if (CompletedCopies[User].length > 100) {
         CompletedCopies[User].shift()
     }
