@@ -621,6 +621,9 @@ async function enqueueSwap(Data) {
         console.log("duplicate transaction detected. skipping")
         return
     }
+    if (!Data.AmountOfTokensToSwap){
+        return
+    }
 
     if (Data.AmountTheyreBuying < 1000) {
         console.log("PARSED TINY TRANSACTION!", Data)
