@@ -13,6 +13,7 @@ function PrivToPub(PrivateKey) {
 }
 
 async function Swap(Key, Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type, MainConnection) {
+  console.log(Amount)
   const CurrentWallet = PrivToPub(Key) //* public wallet address
 
   const CurrentWalletPubKey = new PublicKey(CurrentWallet)
