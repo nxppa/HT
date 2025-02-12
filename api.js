@@ -626,7 +626,7 @@ async function enqueueSwap(Data) {
         console.log("PARSED TINY TRANSACTION!", Data)
     }
     console.log("DETECTED AT ", GetTime())
-    const Key = UserData[UserID].ObfBaseTransKey
+    const Key = UserData[Data.User].ObfBaseTransKey
 
     const TargetWalletData = UserData.Targets[Data.CopyingWallet]
     const PrioFee = TargetWalletData.PriorityFee
