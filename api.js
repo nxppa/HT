@@ -14,6 +14,7 @@ const { FetchSolVal } = require('./Getters/SolVal/JupiterV2.js');
 let SolVal = FetchSolVal()
 let MaxRecentTransactionsPerWallet = 25 //TODO make this editable via console
 const { getAsset } = require("./Getters/AssetInfo/Helius.js")
+const { Swap } = require('./Operations/PumpPortal.js');
 
 async function updateValue() {
     const Fetched = await FetchSolVal()
@@ -577,9 +578,11 @@ function inferTransactionType(amount) {
         return 'no change'
     }
 }
-function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, TransactionType){
 
+function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection){
+    Swap(Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection)
 }
+
 async function enqueueSwap(Data) {
     let UserData = GetData("UserValues")
     if (CompletedCopies[Data.User].length > 100){
@@ -596,12 +599,10 @@ async function enqueueSwap(Data) {
     }
     console.log("DETECTED AT ", GetTime())
     const Key = UserData[UserID].ObfBaseTransKey
-    let AmountSwapping = null
 
     const TargetWalletData = UserData.Targets[Data.CopyingWallet]
     const PrioFee = TargetWalletData.PriorityFee
-    HandleSwap(Data.User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType)
-    
+    HandleSwap(Data.User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[UserID].Main)
 
 
 

@@ -1,8 +1,5 @@
-require('dotenv').config();
-
 const bs58 = require("bs58").default
 const { PublicKey, VersionedTransaction, Connection, Keypair } = require('@solana/web3.js');
-
 
 function PrivToPub(PrivateKey) {
   try {
@@ -15,21 +12,18 @@ function PrivToPub(PrivateKey) {
   }
 }
 
-const MyWallet = PrivToPub(process.env.PrivateKey) //* public wallet address
+async function Swap(Key, Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type, MainConnection) {
+  const connection = Connections.Main
+  const CurrentWallet = PrivToPub(Key) //* public wallet address
 
-const MyWalletPubKey = new PublicKey(MyWallet)
-const SOLANA_RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=62867695-c3eb-46cb-b5bc-1953cf48659f"
-const connection = new Connection(SOLANA_RPC_ENDPOINT, {
-  commitment: 'confirmed',
-});
-async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
+  const CurrentWalletPubKey = new PublicKey(CurrentWallet)
   const response = await fetch(`https://pumpportal.fun/api/trade-local`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      "publicKey": MyWalletPubKey.toString(),
+      "publicKey": CurrentWalletPubKey.toString(),
       "action": Type,
       "mint": Mint,
       "denominatedInSol": "false",
@@ -43,15 +37,15 @@ async function Swap(Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type) {
     const data = await response.arrayBuffer();
     const tx = VersionedTransaction.deserialize(new Uint8Array(data));
     console.log(tx)
-    const signerKeyPair = Keypair.fromSecretKey(bs58.decode(process.env.PrivateKey));
+    const signerKeyPair = Keypair.fromSecretKey(bs58.decode(Key));
     tx.sign([signerKeyPair])
-    const signature = await connection.sendTransaction(tx)
+    const signature = await MainConnection.sendTransaction(tx)
     console.log(signature)
     return signature
   } else {
     console.log(response)
   }
-  
+
 }
 module.exports = { Swap }
 
