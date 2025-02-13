@@ -596,6 +596,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
     for (let i = 1; i < MaxNumRetrying; i++) {
         const ParsedSignature = await Swap(Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection)
         if (!ParsedSignature) {
+            console.log("no signature parsed; continuing")
             continue // ! no signature; continue
         }
         Signature = ParsedSignature
@@ -626,6 +627,7 @@ async function enqueueSwap(Data) {
         return
     }
     if (!Data.AmountOfTokensToSwap){
+        console.log("invalid amount of tokens to swap; skipping: ", Data.AmountOfTokensToSwap)
         return
     }
 
@@ -855,7 +857,7 @@ function subscribeToWalletTransactions(UserID, WalletAdd) {
                 LoggedSignatures.push(logs.signature)
                 handleTradeEvent(logs.signature, InString, WalletAdd, logs.logs, UserID);
             } else {
-                console.log("Useless data: ", logs.signature);
+                //!console.log("Useless data: ", logs.signature);
             }
         }, 'confirmed');
         if (!subscriptions[UserID][WalletAdd]) {
