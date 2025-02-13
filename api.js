@@ -640,7 +640,7 @@ async function enqueueSwap(Data) {
     const TargetWalletData = UserData[User].Targets[Data.CopyingWallet]
     const PrioFee = TargetWalletData.PriorityFee
     const {Successful, Signature} = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main)
-
+    console.log("SWAP STATUS: ", Successful, Signature)
 
     // Client processing
     const AssetData = await getAsset(Data.mintAddress)
@@ -708,7 +708,6 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     if (transactionType == "buy") {
                         // token amount IN MINT
                         const HowManyTokensToBuy = balanceChange * WalletFactor
-                        console.log("mint comparison: ", CurrentMintAmount, LastMintAmount, TheirLastTokens, TheirCurrentTokens)
                         console.log(GetTime(), "BUYING", HowManyTokensToBuy, balanceChange, WalletFactor, logs)
                         const SwapData = {
                             transactionType: "buy",
@@ -748,9 +747,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
             } else {
                 //Token amount IN MINT
                 const HowManyTokensToBuy = CurrentMintAmount * WalletFactor
-                console.log(HowManyTokensToBuy, SolVal, CurrentMintAmount, WalletFactor, mint, signature)
                 console.log(GetTime(), "BUYING INITIAL", HowManyTokensToBuy)
-
                 const SwapData = {
                     transactionType: "buy",
                     mintAddress: mint,
