@@ -593,7 +593,9 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
     }
     let Successful = false
     let Signature = null
+    let Tries = 0
     for (let i = 1; i < MaxNumRetrying; i++) {
+        Tries = i
         const ParsedSignature = await Swap(Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection)
         if (!ParsedSignature) {
             console.log("no signature parsed; continuing")
@@ -612,7 +614,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
         }
         Successful = true
     }
-    return {Successful, Signature}
+    return {Successful, Signature, Tries}
 }
 
 async function enqueueSwap(Data) {
@@ -639,8 +641,8 @@ async function enqueueSwap(Data) {
 
     const TargetWalletData = UserData[User].Targets[Data.CopyingWallet]
     const PrioFee = TargetWalletData.PriorityFee
-    const {Successful, Signature} = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main)
-    console.log("SWAP STATUS: ", Successful, Signature)
+    const {Successful, Signature, Tries} = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main)
+    console.log("SWAP STATUS: ", {Successful, Signature, Tries})
 
     // Client processing
     const AssetData = await getAsset(Data.mintAddress)
@@ -796,6 +798,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         return
     }
 }
+
 
 
 function handleTradeEvent(signature, TransType, Address, logs, UserID) {
