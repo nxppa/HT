@@ -594,7 +594,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
     let Successful = false
     let Signature = null
     let Tries = 0
-    for (let i = 1; i < MaxNumRetrying; i++) {
+    for (let i = 0; i < MaxNumRetrying; i++) {
         Tries = i
         const ParsedSignature = await Swap(Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection)
         if (!ParsedSignature) {
