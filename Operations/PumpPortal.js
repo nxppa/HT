@@ -43,8 +43,8 @@ async function Swap(Key, Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type, Ma
     console.log(signature)
     return signature
   } else {
-    console.log(response)
-  }
+    console.log("Did not return 200: ", response)
+  } 
 
 }
 module.exports = { Swap }

@@ -601,6 +601,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
             console.log("no signature parsed; continuing")
             continue // ! no signature; continue
         }
+        
         Signature = ParsedSignature
         await new Promise((resolve) => {
             Events.once(`${UserID}:${Signature}`, (Param) => {
@@ -608,7 +609,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
             });
         });
         const Analysis = SignatureAnalysis[Signature]
-        const LogsArray = logs.logs
+        const LogsArray = Analysis.logs
         if (findMatchingStrings(LogsArray, ["Error", "panicked"], true) || Analysis.err) {
             continue
         }
