@@ -3,6 +3,7 @@ const express = require('express');
 const Events = require("events")
 const fs = require('fs');
 const cors = require('cors');
+const compression = require('compression');
 const jwt = require('jsonwebtoken');
 const bs58 = require("bs58").default
 const { generateKey, decodeKey } = require("./Operations/PassGen.js")
@@ -286,6 +287,8 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(compression());
+
 function SendWS(UserID, Dictionary) {
     const UserWebSocket = UserIDToWebsocket[UserID]
     if (UserWebSocket) {
