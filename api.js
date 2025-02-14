@@ -956,8 +956,8 @@ async function AddUserToScript(UserID) {
     }
     const PersonalWalletPubKey = new PublicKey(MyWallet)
     RPCConnectionsByUser[UserID].Main.onLogs(PersonalWalletPubKey, async (logs, ctx) => {
-        Events.emit(`${UserID}:${logs.signature}`, logs.signature)
         SignatureAnalysis[logs.signature] = logs.logs //TODO make this shift and clear
+        Events.emit(`${UserID}:${logs.signature}`, logs.signature)
     }, 'confirmed')
     EachUserTokens[UserID] = GetTokens(MyWallet, null, RPCConnectionsByUser[UserID].SubConnections)
 }
