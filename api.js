@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const Events = require("events")
+const EventEmitter = require("events")
+const Events = new EventEmitter();
 const fs = require('fs');
 const cors = require('cors');
 const compression = require('compression');
