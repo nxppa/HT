@@ -621,6 +621,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
 async function enqueueSwap(Data) {
     //! signature not getting added to array
     let UserData = GetData("UserValues")
+    const TargetWalletData = UserData[User].Targets[Data.CopyingWallet]
     const User = Data.User
     if (CompletedCopies[User].length > 100) {
         CompletedCopies[User].shift()
@@ -634,16 +635,20 @@ async function enqueueSwap(Data) {
         return
     }
 
+
     if (Data.AmountTheyreBuying < 1000) {
         console.log("PARSED TINY TRANSACTION!", Data)
     }
     console.log("DETECTED AT ", GetTime())
     const Key = UserData[User].ObfBaseTransKey
 
-    const TargetWalletData = UserData[User].Targets[Data.CopyingWallet]
     const PrioFee = TargetWalletData.PriorityFee
-    const {Successful, Signature, Tries} = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main)
-    console.log("SWAP STATUS: ", {Successful, Signature, Tries})
+    if (!TargetWalletData.Halted){
+        const {Successful, Signature, Tries} = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main)
+        console.log("SWAP STATUS: ", {Successful, Signature, Tries})
+    } else {
+        console.log("Wallet is halted; not parseing transaction")
+    }
 
     // Client processing
     const AssetData = await getAsset(Data.mintAddress)
