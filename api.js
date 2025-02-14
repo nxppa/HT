@@ -595,7 +595,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
     let Signature = null
     let Tries = 0
     for (let i = 0; i < MaxNumRetrying; i++) {
-        Tries = i
+        Tries = i + 1 //! indexes at 1
         const ParsedSignature = await Swap(Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection)
         if (!ParsedSignature) {
             console.log("no signature parsed; continuing")
@@ -619,60 +619,70 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
 }
 
 async function enqueueSwap(Data) {
-    //! signature not getting added to array
-    let UserData = GetData("UserValues")
-    const User = Data.User
-    const TargetWalletData = UserData[User].Targets[Data.CopyingWallet]
+    let UserData = GetData("UserValues");
+    const User = Data.User;
+    const TargetWalletData = UserData[User].Targets[Data.CopyingWallet];
+
+    // Remove oldest transaction if length > 100
     if (CompletedCopies[User].length > 100) {
-        CompletedCopies[User].shift()
-    }
-    if (CompletedCopies[User].includes(Data.Signature)) {
-        console.log("duplicate transaction detected. skipping")
-        return
-    }
-    if (!Data.AmountOfTokensToSwap){
-        console.log("invalid amount of tokens to swap; skipping: ", Data.AmountOfTokensToSwap)
-        return
+        CompletedCopies[User].shift();
     }
 
+    // Check for duplicate transactions
+    if (CompletedCopies[User].includes(Data.Signature)) {
+        console.log("Duplicate transaction detected. Skipping.");
+        return;
+    }
+
+    // Validate amount
+    if (!Data.AmountOfTokensToSwap) {
+        console.log("Invalid amount of tokens to swap; skipping: ", Data.AmountOfTokensToSwap);
+        return;
+    }
 
     if (Data.AmountTheyreBuying < 1000) {
-        console.log("PARSED TINY TRANSACTION!", Data)
+        console.log("PARSED TINY TRANSACTION!", Data);
     }
-    console.log("DETECTED AT ", GetTime())
-    const Key = UserData[User].ObfBaseTransKey
 
-    const PrioFee = TargetWalletData.PriorityFee
-    if (!TargetWalletData.Halted){
-        const {Successful, Signature, Tries} = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main)
-        console.log("SWAP STATUS: ", {Successful, Signature, Tries})
+    console.log("DETECTED AT ", GetTime());
+
+    const Key = UserData[User].ObfBaseTransKey;
+    const PrioFee = TargetWalletData.PriorityFee;
+
+    let ParsedData = null;
+
+    if (!TargetWalletData.Halted) {
+        ParsedData = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main);
+        console.log("SWAP STATUS: ", ParsedData);
     } else {
-        console.log("Wallet is halted; not parseing transaction")
+        ParsedData = { Successful: false }
     }
 
-    // Client processing
-    const AssetData = await getAsset(Data.mintAddress)
-    Data.Token = AssetData
+    const AssetData = await getAsset(Data.mintAddress);
+    Data.Token = AssetData;
+
     let MessageToClient = {
         type: "Transaction",
         data: Data,
-    }
+    };
+
     MessageToClient.data.Time = Date.now()
-    if (UserData[User].Targets[Data.CopyingWallet].Halted) {
-        MessageToClient.data.Halted = true
-    } else {
-        MessageToClient.data.Halted = false
-    }
-    MessageToClient.data.SuccessfullyEnacted = Successful //!
-    delete MessageToClient.User
-    delete MessageToClient.data.logs
-    UserData[User].Targets[Data.CopyingWallet].RecentTransactions.push(Data)
+    MessageToClient.data.Halted = !!UserData[User].Targets[Data.CopyingWallet].Halted;
+    MessageToClient.data.SuccessfullyEnacted = ParsedData.Successful;
+
+    delete MessageToClient.User;
+    delete MessageToClient.data.logs;
+
+    // Store transaction in recent transactions
+    UserData[User].Targets[Data.CopyingWallet].RecentTransactions.push(Data);
     if (UserData[User].Targets[Data.CopyingWallet].RecentTransactions.length > MaxRecentTransactionsPerWallet) {
-        UserData[User].Targets[Data.CopyingWallet].RecentTransactions.shift()
+        UserData[User].Targets[Data.CopyingWallet].RecentTransactions.shift();
     }
-    WriteData("UserValues", UserData)
-    SendWS(User, MessageToClient)
+
+    WriteData("UserValues", UserData);
+    SendWS(User, MessageToClient);
 }
+
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
     const UserTokens = EachUserTokens[UserID]
