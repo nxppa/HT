@@ -13,9 +13,8 @@ function PrivToPub(PrivateKey) {
 }
 
 async function Swap(Key, Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type, MainConnection) {
-  console.log(Amount)
+  console.log("ALL PARAMETERS: ", {Key, Mint, Amount, Slippage, PrioFee, Type})
   const CurrentWallet = PrivToPub(Key) //* public wallet address
-
   const CurrentWalletPubKey = new PublicKey(CurrentWallet)
   const response = await fetch(`https://pumpportal.fun/api/trade-local`, {
     method: "POST",
