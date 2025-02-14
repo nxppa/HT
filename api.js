@@ -621,8 +621,8 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
 async function enqueueSwap(Data) {
     //! signature not getting added to array
     let UserData = GetData("UserValues")
-    const TargetWalletData = UserData[User].Targets[Data.CopyingWallet]
     const User = Data.User
+    const TargetWalletData = UserData[User].Targets[Data.CopyingWallet]
     if (CompletedCopies[User].length > 100) {
         CompletedCopies[User].shift()
     }
