@@ -657,7 +657,6 @@ async function enqueueSwap(Data) {
     } else {
         ParsedData = { Successful: false }
     }
-
     const AssetData = await getAsset(Data.mintAddress);
     Data.Token = AssetData;
 

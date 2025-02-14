@@ -14,32 +14,30 @@ function PrivToPub(PrivateKey) {
 
 async function Swap(Key, Mint, Amount, Slippage = 40, PrioFee = 0.0001, Type, MainConnection) {
   console.log("ALL PARAMETERS: ", {Key, Mint, Amount, Slippage, PrioFee, Type})
-  const CurrentWallet = PrivToPub(Key) //* public wallet address
-  const CurrentWalletPubKey = new PublicKey(CurrentWallet)
+  const CurrentWallet = PrivToPub(Key)
   const response = await fetch(`https://pumpportal.fun/api/trade-local`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      "publicKey": CurrentWalletPubKey.toString(),
+      "publicKey": CurrentWallet,
       "action": Type,
       "mint": Mint,
       "denominatedInSol": "false",
       "amount": Amount,
       "slippage": Slippage,
       "priorityFee": PrioFee,
-      "pool": "pump"
+      "pool": "auto"
     })
   });
   if (response.status === 200) {
     const data = await response.arrayBuffer();
     const tx = VersionedTransaction.deserialize(new Uint8Array(data));
-    console.log(tx)
     const signerKeyPair = Keypair.fromSecretKey(bs58.decode(Key));
     tx.sign([signerKeyPair])
     const signature = await MainConnection.sendTransaction(tx)
-    console.log(signature)
+    console.log("signature: ", signature)
     return signature
   } else {
     console.log("Did not return 200: ", response)
