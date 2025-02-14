@@ -927,7 +927,7 @@ let EachUserTokens = {}
 let RPCConnectionsByUser = {}
 async function AddRPCToScript(UserID, Link) {
     const ArrEnd = RPCConnectionsByUser[UserID].SubConnections.length
-    RPCConnectionsByUser[UserID].SubConnections[ArrEnd] = new Connection(Link, { commitment: 'confirmed' });
+    RPCConnectionsByUser[UserID].SubConnections[ArrEnd] = new Connection(Link, "confirmed" );
 }
 //9WD3qzitzuC1r
 //879244945867804700
@@ -946,7 +946,7 @@ async function AddUserToScript(UserID) {
         console.log("adding rpc")
         AddRPCToScript(UserID, endpoint)
     });
-    RPCConnectionsByUser[UserID].Main = new Connection(UserData[UserID].Connections.Main)
+    RPCConnectionsByUser[UserID].Main = new Connection(UserData[UserID].Connections.Main, "confirmed")
     const MyWallet = PrivToPub(UserData[UserID].ObfBaseTransKey)
     for (const TargetWallet in CurrentUserTargets) {
         if (UserData[UserID].Targets[TargetWallet].Valid == true) {
