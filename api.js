@@ -199,11 +199,7 @@ function SetWalletAddress(UserID, Old, New, Data) {
     return UserValues[UserID]
 }
 
-function RemoveWallet(UserID, AccountToRemove) {
-    let UserValues = GetData("UserValues")
-    delete UserValues[UserID].Targets[AccountToRemove];
-    WriteData("UserValues", UserValues)
-}
+
 
 function EditDataBaseValue(UserID, Target, Param, Value) {
     let UserValues = GetData("UserValues")
@@ -610,8 +606,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
             });
         });
         const Analysis = SignatureAnalysis[Signature]
-        const LogsArray = Analysis.logs
-        if (findMatchingStrings(LogsArray, ["Error", "panicked"], true) || Analysis.err) {
+        if (findMatchingStrings(Analysis, ["Error", "panicked"], true) || Analysis.err) {
             continue
         }
         Successful = true
@@ -917,7 +912,13 @@ async function UpdateWalletFactor(UserID, Wallet, PresetWalletSize = null, Signa
     return SOLBalChange;
 }
 
-//TODO make remove wallet from script (for when deleting and changing names)
+async function RemoveWallet(UserID, AccountToRemove) {
+    let UserValues = GetData("UserValues")
+    //TODO make this not just remove from json file but also remove from script
+
+    delete UserValues[UserID].Targets[AccountToRemove];
+    WriteData("UserValues", UserValues)
+}
 async function AddWalletToScript(UserID, Wallet) {
     const CurrentTokens = GetTokens(Wallet, null, RPCConnectionsByUser[UserID].SubConnections)
     EachUserTargetData[UserID][Wallet] = { PreviousTokens: CurrentTokens }
