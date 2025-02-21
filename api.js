@@ -19,7 +19,6 @@ let SolVal = FetchSolVal()
 let MaxRecentTransactionsPerWallet = 25 //TODO make this editable via console
 const { getAsset } = require("./Getters/AssetInfo/Helius.js")
 const { Swap } = require('./Operations/PumpPortal.js');
-let TokensByUser = {}
 async function updateValue() {
     const Fetched = await FetchSolVal()
     if (Fetched) {
@@ -587,7 +586,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
         EachUserTokens[UserID][Mint] = EachUserTokens[UserID][Mint] ? EachUserTokens[UserID][Mint] : 0
         EachUserTokens[UserID][Mint] += Amount //! imaginary tokens
         MaxNumRetrying = 1
-    } else {
+    } else if (TransactionType == "sell") {
         EachUserTokens[UserID][Mint] -= Amount
     }
     let Successful = false
@@ -614,10 +613,11 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
         Successful = true
     }
     if (!Successful){
-        TokensByUser[UserID][Mint]
+        EachUserTokens[UserID][Mint] = EachUserTokens[UserID][Mint] ? EachUserTokens[UserID][Mint] : 0
+
+        //TODO make it refund imaginary tokens if fails
     }
     return {Successful, Signature, Tries}
-    //TODO make it refund imaginary tokens if fails
 }
 
 async function enqueueSwap(Data) {
@@ -671,7 +671,6 @@ async function enqueueSwap(Data) {
 
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
-    const UserTokens = EachUserTokens[UserID]
     let Diagnosed = false
     if (deep >= 20) {
         //TODO make it so its a time limit aswell as max retries limit
@@ -683,9 +682,9 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         if (TheirLastTokens instanceof Promise) {
             TheirLastTokens = await TheirLastTokens;
         }
-        const TheirCurrentTokens = await GetTokens(WalletAddress, TheirLastTokens, RPCConnectionsByUser[UserID].SubConnections);
+        const TargetCurrentTokens = await GetTokens(WalletAddress, TheirLastTokens, RPCConnectionsByUser[UserID].SubConnections);
 
-        if (AreDictionariesEqual(TheirLastTokens, TheirCurrentTokens) && deep == 0) {
+        if (AreDictionariesEqual(TheirLastTokens, TargetCurrentTokens) && deep == 0) {
             console.log("no change in wallet detected. Retrying", deep + 1)
             await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
             return
@@ -698,8 +697,8 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         if (Number.isNaN(WalletFactor)) {
             console.warn("WALLET FACTOR IS NAN. accompanying data: ", UserID, CurrentTargetWalletData)
         }
-        for (const mint in TheirCurrentTokens) {
-            const CurrentMintAmount = TheirCurrentTokens[mint]
+        for (const mint in TargetCurrentTokens) {
+            const CurrentMintAmount = TargetCurrentTokens[mint]
             const LastMintAmount = TheirLastTokens[mint]
             if (mint in TheirLastTokens) {
                 const balanceChange = CurrentMintAmount - LastMintAmount
@@ -728,8 +727,8 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     } else if (transactionType == "sell") {
                         // token amount IN MINT
                         const FactorSold = Math.abs(balanceChange) / LastMintAmount
-                        const MyTokenAmountSelling = UserTokens[mint] * FactorSold || 0
-                        console.log(balanceChange, LastMintAmount, UserTokens, FactorSold, MyTokenAmountSelling, null, logs)
+                        const MyTokenAmountSelling = TargetCurrentTokens[mint] * FactorSold || 0 //! fix this
+                        console.log(balanceChange, LastMintAmount, TargetCurrentTokens, FactorSold, MyTokenAmountSelling, null, logs)
                         console.log(GetTime(), "SELLING", MyTokenAmountSelling, mint)
 
                         const SwapData = {
@@ -769,8 +768,8 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
             }
         }
         for (const mint in TheirLastTokens) {
-            if (TheirCurrentTokens[mint] == null) {
-                const AllMyMint = UserTokens[mint] || 0;
+            if (TargetCurrentTokens[mint] == null) {
+                const AllMyMint = TargetCurrentTokens[mint] || 0; //! fix this
                 console.log(GetTime(), "SELLING ALL", AllMyMint);
                 const SwapData = {
                     transactionType: "sell",
@@ -786,7 +785,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                 Diagnosed = true;
             }
         }
-        CurrentTargetWalletData.PreviousTokens = TheirCurrentTokens
+        CurrentTargetWalletData.PreviousTokens = TargetCurrentTokens
     } catch (error) {
         if (error.response && error.response.status === 429) {
             console.warn('Encountered 429 Too Many Requests. slow down.');
