@@ -791,7 +791,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         if (error.response && error.response.status === 429) {
             console.warn('Encountered 429 Too Many Requests. slow down.');
         } else {
-            console.log('Unexpected error during token balance check:', error.transactionMessage);
+            console.log('Error Swapping:', error.transactionMessage);
         }
     }
     if (!Diagnosed) {
