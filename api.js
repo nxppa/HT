@@ -295,7 +295,7 @@ function SendWS(UserID, Dictionary) {
 }
 let UserIDToWebsocket = {}
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 4000 }); //TODO make this env
+const wss = new WebSocket.Server({ port: process.env.WSPORT })
 wss.on('connection', (ws, req) => {
     console.log("rcvd")
     const params = new URLSearchParams(req.url.split('?')[1]);
@@ -615,7 +615,11 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
     }
     if (!Successful){
         EachUserTokens[UserID][Mint] = EachUserTokens[UserID][Mint] ? EachUserTokens[UserID][Mint] : 0
-
+        if (TransactionType == "buy"){
+            EachUserTokens[UserID][Mint] -= Amount
+        } else if (TransactionType == "sell"){
+            EachUserTokens[UserID][Mint] += Amount
+        }
         //TODO make it refund imaginary tokens if fails
     }
     return {Successful, Signature, Tries}
