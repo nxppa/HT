@@ -673,7 +673,7 @@ async function enqueueSwap(Data) {
 async function checkTokenBalances(signature, TransType, WalletAddress, logs, deep, UserID) {
     const CurrentTargetWalletData = EachUserTargetData[UserID][WalletAddress]
     let Diagnosed = false
-    if (deep >= 20) {
+    if (deep >= 10) {
         //TODO make it so its a time limit aswell as max retries limit
         console.log("max retries for changes logged exceeded")
         return
@@ -691,7 +691,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
             return
         } else {
             if (deep != 0) {
-                console.log("deepness: ", deep)
+                //console.log("deepness: ", deep)
             }
         }
         const WalletFactor = CurrentTargetWalletData.WalletFactor
