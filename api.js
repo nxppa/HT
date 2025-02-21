@@ -712,7 +712,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                     if (transactionType == "buy") {
                         // token amount IN MINT
                         const HowManyTokensToBuy = balanceChange * WalletFactor
-                        console.log(GetTime(), "BUYING", HowManyTokensToBuy, balanceChange, WalletFactor, logs)
+                        console.log(GetTime(), "BUYING", signature)
                         const SwapData = {
                             transactionType: "buy",
                             mintAddress: mint,
@@ -729,8 +729,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
                         // token amount IN MINT
                         const FactorSold = Math.abs(balanceChange) / LastMintAmount
                         const MyTokenAmountSelling = UserCurrentTokens[mint] * FactorSold || 0
-                        console.log(balanceChange, LastMintAmount, UserCurrentTokens, FactorSold, MyTokenAmountSelling, null, logs)
-                        console.log(GetTime(), "SELLING", MyTokenAmountSelling, mint)
+                        console.log(GetTime(), "SELLING", signature)
 
                         const SwapData = {
                             transactionType: "sell",
@@ -751,7 +750,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
             } else {
                 //Token amount IN MINT
                 const HowManyTokensToBuy = CurrentMintAmount * WalletFactor
-                console.log(GetTime(), "BUYING INITIAL", HowManyTokensToBuy)
+                console.log(GetTime(), "BUYING INITIAL", signature)
                 const SwapData = {
                     transactionType: "buy",
                     mintAddress: mint,
@@ -771,7 +770,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         for (const mint in TheirLastTokens) {
             if (TargetCurrentTokens[mint] == null) {
                 const AllMyMint = UserCurrentTokens[mint] || 0; //! fix this
-                console.log(GetTime(), "SELLING ALL", AllMyMint);
+                console.log(GetTime(), "SELLING ALL", signature);
                 const SwapData = {
                     transactionType: "sell",
                     mintAddress: mint,
