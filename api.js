@@ -637,7 +637,7 @@ async function enqueueSwap(Data) {
         return;
     }
     if (Data.AmountTheyreBuying < 1000) {
-        console.log("PARSED TINY TRANSACTION!", Data);
+        console.log("PARSED TINY TRANSACTION!");
     }
     console.log("DETECTED AT ", GetTime());
     const Key = UserData[User].ObfBaseTransKey;
