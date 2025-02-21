@@ -581,7 +581,8 @@ function inferTransactionType(amount) {
 }
 
 async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, TransactionType, Connection) {
-    let MaxNumRetrying = 10
+    //TODO make it not retry in certain cases such as insufficient funds
+    let MaxNumRetrying = 3
     if (TransactionType == "buy") {
         EachUserTokens[UserID][Mint] = EachUserTokens[UserID][Mint] ? EachUserTokens[UserID][Mint] : 0
         EachUserTokens[UserID][Mint] += Amount //! imaginary tokens
