@@ -19,6 +19,8 @@ let SolVal = FetchSolVal()
 let MaxRecentTransactionsPerWallet = 25 //TODO make this editable via console
 const { getAsset } = require("./Getters/AssetInfo/Helius.js")
 const { Swap } = require('./Operations/PumpPortal.js');
+
+
 async function updateValue() {
     const Fetched = await FetchSolVal()
     if (Fetched) {
@@ -54,17 +56,18 @@ const SpecialTokens = {
     HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr: "EURC",
 }
 async function GetBal(UserID, Wallet) {
-    //!important
-    const connection = RPCConnectionsByUser[UserID].Main
-    //TODO make it so it uses main and subconnections instead of just main
+    const connectionList = RPCConnectionsByUser[UserID].SubConnections;
     try {
-        const Balance = await connection.getBalance(new PublicKey(Wallet)) / Bil
-        return Balance
+        const tokenBalances = await GetTokens(Wallet, null, connectionList);
+        const solBalance = await RPCConnectionsByUser[UserID].Main.getBalance(new PublicKey(Wallet)) / Bil;
+        const wsolBalance = tokenBalances["So11111111111111111111111111111111111111112"] || 0;
+        return solBalance + wsolBalance;
     } catch (e) {
-        console.log("COULD NOT GET BALANCE")
-        return "err"
+        console.log("COULD NOT GET BALANCE");
+        return "err";
     }
 }
+
 function PrivToPub(PrivateKey) {
     try {
         const privateKeyArray = bs58.decode(PrivateKey);
@@ -74,6 +77,8 @@ function PrivToPub(PrivateKey) {
         throw new Error('Invalid private key format or input. Ensure it is a valid Base58-encoded string.');
     }
 }
+
+
 const app = express();
 const MaxWallets = 100;
 const port = process.env.PORT
