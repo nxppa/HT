@@ -687,7 +687,7 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         const UserCurrentTokens = EachUserTokens[UserID]
         if (AreDictionariesEqual(TheirLastTokens, TargetCurrentTokens) && deep == 0) {
             console.log("no change in wallet detected. Retrying", deep + 1)
-            await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
+            await checkTokenBalances(signature, TransType, WalletAddress, deep + 1, UserID)
             return
         } else {
             if (deep != 0) {
@@ -791,11 +791,11 @@ async function checkTokenBalances(signature, TransType, WalletAddress, logs, dee
         if (error.response && error.response.status === 429) {
             console.warn('Encountered 429 Too Many Requests. slow down.');
         } else {
-            console.error('Unexpected error during token balance check:', error);
+            console.log('Unexpected error during token balance check:', error.transactionMessage);
         }
     }
     if (!Diagnosed) {
-        console.log("?no change? retrying", TransType, logs, GetTime(), deep + 1, UserID)
+        console.log("?no change? retrying", TransType, GetTime(), deep + 1, UserID)
         await checkTokenBalances(signature, TransType, WalletAddress, logs, deep + 1, UserID)
         return
     }
