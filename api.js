@@ -295,7 +295,7 @@ function SendWS(UserID, Dictionary) {
 }
 let UserIDToWebsocket = {}
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: process.env.WSPORT })
+const wss = new WebSocket.Server({ port: Number(process.env.WSPORT) })
 wss.on('connection', (ws, req) => {
     console.log("rcvd")
     const params = new URLSearchParams(req.url.split('?')[1]);
