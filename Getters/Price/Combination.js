@@ -3,6 +3,7 @@ const { GeckoPrice } = require("./Failsafes/CoinGecko");
 const { JupiterPrice } = require("./Failsafes/jupiter");
 const { HeliusPrice } = require("./Failsafes/Helius");
 const { PumpPrice } = require("./Failsafes/Pumpfun");
+//TODO make error logging less intrusive 
 function GetTime(raw) {
     const now = new Date();
     let time = raw 
