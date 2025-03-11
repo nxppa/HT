@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const bs58 = require("bs58").default
 const { generateKey, decodeKey } = require("./Operations/PassGen.js")
 const { AnalyseAccount } = require('./Getters/AccountAnalysis/AnalyseAccount');
-const { Connection, PublicKey, Keypair, Transaction } = require('@solana/web3.js');
+const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const GetTokens = require("./Getters/TokenBalance/GetTokens.js")
 const Bil = 1000000000
 let CompletedCopies = {}
@@ -625,7 +625,6 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
         } else if (TransactionType == "sell"){
             EachUserTokens[UserID][Mint] += Amount
         }
-        //TODO make it refund imaginary tokens if fails
     }
     return {Successful, Signature, Tries}
 }
@@ -643,7 +642,7 @@ async function enqueueSwap(Data) {
     }
     if (!Data.AmountOfTokensToSwap) {
         console.log("Invalid amount of tokens to swap; skipping: ", Data.AmountOfTokensToSwap);
-        return;
+        return; //TODO make it parse transactions even if amount is invalid to include target wallet transactions in logs
     }
     if (Data.AmountTheyreBuying < 1000) {
         console.log("PARSED TINY TRANSACTION: ", Data.Signature);
