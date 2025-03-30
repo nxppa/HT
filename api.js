@@ -631,6 +631,7 @@ async function HandleSwap(UserID, Key, Mint, Amount, Slippage, PriorityFee, Tran
 
 async function enqueueSwap(Data) {
     let UserData = GetData("UserValues");
+    let AllowedToSwap = true
     const User = Data.User;
     const TargetWalletData = UserData[User].Targets[Data.CopyingWallet];
     if (CompletedCopies[User].length > 100) {
@@ -642,7 +643,8 @@ async function enqueueSwap(Data) {
     }
     if (!Data.AmountOfTokensToSwap) {
         console.log("Invalid amount of tokens to swap; skipping: ", Data.AmountOfTokensToSwap);
-        return; //TODO make it parse transactions even if amount is invalid to include target wallet transactions in logs
+        AllowedToSwap = false
+        //return; //TODO make it parse transactions even if amount is invalid to include target wallet transactions in logs
     }
     if (Data.AmountTheyreBuying < 1000) {
         console.log("PARSED TINY TRANSACTION: ", Data.Signature);
@@ -651,12 +653,14 @@ async function enqueueSwap(Data) {
     const Key = UserData[User].ObfBaseTransKey;
     const PrioFee = TargetWalletData.PriorityFee;
     let ParsedData = null;
-    if (!TargetWalletData.Halted) {
+    if (!TargetWalletData.Halted && AllowedToSwap) {
         ParsedData = await HandleSwap(User, Key, Data.mintAddress, Data.AmountOfTokensToSwap, 40, PrioFee, Data.transactionType, RPCConnectionsByUser[User].Main);
         //TODO add/remove tokens based on transaction, add imaginary tokens when buying to fulfil transactions so its not gay
         console.log("SWAP STATUS: ", ParsedData);
-    } else {
+    } else if (AllowedToSwap) {
         ParsedData = { Successful: false }
+    } else {
+        ParsedData = { Successful: true }
     }
     const AssetData = await getAsset(Data.mintAddress);
     Data.Token = AssetData;
